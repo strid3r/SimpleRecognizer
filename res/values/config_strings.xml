@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Config XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="config_name">
+		Application Config
+	</string>
+	
+	<string name="config_file_name">
+		Config
+	</string>
+	
+	<!-- KEYS -->
+	<string name="config_key_course_id">
+		COURSE_ID
+	</string>
+	
+	<string name="config_key_item_id">
+		ITEM_ID
+	</string>
+	
+	<string name="config_key_is_creator">
+		IS_CREATOR
+	</string>
+	
+	<!-- DEFAULT VALUE -->
+	<!-- Place Holder -->
+	
+</resources>

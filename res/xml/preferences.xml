@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 XML Preferences XML
+	 By © strider 2012.
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+				  android:title="@string/preferences_name">
+	
+	<!-- MAIN SETTINGS -->
+	<!-- <PreferenceCategory android:key="@string/preferences_category_main_key"
+						android:title="@string/preferences_category_main_title"> -->
+		
+		<!-- TEMP -->
+		<!-- Place Holder -->
+		
+	<!-- </PreferenceCategory> -->
+	
+	<!-- DISPLAY SETTINGS -->
+	<PreferenceCategory android:key="@string/preferences_category_display_key"
+						android:title="@string/preferences_category_display_title">
+		
+		<!-- KEEP SCREEN ON -->
+		<CheckBoxPreference android:key="@string/prefs_key_display_is_keep_screen_on"
+							android:title="@string/prefs_title_display_is_keep_screen_on"
+							android:summary="@string/prefs_summary_display_is_keep_screen_on"
+							android:defaultValue="@bool/prefs_default_value_display_is_keep_screen_on" />
+		
+		<!-- FULL SCREEN -->
+		<CheckBoxPreference android:key="@string/prefs_key_display_is_full_screen"
+							android:title="@string/prefs_title_display_is_full_screen"
+							android:summary="@string/prefs_summary_display_is_full_screen"
+							android:defaultValue="@bool/prefs_default_value_display_is_full_screen" />
+		
+	</PreferenceCategory>
+	
+	<!-- LICENSING -->
+	<!-- <PreferenceCategory android:key="@string/preferences_category_licensing_key"
+						android:title="@string/preferences_category_licensing_title"> -->
+		
+		<!-- PURCHASE -->
+		<!-- <Preference android:key="@string/prefs_key_licensing_purchase"
+					android:layout="@layout/button_preferences_purchase" /> -->
+		
+	<!-- </PreferenceCategory> -->
+	
+</PreferenceScreen>

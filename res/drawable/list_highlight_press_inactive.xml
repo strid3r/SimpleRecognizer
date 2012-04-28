@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Drawable List Highlight Press Inactive XML
+	 By © strider 2012.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	   android:shape="rectangle"
+	   android:dither="true">
+	
+	<gradient android:angle="270.0"
+			  android:startColor="@color/main_pressSolid"
+			  android:endColor="@color/transparent" />
+	
+	<stroke android:width="1.0dp"
+			android:color="@color/main_pressStroke" />
+	
+	<corners android:radius="0.0dp" />
+	
+</shape>

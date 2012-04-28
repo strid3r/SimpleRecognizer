@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings About XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="about_name">
+		About
+	</string>
+	
+	<!-- MENU -->
+	<!--
+	<string name="about_menu_back">
+		Back
+	</string>
+	-->
+	
+</resources>

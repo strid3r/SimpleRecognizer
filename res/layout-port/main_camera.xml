@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Layout Portrait Main Camera XML
+	 By © strider 2012.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/linearLayoutMainCamera"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+			  android:orientation="vertical"
+			  android:padding="0.0dp">
+	
+	<!-- CAMERA -->
+	<FrameLayout android:id="@+id/frameLayoutCameraPreview"
+				 android:layout_width="match_parent"
+				 android:layout_height="match_parent"
+				 android:layout_weight="1.0">
+		
+		<!-- PREVIEW -->
+		<ru.strider.simplerecognizer.CameraPreview android:id="@+id/cameraPreview"
+												   android:layout_width="match_parent"
+				 								   android:layout_height="match_parent" />
+		
+		<!-- SHUTTER -->
+		<LinearLayout android:id="@+id/linearLayoutShutter"
+					  android:layout_width="match_parent"
+					  android:layout_height="match_parent"
+					  android:orientation="vertical"
+					  android:gravity="bottom"
+					  android:weightSum="1.0">
+			
+			<ViewSwitcher android:id="@+id/viewSwitcherShutter"
+						  android:layout_width="match_parent"
+						  android:layout_height="0dp"
+						  android:layout_weight="0.2">
+				
+				<ImageButton android:id="@+id/imageButtonShutter"
+							 android:layout_width="wrap_content"
+							 android:layout_height="wrap_content"
+							 android:layout_gravity="center"
+							 android:adjustViewBounds="true"
+							 android:src="@drawable/ic_camera_shutter"
+							 android:background="@drawable/button_shutter_selector" />
+				
+				<ProgressBar android:id="@+id/progressBarShutter"
+							 android:layout_width="wrap_content"
+							 android:layout_height="wrap_content"
+							 android:layout_gravity="center"
+							 android:indeterminate="true"
+							 android:indeterminateOnly="true"
+							 android:indeterminateDrawable="@drawable/progress_indeterminate" />
+				
+			</ViewSwitcher>
+			
+		</LinearLayout>
+		
+	</FrameLayout>
+	
+</LinearLayout>

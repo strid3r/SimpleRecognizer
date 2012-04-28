@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Drawable TextView About Yellow XML
+	 By © strider 2012.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+		  android:dither="true">
+	
+	<item android:state_pressed="true">
+		
+		<shape android:shape="rectangle">
+			
+			<solid android:color="@color/yellowSolid" />
+			
+			<stroke android:width="1.0dp"
+					android:color="@color/gray_light" />
+			
+			<corners android:radius="0.0dp" />
+			
+		</shape>
+		
+	</item>
+	
+	<item android:state_focused="true">
+		
+		<shape android:shape="rectangle">
+			
+			<solid android:color="@color/yellowSolid" />
+			
+			<stroke android:width="1.0dp"
+					android:color="@color/gray_light" />
+			
+			<corners android:radius="0.0dp" />
+			
+		</shape>
+		
+	</item>
+	
+	<item>
+		
+		<shape android:shape="rectangle">
+			
+			<gradient android:angle="270.0"
+					  android:startColor="@color/yellowSolid"
+					  android:endColor="@color/yellowStroke" />
+			
+			<stroke android:width="1.0dp"
+					android:color="@color/yellowStroke" />
+			
+			<corners android:radius="0.0dp" />
+			
+		</shape>
+		
+	</item>
+	
+</selector>

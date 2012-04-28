@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Values Colors XML
+	 By © strider 2012.
+-->
+<resources>
+	
+	<!-- GLOBAL -->
+	<color name="transparent">
+		#00000000
+	</color>
+	
+	<color name="black">
+		#ff000000
+	</color>
+	
+	<color name="white">
+		#ffffffff
+	</color>
+	
+	<color name="main_pressSolid">
+		#ff3ebaf7
+	</color>
+	
+	<color name="main_pressStroke">
+		#ff2fb5f7
+	</color>
+	
+	<color name="primary_focusSolid">
+		#a85e81f3
+	</color>
+	
+	<color name="primary_focusStroke">
+		#ff00a8e6
+	</color>
+	
+	<color name="secondary_focusSolid">
+		#10f3d465
+	</color>
+	
+	<color name="secondary_focusStroke">
+		#ff2457ff
+	</color>
+	
+	<!-- PART -->
+	<color name="yellow">
+		#ffffff00
+	</color>
+	
+	<color name="red">
+		#ffff0000
+	</color>
+	
+	<color name="green">
+		#ff00ff00
+	</color><!--14A804-->
+	
+	<color name="blue">
+		#ff0000ff
+	</color>
+	
+	<!-- MAIN -->
+	<color name="main">
+		#ffff6600
+	</color>
+	
+	<color name="main_light">
+		#ffff9933
+	</color>
+	
+	<color name="magenta">
+		#ffff00ff
+	</color>
+	
+	<color name="violet">
+		#ffee82ee
+	</color>
+	
+	<color name="cyan">
+		#ff00ffff
+	</color>
+	
+	<color name="gray_light">
+		#ffcccccc
+	</color>
+	
+	<color name="blue_dodger">
+		#ff0091ff
+	</color>
+	
+	<color name="silver">
+		#ffc0c0c0
+	</color>
+	
+	<!-- YELLOW BUTTON -->
+	<color name="yellowSolid">
+		#fff3ae1b
+	</color>
+	
+	<color name="yellowStroke">
+		#ffbb6008
+	</color>
+	
+	<!-- RED BUTTON -->
+	<color name="redSolid">
+		#ffef4444
+	</color>
+	
+	<color name="redStroke">
+		#ff992f2f
+	</color>
+	
+	<!-- GREEN BUTTON -->
+	<color name="greenSolid">
+		#ff70c656
+	</color>
+	
+	<color name="greenStroke">
+		#ff53933f
+	</color>
+	
+	<!-- BLUE BUTTON -->
+	<color name="blueSolid">
+		#ff449def
+	</color>
+	
+	<color name="blueStroke">
+		#ff2f6699
+	</color>
+	
+	<!-- PURPLE BUTTON -->
+	<color name="purpleSolid">
+		#ffa276eb
+	</color>
+	
+	<color name="purpleStroke">
+		#ff6a3ab2
+	</color>
+	
+	<!-- BLACK BUTTON -->
+	<color name="blackSolid">
+		#ff343434
+	</color>
+	
+	<color name="blackStroke">
+		#ff171717
+	</color>
+	
+</resources>

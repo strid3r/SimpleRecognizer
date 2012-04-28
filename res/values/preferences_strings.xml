@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Bools Preferences XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="preferences_name">
+		Application Preferences
+	</string>
+	
+	<string name="preferences_file_name">
+		Preferences
+	</string>
+	
+	<!-- MENU -->
+	<string name="preferences_menu_save">
+		Save
+	</string>
+	
+	<!-- CATEGORY -->
+	<string name="preferences_category_main_key">
+		MAIN_SETTINGS
+	</string>
+	
+	<string name="preferences_category_main_title">
+		Main Settings
+	</string>
+	
+	<string name="preferences_category_display_key">
+		DISPLAY_SETTINGS
+	</string>
+	
+	<string name="preferences_category_display_title">
+		Display Settings
+	</string>
+	
+	<string name="preferences_category_licensing_key">
+		LICENSING
+	</string>
+	
+	<string name="preferences_category_licensing_title">
+		Licensing
+	</string>
+	
+	<!-- KEYS -->
+	<string name="prefs_key_display_is_keep_screen_on">
+		IS_KEEP_SCREEN_ON
+	</string>
+	
+	<string name="prefs_key_display_is_full_screen">
+		IS_FULL_SCREEN
+	</string>
+	
+	<string name="prefs_key_licensing_purchase">
+		PURCHASE
+	</string>
+	
+	<!-- TITLE -->
+	<string name="prefs_title_display_is_keep_screen_on">
+		Keep Screen On
+	</string>
+	
+	<string name="prefs_title_display_is_full_screen">
+		Full Screen
+	</string>
+	
+	<string name="prefs_title_licensing_purchase">
+		Remove Ads &amp; support dev.
+	</string>
+	
+	<!-- SUMMATY -->
+	<string name="prefs_summary_display_is_keep_screen_on">
+		Prevent screen from turning off\nwhile Application is in use
+	</string>
+	
+	<string name="prefs_summary_display_is_full_screen">
+		Enable full-screen mode,\nhiding the notification bar
+	</string>
+	
+	<!-- DEFAULT VALUE -->
+	<!-- Place Holder -->
+	
+</resources>

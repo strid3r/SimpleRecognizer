@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Context Menu Select Course XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <group android:id="@+id/selectCourseContextMenuControls">
+		
+		<!-- <item android:id="@+id/selectCourseContextMenuApplySelection"
+			  android:title="@string/select_course_context_menu_apply_selection"
+			  android:orderInCategory="0" /> -->
+		
+		<item android:id="@+id/selectCourseContextMenuShowCreator"
+			  android:title="@string/select_course_context_menu_show_creator"
+			  android:orderInCategory="1" />
+		
+		<item android:id="@+id/selectCourseContextMenuEdit"
+			  android:title="@string/select_course_context_menu_edit"
+			  android:orderInCategory="2" />
+		
+		<item android:id="@+id/selectCourseContextMenuDelete"
+			  android:title="@string/select_course_context_menu_delete"
+			  android:orderInCategory="3" />
+		
+	</group>
+	
+</menu>

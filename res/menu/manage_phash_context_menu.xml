@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Context Menu Manage PHash XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <group android:id="@+id/managePHashContextMenuControls">
+		
+    	<item android:id="@+id/managePHashContextMenuShowComment"
+			  android:title="@string/manage_phash_context_menu_show_comment"
+			  android:orderInCategory="0" />
+    	
+		<item android:id="@+id/managePHashContextMenuEdit"
+			  android:title="@string/manage_phash_context_menu_edit"
+			  android:orderInCategory="1" />
+		
+		<item android:id="@+id/managePHashContextMenuDelete"
+			  android:title="@string/manage_phash_context_menu_delete"
+			  android:orderInCategory="2" />
+		
+	</group>
+	
+</menu>

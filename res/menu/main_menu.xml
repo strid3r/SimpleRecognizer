@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Menu Main XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<group android:id="@+id/mainMenuContent">
+		
+		<item android:id="@+id/mainMenuSwitchMode"
+		      android:title="@string/main_menu_switch_mode_creator"
+		      android:icon="@drawable/ic_menu_login"
+		      android:orderInCategory="5" />
+		
+		<item android:id="@+id/mainMenuCourse"
+		      android:title="@string/main_menu_course"
+		      android:icon="@drawable/ic_menu_gallery"
+		      android:orderInCategory="6" />
+		
+		<item android:id="@+id/mainMenuSwitchCamera"
+		      android:title="@string/main_menu_switch_camera"
+		      android:icon="@drawable/ic_menu_camera"
+		      android:orderInCategory="7" />
+		
+	</group>
+	
+	<group android:id="@+id/mainMenuControls">
+		
+		<item android:id="@+id/mainMenuPreferences"
+			  android:title="@string/main_menu_preferences"
+			  android:icon="@drawable/ic_menu_preferences"
+			  android:orderInCategory="8" />
+		
+		<item android:id="@+id/mainMenuAbout"
+			  android:title="@string/main_menu_about"
+			  android:icon="@drawable/ic_menu_info"
+			  android:orderInCategory="9" />
+		
+		<item android:id="@+id/mainMenuExit"
+			  android:title="@string/main_menu_exit"
+			  android:icon="@drawable/ic_menu_exit"
+			  android:orderInCategory="10" />
+		
+	</group>
+	
+</menu>

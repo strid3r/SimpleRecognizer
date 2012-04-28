@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Drawable Button Shutter Selector XML
+	 By © strider 2012.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+		  android:dither="true">
+	
+	<!-- PRESSED -->
+	<item android:state_pressed="true"
+		  android:drawable="@drawable/btn_shutter_pressed" />
+	
+	<!-- THE REST -->
+	<item android:drawable="@drawable/btn_shutter_normal" />
+	
+</selector>

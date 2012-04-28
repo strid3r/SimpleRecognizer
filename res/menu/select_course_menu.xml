@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Menu Select Course XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <group android:id="@+id/selectCourseMenuControls">
+		
+		<item android:id="@+id/selectCourseMenuAddCourse"
+		      android:title="@string/select_course_menu_add_course"
+		      android:icon="@drawable/ic_menu_camera"
+		      android:orderInCategory="0" />
+		
+		<item android:id="@+id/selectCourseMenuSave"
+		      android:title="@string/select_course_menu_save"
+		      android:icon="@drawable/ic_menu_save"
+		      android:orderInCategory="1" />
+		
+	</group>
+	
+</menu>

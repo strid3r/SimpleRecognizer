@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Select Course XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="select_course_name_viewer">
+		Select Course
+	</string>
+	
+	<string name="select_course_name_creator">
+		Manage Course
+	</string>
+	
+	<!-- MENU -->
+	<string name="select_course_menu_add_course">
+		Add Course
+	</string>
+	
+	<string name="select_course_menu_save">
+		Save
+	</string>
+	
+	<!-- CONTEXT MENU -->
+	<string name="select_course_context_menu_header_title">
+		Confirmation Menu
+	</string>
+	
+	<string name="select_course_context_menu_apply_selection">
+		Apply Selection
+	</string>
+	
+	<string name="select_course_context_menu_show_creator">
+		Show Creator
+	</string>
+	
+	<string name="select_course_context_menu_edit">
+		Edit Course
+	</string>
+	
+	<string name="select_course_context_menu_delete">
+		Delete Course
+	</string>
+	
+	<!-- DIALOG -->
+	<string name="select_course_dialog_not_creator_title">
+		Forbidden
+	</string>
+	
+	<string name="select_course_dialog_not_creator_message">
+		You can not manage this course,\nbecause you are not its creator.
+	</string>
+	
+	<string name="select_course_dialog_title_title">
+		Title
+	</string>
+	
+	<string name="select_course_dialog_category_title">
+		Category
+	</string>
+	
+	<string name="select_course_dialog_creator_title">
+		Creator
+	</string>
+	
+</resources>

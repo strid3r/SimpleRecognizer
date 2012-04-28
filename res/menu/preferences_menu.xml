@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Menu Preferences XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <group android:id="@+id/preferencesMenuControls">
+		
+		<item android:id="@+id/preferencesMenuSave"
+		      android:title="@string/preferences_menu_save"
+		      android:icon="@drawable/ic_menu_save"
+		      android:orderInCategory="0" />
+		
+	</group>
+	
+</menu>

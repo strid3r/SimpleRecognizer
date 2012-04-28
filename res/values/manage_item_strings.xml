@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Manage Item XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="manage_item_name">
+		Manage Item
+	</string>
+	
+	<!-- MENU -->
+	<string name="manage_item_menu_add_item">
+		Add Item
+	</string>
+	
+	<string name="manage_item_menu_delete_course">
+		Delete Course
+	</string>
+	
+	<string name="manage_item_menu_save">
+		Save
+	</string>
+	
+	<!-- CONTEXT MENU -->
+	<string name="manage_item_context_menu_header_title">
+		Confirmation Menu
+	</string>
+	
+	<string name="manage_item_context_menu_apply_selection">
+		Apply Selection
+	</string>
+	
+	<string name="manage_item_context_menu_show_content">
+		Show Content
+	</string>
+	
+	<string name="manage_item_context_menu_edit">
+		Edit Item
+	</string>
+	
+	<string name="manage_item_context_menu_delete">
+		Delete Item
+	</string>
+	
+	<!-- DIALOG -->
+	<string name="manage_item_dialog_title_title">
+		Title
+	</string>
+	
+	<string name="manage_item_dialog_content_title">
+		Content
+	</string>
+	
+</resources>

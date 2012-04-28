@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Application XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="app_name">
+		Simple Recognizer
+	</string>
+	
+	<string name="app_footer">
+		Loading...
+	</string>
+	
+	<string name="app_version">
+		Version:
+	</string>
+	
+	<string name="app_copyright">
+		Copyright © 2012 Dmitry Stankov.
+	</string>
+	
+	<!-- DATABASE -->
+	<string name="database_create_error_title">
+		Unable to create DataBase file
+	</string>
+	
+	<string name="database_create_error_tip_1">
+		1. Please try to Clear App Data and launch it again:
+	</string>
+	
+	<string name="database_create_error_tip_1_help">
+		( Manage apps -> App -> Clear data ).
+	</string>
+	
+	<string name="database_create_error_tip_2">
+		2. Also check the available free space on Internal Memory.
+	</string>
+	
+	<!-- DIALOG -->
+	<string name="dialog_ad_free_found">
+		To use this Application, You Must Disable/Uninstall AdFree Package:
+	</string>
+	
+	<string name="dialog_button_buy_license">
+		Buy License
+	</string>
+	
+	<string name="dialog_button_try_next">
+		Try Next
+	</string>
+	
+	<string name="dialog_button_exit">
+		Exit
+	</string>
+	
+	<string name="dialog_button_ok">
+		OK
+	</string>
+	
+	<string name="dialog_button_save">
+		Save
+	</string>
+	
+	<string name="dialog_button_close">
+		Close
+	</string>
+	
+	<string name="dialog_button_cancel">
+		Cancel
+	</string>
+	
+</resources>

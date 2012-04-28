@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Layout ExpandableList Item Activated Single Choice XML
+	 By © strider 2012.
+-->
+<ru.strider.widget.CheckedLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+									   android:id="@+id/linearLayoutExpandableListItemActivatedSingleChoice"
+									   android:layout_width="match_parent"
+									   android:layout_height="wrap_content"
+									   android:orientation="horizontal"
+									   android:addStatesFromChildren="true"
+									   android:background="@drawable/activated_background"
+									   android:padding="0.0dp">
+	
+	<!-- ARROW -->
+	<ru.strider.widget.RealImageView android:id="@+id/imageViewArrow"
+									 android:layout_width="40.0dp"
+									 android:layout_height="match_parent"
+									 android:layout_weight="0.0"
+									 android:src="@drawable/indicator_expandablelist_minimized"
+									 android:padding="8.0dp" />
+	
+	<!-- ITEM -->
+	<ru.strider.widget.MainCheckedTextView android:id="@+id/checkedTextViewItem"
+										   android:layout_width="match_parent"
+										   android:layout_height="wrap_content"
+										   android:layout_weight="1.0"
+										   style="@style/ListItemSingleChoice" />
+	
+</ru.strider.widget.CheckedLinearLayout>

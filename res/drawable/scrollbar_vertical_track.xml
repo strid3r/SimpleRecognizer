@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Drawable Scrollbar Vertical Track XML
+	 By © strider 2012.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	   android:dither="true">
+	
+	<gradient android:angle="0.0"
+			  android:startColor="@color/blackStroke"
+			  android:endColor="@color/silver" />
+	
+	<corners android:radius="4.0dp" />
+	
+</shape>

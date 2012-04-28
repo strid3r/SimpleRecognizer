@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Drawable Background Main XML
+	 By © strider 2012.
+-->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+		android:dither="true"
+		android:tileMode="repeat"
+		android:src="@drawable/bg" />

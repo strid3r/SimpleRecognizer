@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Layout Load Main XML
+	 By © strider 2012.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/linearLayoutLoadMain"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+			  android:orientation="vertical"
+			  android:padding="0.0dp">
+	
+	<!-- LOGO TEXT -->
+	<ru.strider.widget.MainTextView android:id="@+id/textViewLoadMainLogo"
+									android:text="@string/app_name"
+									style="@style/Main.ButtonMain.TextViewAbout" />
+	
+	<!-- CENTER -->
+	<LinearLayout android:id="@+id/linearLayoutLoadMainCenter"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:layout_weight="1.0"
+				  android:gravity="center"
+				  android:orientation="horizontal"
+				  android:weightSum="1.0">
+		
+		<!-- LOGO IMAGE -->
+		<ru.strider.widget.RealImageView android:id="@+id/imageViewLoadMainLogo"
+										 android:layout_width="0.0dp"
+										 android:layout_height="wrap_content"
+										 android:layout_weight="0.7"
+										 android:layout_margin="2.0dp"
+										 android:src="@drawable/ic_launcher"
+										 android:adjustViewBounds="true" />
+		
+	</LinearLayout>
+	
+	<!-- BOTTOM -->
+	<LinearLayout android:id="@+id/linearLayoutLoadMainBottom"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:layout_weight="0.0"
+				  android:orientation="vertical">
+		
+		<!-- PROGRESS BAR -->
+		<ProgressBar android:id="@+id/progressBarLoadMain"
+					 android:layout_width="match_parent"
+					 android:layout_height="wrap_content"
+					 android:layout_margin="2.0dp"
+					 android:indeterminate="true"
+					 android:indeterminateOnly="true"
+					 android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal"
+					 android:minHeight="20.0dp"
+					 android:maxHeight="20.0dp" />
+		
+		<!-- FOOTER -->
+		<ru.strider.widget.MainTextView android:id="@+id/textViewLoadMainFooter"
+										android:text="@string/app_footer"
+										android:textSize="24sp"
+										style="@style/Main.ButtonMain.TextViewAbout.Info" />
+		
+	</LinearLayout>
+	
+</LinearLayout>

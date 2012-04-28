@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Menu Manage Item XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <group android:id="@+id/manageItemMenuControls">
+		
+		<item android:id="@+id/manageItemMenuAddItem"
+		      android:title="@string/manage_item_menu_add_item"
+		      android:icon="@drawable/ic_menu_camera"
+		      android:orderInCategory="0" />
+		
+		<item android:id="@+id/manageItemMenuDeleteCourse"
+		      android:title="@string/manage_item_menu_delete_course"
+		      android:icon="@drawable/ic_menu_gallery"
+		      android:orderInCategory="1" />
+		
+		<item android:id="@+id/manageItemMenuSave"
+		      android:title="@string/manage_item_menu_save"
+		      android:icon="@drawable/ic_menu_save"
+		      android:orderInCategory="2" />
+		
+	</group>
+	
+</menu>

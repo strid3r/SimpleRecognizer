@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Main XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="main_name">
+		Main Camera
+	</string>
+	
+	<!-- MENU -->
+	<string name="main_menu_switch_mode_creator">
+		Switch to Creator
+	</string>
+	
+	<string name="main_menu_switch_mode_viewer">
+		Switch to Viewer
+	</string>
+	
+	<string name="main_menu_course">
+		Course
+	</string>
+	
+	<string name="main_menu_switch_camera">
+		Switch Camera
+	</string>
+	
+	<string name="main_menu_preferences">
+		Settings
+	</string>
+	
+	<string name="main_menu_about">
+		About
+	</string>
+	
+	<string name="main_menu_exit">
+		Exit
+	</string>
+	
+	<!-- DIALOG -->
+	<string name="main_dialog_camera_error_title">
+		Camera Error
+	</string>
+	
+	<string name="main_dialog_camera_alert_title">
+		Camera Alert
+	</string>
+	
+	<string name="main_dialog_camera_alert_message">
+		Sorry, but Device has only one camera.
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="key_button_back_double_press">
+		‹‹ Press Back Key Again To Close App ››
+	</string>
+	
+</resources>

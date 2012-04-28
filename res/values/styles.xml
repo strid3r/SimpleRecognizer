@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Values Styles XML
+	 By © strider 2012.
+-->
+<resources>
+	
+	<!-- LIST ITEM SINGLE CHOICE -->
+	<style name="ListItemSingleChoice">
+		
+		<item name="android:padding">
+			14.0dp
+		</item>
+		
+		<item name="android:includeFontPadding">
+			false
+		</item>
+		
+		<item name="android:lines">
+			1
+		</item>
+		
+		<item name="android:maxLines">
+			1
+		</item>
+		
+		<item name="android:singleLine">
+			true
+		</item>
+		
+		<item name="android:ellipsize">
+			marquee
+		</item>
+		
+		<item name="android:marqueeRepeatLimit">
+			marquee_forever
+		</item>
+		
+		<item name="android:scrollHorizontally">
+			true
+		</item>
+		
+		<item name="android:gravity">
+			center_vertical
+		</item>
+		
+		<item name="android:textSize">
+			24sp
+		</item>
+		
+		<item name="android:textStyle">
+			bold
+		</item>
+		
+		<item name="android:textColor">
+			@color/white
+		</item>
+		
+		<item name="android:shadowColor">
+			@color/black
+		</item>
+		
+		<item name="android:shadowDx">
+			1
+		</item>
+		
+		<item name="android:shadowDy">
+			1
+		</item>
+		
+		<item name="android:shadowRadius">
+			2
+		</item>
+		
+		<item name="android:checkMark">
+			?android:attr/listChoiceIndicatorSingle
+		</item>
+		
+	</style>
+	
+	<!-- LIST ITEM SINGLE CHOICE ACTIVATED -->
+	<style name="ListItemSingleChoice.Activated">
+		
+		<item name="android:background">
+			@drawable/activated_background
+		</item>
+		
+	</style>
+	
+	<!-- MAIN -->
+	<style name="Main" />
+	
+	<!-- ADMOB -->
+	<style name="Main.AdView">
+		
+		<item name="android:layout_width">
+			match_parent
+		</item>
+		
+		<item name="android:layout_height">
+			wrap_content
+		</item>
+		
+		<item name="android:layout_weight">
+			0.0
+		</item>
+		
+	</style>
+	
+	<!-- ALERT DIALOG -->
+	<style name="Main.AlertDialog">
+		
+		<item name="android:layout_width">
+			match_parent
+		</item>
+		
+		<item name="android:layout_height">
+			wrap_content
+		</item>
+		
+		<item name="android:layout_marginLeft">
+			16dp
+		</item>
+		
+		<item name="android:layout_marginRight">
+			16dp
+		</item>
+		
+	</style>
+	
+	<!-- ALERT DIALOG EDIT TEXTVIEW -->
+	<style name="Main.AlertDialog.TextView"
+		   parent="@style/Main.AlertDialog">
+		
+		<item name="android:gravity">
+			left
+		</item>
+		
+		<item name="android:textSize">
+			24sp
+		</item>
+		
+		<item name="android:textColor">
+			@color/main
+		</item>
+		
+	</style>
+	
+	<!-- ALERT DIALOG EDIT EDITVIEW -->
+	<style name="Main.AlertDialog.EditView"
+		   parent="@style/Main.AlertDialog">
+		
+		<item name="android:gravity">
+			fill_horizontal
+		</item>
+		
+	</style>
+	
+	<!-- BUTTON MAIN -->
+	<style name="Main.ButtonMain">
+		
+		<item name="android:layout_width">
+			match_parent
+		</item>
+		
+		<item name="android:layout_height">
+			wrap_content
+		</item>
+		
+		<item name="android:layout_margin">
+			2.0dp
+		</item>
+		
+		<item name="android:paddingLeft">
+			4.0dp
+		</item>
+		
+		<item name="android:paddingTop">
+			8.0dp
+		</item>
+		
+		<item name="android:paddingRight">
+			4.0dp
+		</item>
+		
+		<item name="android:paddingBottom">
+			8.0dp
+		</item>
+		
+		<item name="android:includeFontPadding">
+			false
+		</item>
+		
+		<item name="android:lines">
+			1
+		</item>
+		
+		<item name="android:maxLines">
+			1
+		</item>
+		
+		<item name="android:singleLine">
+			true
+		</item>
+		
+		<item name="android:ellipsize">
+			marquee
+		</item>
+		
+		<item name="android:marqueeRepeatLimit">
+			marquee_forever
+		</item>
+		
+		<item name="android:scrollHorizontally">
+			true
+		</item>
+		
+		<item name="android:focusable">
+			true
+		</item>
+		
+		<item name="android:gravity">
+			center
+		</item>
+		
+		<item name="android:textSize">
+			24sp
+		</item><!--26sp-->
+		
+		<item name="android:textStyle">
+			bold
+		</item>
+		
+		<item name="android:textColor">
+			@color/white
+		</item>
+		
+		<item name="android:shadowColor">
+			@color/black
+		</item>
+		
+		<item name="android:shadowDx">
+			1
+		</item>
+		
+		<item name="android:shadowDy">
+			1
+		</item>
+		
+		<item name="android:shadowRadius">
+			2
+		</item>
+		
+	</style>
+	
+	<!-- TEXTVIEW ABOUT -->
+	<style name="Main.ButtonMain.TextViewAbout">
+		
+		<item name="android:layout_weight">
+			0.0
+		</item>
+		
+		<item name="android:textSize">
+			26sp
+		</item>
+		
+		<item name="android:background">
+			@drawable/textview_about_yellow
+		</item>
+		
+	</style>
+	
+	<!-- TEXTVIEW ABOUT INFO -->
+	<style name="Main.ButtonMain.TextViewAbout.Info">
+		
+		<item name="android:textSize">
+			20sp
+		</item>
+		
+		<item name="android:background">
+			@drawable/textview_about_black
+		</item>
+		
+	</style>
+	
+</resources>

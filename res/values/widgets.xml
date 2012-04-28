@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Values Widgets XML
+	 By © strider 2012.
+-->
+<resources>
+	
+	<!-- MAIN ACTION BAR -->
+	<style name="Widget.Main.ActionBar"
+		   parent="@style/Widget.Sherlock.ActionBar">
+		
+		<item name="titleTextStyle">
+			@style/TextAppearance.Main.Widget.ActionBar.Title
+		</item>
+		
+		<item name="android:titleTextStyle">
+			@style/TextAppearance.Main.Widget.ActionBar.Title
+		</item>
+		
+	</style>
+	
+	<!-- MAIN ACTION BAR TITLE TEXT STYLE -->
+	<style name="TextAppearance.Main.Widget.ActionBar.Title"
+		   parent="@style/TextAppearance.Sherlock.Widget.ActionBar.Title">
+		
+		<item name="android:textStyle">
+			bold
+		</item>
+		
+		<item name="android:textColor">
+			@color/main
+		</item>
+		
+	</style>
+	
+</resources>

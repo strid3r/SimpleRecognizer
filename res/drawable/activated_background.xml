@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Drawable Activated Background XML
+	 By © strider 2012.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+		  android:exitFadeDuration="@android:integer/config_mediumAnimTime"
+		  android:dither="true">
+	
+	<!-- FOCUSED -->
+	<item android:state_focused="true"
+		  android:drawable="@drawable/list_highlight_focus_active" />
+	
+	<!-- PRESSED -->
+	<item android:state_pressed="true"
+		  android:drawable="@drawable/list_highlight_focus_active" />
+	
+	<!-- CHECKED -->
+	<item android:state_checked="true"
+		  android:drawable="@drawable/list_highlight_press_active" />
+	
+	<!-- ACTIVATED -->
+	<item android:state_activated="true"
+		  android:drawable="@drawable/list_highlight_press_active" />
+	
+	<!-- THE REST -->
+	<item android:drawable="@drawable/list_highlight_press_inactive" />
+	
+	<!-- UNFOCUSED --><!-- TODO: UNREACHABLE -->
+	<item android:state_focused="false"
+		  android:drawable="@drawable/list_highlight_focus_inactive" />
+	
+</selector>

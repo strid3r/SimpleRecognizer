@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Bools Preferences XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- DEFAULT VALUE -->
+	<bool name="prefs_default_value_display_is_keep_screen_on">
+		false
+	</bool>
+	
+	<bool name="prefs_default_value_display_is_full_screen">
+		true
+	</bool>
+	
+</resources>

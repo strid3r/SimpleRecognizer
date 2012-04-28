@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Layout Button Preferences Purchase XML
+	 By © strider 2012.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/linearLayoutButtonPreferencesPurchase"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:orientation="vertical"
+			  android:padding="0.0dp">
+	
+	<!-- PURCHASE -->
+	<ru.strider.widget.MainButton android:id="@+id/buttonPreferencesPurchase"
+								  android:text="@string/prefs_title_licensing_purchase"
+								  android:gravity="left|center_vertical"
+								  android:textSize="24sp"
+								  style="@style/Main.ButtonMain.TextViewAbout"
+								  android:onClick="onClickButtonPurchase" />
+	
+</LinearLayout>

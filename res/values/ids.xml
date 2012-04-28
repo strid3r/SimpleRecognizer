@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Values Ids XML
+	 By © strider 2012.
+-->
+<resources>
+	
+	<!-- ADVIEW -->
+	<item type="id" name="adView" />
+	
+</resources>
