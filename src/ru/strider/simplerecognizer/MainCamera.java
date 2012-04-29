@@ -5,6 +5,7 @@
  * Activity Main Camera Class
  * By © strider 2012.
  */
+
 package ru.strider.simplerecognizer;
 
 import android.app.Activity;
@@ -30,6 +31,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -43,6 +45,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import ru.strider.simplerecognizer.adapter.SpinnerArrayAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.model.Item;
@@ -505,7 +508,13 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					//ImagePHash.DCT_LOW_SIZE
 				);
 			
-			String pHashHex = mImagePHash.getPHash(mData);
+			String pHashHex = null;
+			
+			try {
+				pHashHex = mImagePHash.getPHash(mData);
+			} catch (OutOfMemoryError e) {
+				//FIXME: Temp Handler For Strange Behavior
+			}
 			
 			//
 			
@@ -528,13 +537,28 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				
 				Course course = dbAdapter.getCourse(mConfigAdapter.getCourseId());
 				
+				final List<Item> listItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
+				
 				Item item = dbAdapter.getItem(mConfigAdapter.getItemId());
 				
 				dbAdapter.close();
 				
 				if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(mContext, course.getCreator())) {
+					List<String> listTitle = new ArrayList<String>();
+					for (Item courseItem : listItem) {
+						listTitle.add(courseItem.getTitle());
+					}
+					
 					LayoutInflater inflater = LayoutInflater.from(mContext);
 					final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+					
+					final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
+					
+					SpinnerArrayAdapter adapter = new SpinnerArrayAdapter(mContext, listTitle);
+					
+					spinnerItem.setAdapter(adapter);
+					
+					spinnerItem.setSelection(listTitle.indexOf(item.getTitle()));
 					
 					final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
 					editTextHexValue.setText(result);
@@ -542,7 +566,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					final EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
 					
 					AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-					builder.setTitle(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle() + SimpleRecognizer.SEPARATOR + item.getTitle());
+					builder.setTitle(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle());
 					builder.setView(view);
 					
 					builder.setNegativeButton(R.string.dialog_button_cancel, null);
@@ -556,7 +580,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 							dbAdapter.addPHash(new PHash(
 									editTextHexValue.getText().toString(),
 									editTextComment.getText().toString(),
-									mConfigAdapter.getItemId()
+									listItem.get(spinnerItem.getSelectedItemPosition()).getId()
 								));
 							
 							dbAdapter.close();
@@ -695,7 +719,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 			String pHashHexSource = null;
 			
 			try {
-				is = mContext.getResources().openRawResource(R.drawable.ic_launcher);
+				is = mContext.getResources().openRawResource(R.drawable.ic_launcher_camera);
 			} catch (NotFoundException e) {
 				Log.e(LOG_TAG, "Error Loading Image From Raw Resources");
 				Log.w(LOG_TAG, e);

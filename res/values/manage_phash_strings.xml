@@ -47,6 +47,14 @@
 	</string>
 	
 	<!-- DIALOG -->
+	<string name="manage_phash_dialog_item_title">
+		Item
+	</string>
+	
+	<string name="manage_phash_dialog_item_prompt">
+		Choose an Item
+	</string>
+	
 	<string name="manage_phash_dialog_hex_value_title">
 		Hex Value
 	</string>

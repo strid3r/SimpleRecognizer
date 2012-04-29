@@ -175,7 +175,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			try {
 				mCamera.setParameters(parameters);
 			} catch (Exception e) {
-				//
+				//FIXME: Temp Handler For Strange Behavior
 			}
 		}
 	}

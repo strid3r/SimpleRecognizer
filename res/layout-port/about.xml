@@ -37,7 +37,7 @@
 										 android:layout_height="wrap_content"
 										 android:layout_weight="0.5"
 										 android:layout_margin="2.0dp"
-										 android:src="@drawable/ic_launcher"
+										 android:src="@drawable/ic_launcher_camera"
 										 android:adjustViewBounds="true" />
 		
 	</LinearLayout>

@@ -850,45 +850,44 @@ containing a value of this type.
         public static final int btn_shutter_pressed=0x7f02005c;
         public static final int button_shutter_selector=0x7f02005d;
         public static final int ic_camera_shutter=0x7f02005e;
-        public static final int ic_launcher=0x7f02005f;
-        public static final int ic_launcher_camera=0x7f020060;
-        public static final int ic_menu_camera=0x7f020061;
-        public static final int ic_menu_exit=0x7f020062;
-        public static final int ic_menu_gallery=0x7f020063;
-        public static final int ic_menu_info=0x7f020064;
-        public static final int ic_menu_login=0x7f020065;
-        public static final int ic_menu_preferences=0x7f020066;
-        public static final int ic_menu_save=0x7f020067;
-        public static final int indicator_expandablelist_maximized=0x7f020068;
-        public static final int indicator_expandablelist_minimized=0x7f020069;
-        public static final int list_activated_holo=0x7f02006a;
-        public static final int list_highlight_focus_active=0x7f02006b;
-        public static final int list_highlight_focus_inactive=0x7f02006c;
-        public static final int list_highlight_press_active=0x7f02006d;
-        public static final int list_highlight_press_inactive=0x7f02006e;
-        public static final int progress_01=0x7f02006f;
-        public static final int progress_02=0x7f020070;
-        public static final int progress_03=0x7f020071;
-        public static final int progress_04=0x7f020072;
-        public static final int progress_05=0x7f020073;
-        public static final int progress_06=0x7f020074;
-        public static final int progress_07=0x7f020075;
-        public static final int progress_08=0x7f020076;
-        public static final int progress_09=0x7f020077;
-        public static final int progress_10=0x7f020078;
-        public static final int progress_11=0x7f020079;
-        public static final int progress_12=0x7f02007a;
-        public static final int progress_indeterminate=0x7f02007b;
-        public static final int progress_indeterminate_horizontal=0x7f02007c;
-        public static final int progressbar_indeterminate_1=0x7f02007d;
-        public static final int progressbar_indeterminate_2=0x7f02007e;
-        public static final int progressbar_indeterminate_3=0x7f02007f;
-        public static final int scrollbar_horizontal_thumb=0x7f020080;
-        public static final int scrollbar_horizontal_track=0x7f020081;
-        public static final int scrollbar_vertical_thumb=0x7f020082;
-        public static final int scrollbar_vertical_track=0x7f020083;
-        public static final int textview_about_black=0x7f020084;
-        public static final int textview_about_yellow=0x7f020085;
+        public static final int ic_launcher_camera=0x7f02005f;
+        public static final int ic_menu_camera=0x7f020060;
+        public static final int ic_menu_exit=0x7f020061;
+        public static final int ic_menu_gallery=0x7f020062;
+        public static final int ic_menu_info=0x7f020063;
+        public static final int ic_menu_login=0x7f020064;
+        public static final int ic_menu_preferences=0x7f020065;
+        public static final int ic_menu_save=0x7f020066;
+        public static final int indicator_expandablelist_maximized=0x7f020067;
+        public static final int indicator_expandablelist_minimized=0x7f020068;
+        public static final int list_activated_holo=0x7f020069;
+        public static final int list_highlight_focus_active=0x7f02006a;
+        public static final int list_highlight_focus_inactive=0x7f02006b;
+        public static final int list_highlight_press_active=0x7f02006c;
+        public static final int list_highlight_press_inactive=0x7f02006d;
+        public static final int progress_01=0x7f02006e;
+        public static final int progress_02=0x7f02006f;
+        public static final int progress_03=0x7f020070;
+        public static final int progress_04=0x7f020071;
+        public static final int progress_05=0x7f020072;
+        public static final int progress_06=0x7f020073;
+        public static final int progress_07=0x7f020074;
+        public static final int progress_08=0x7f020075;
+        public static final int progress_09=0x7f020076;
+        public static final int progress_10=0x7f020077;
+        public static final int progress_11=0x7f020078;
+        public static final int progress_12=0x7f020079;
+        public static final int progress_indeterminate=0x7f02007a;
+        public static final int progress_indeterminate_horizontal=0x7f02007b;
+        public static final int progressbar_indeterminate_1=0x7f02007c;
+        public static final int progressbar_indeterminate_2=0x7f02007d;
+        public static final int progressbar_indeterminate_3=0x7f02007e;
+        public static final int scrollbar_horizontal_thumb=0x7f02007f;
+        public static final int scrollbar_horizontal_track=0x7f020080;
+        public static final int scrollbar_vertical_thumb=0x7f020081;
+        public static final int scrollbar_vertical_track=0x7f020082;
+        public static final int textview_about_black=0x7f020083;
+        public static final int textview_about_yellow=0x7f020084;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f05002b;
@@ -923,98 +922,100 @@ containing a value of this type.
         /**  ADVIEW 
          */
         public static final int adView=0x7f050010;
-        public static final int buttonPreferencesPurchase=0x7f050043;
-        public static final int cameraPreview=0x7f050050;
-        public static final int checkedTextViewItem=0x7f050046;
+        public static final int buttonPreferencesPurchase=0x7f050045;
+        public static final int cameraPreview=0x7f050052;
+        public static final int checkedTextViewItem=0x7f050048;
         public static final int disableHome=0x7f050009;
-        public static final int editTextCategory=0x7f05003f;
-        public static final int editTextComment=0x7f05003b;
+        public static final int editTextCategory=0x7f050041;
+        public static final int editTextComment=0x7f05003d;
         public static final int editTextContent=0x7f050035;
-        public static final int editTextCreator=0x7f050041;
-        public static final int editTextHexValue=0x7f050039;
+        public static final int editTextCreator=0x7f050043;
+        public static final int editTextHexValue=0x7f05003b;
         public static final int editTextTitle=0x7f050033;
-        public static final int frameLayoutCameraPreview=0x7f05004f;
+        public static final int frameLayoutCameraPreview=0x7f050051;
         public static final int homeAsUp=0x7f050006;
-        public static final int imageButtonShutter=0x7f050053;
+        public static final int imageButtonShutter=0x7f050055;
         public static final int imageViewAboutLogo=0x7f050015;
-        public static final int imageViewArrow=0x7f050045;
-        public static final int imageViewLoadMainLogo=0x7f05004a;
+        public static final int imageViewArrow=0x7f050047;
+        public static final int imageViewLoadMainLogo=0x7f05004c;
         public static final int linearLayoutAbout=0x7f050011;
         public static final int linearLayoutAboutBottom=0x7f050016;
         public static final int linearLayoutAboutCenter=0x7f050014;
         public static final int linearLayoutAdView=0x7f050012;
         public static final int linearLayoutAlertDialogManageItemEdit=0x7f050031;
         public static final int linearLayoutAlertDialogManagePHashEdit=0x7f050037;
-        public static final int linearLayoutAlertDialogSelectCourseEdit=0x7f05003d;
-        public static final int linearLayoutButtonPreferencesPurchase=0x7f050042;
-        public static final int linearLayoutExpandableListItemActivatedSingleChoice=0x7f050044;
-        public static final int linearLayoutLoadMain=0x7f050047;
-        public static final int linearLayoutLoadMainBottom=0x7f05004b;
-        public static final int linearLayoutLoadMainCenter=0x7f050049;
-        public static final int linearLayoutMainCamera=0x7f05004e;
-        public static final int linearLayoutManageItem=0x7f050055;
-        public static final int linearLayoutManagePHash=0x7f050056;
-        public static final int linearLayoutPreferences=0x7f050057;
-        public static final int linearLayoutSelectCourse=0x7f050058;
-        public static final int linearLayoutShutter=0x7f050051;
+        public static final int linearLayoutAlertDialogSelectCourseEdit=0x7f05003f;
+        public static final int linearLayoutButtonPreferencesPurchase=0x7f050044;
+        public static final int linearLayoutExpandableListItemActivatedSingleChoice=0x7f050046;
+        public static final int linearLayoutLoadMain=0x7f050049;
+        public static final int linearLayoutLoadMainBottom=0x7f05004d;
+        public static final int linearLayoutLoadMainCenter=0x7f05004b;
+        public static final int linearLayoutMainCamera=0x7f050050;
+        public static final int linearLayoutManageItem=0x7f050057;
+        public static final int linearLayoutManagePHash=0x7f050058;
+        public static final int linearLayoutPreferences=0x7f050059;
+        public static final int linearLayoutSelectCourse=0x7f05005a;
+        public static final int linearLayoutShutter=0x7f050053;
         public static final int listMode=0x7f050002;
-        public static final int mainMenuAbout=0x7f05005f;
-        public static final int mainMenuContent=0x7f050059;
-        public static final int mainMenuControls=0x7f05005d;
-        public static final int mainMenuCourse=0x7f05005b;
-        public static final int mainMenuExit=0x7f050060;
-        public static final int mainMenuPreferences=0x7f05005e;
-        public static final int mainMenuSwitchCamera=0x7f05005c;
-        public static final int mainMenuSwitchMode=0x7f05005a;
-        public static final int manageItemContextMenuApplySelection=0x7f050062;
-        public static final int manageItemContextMenuControls=0x7f050061;
-        public static final int manageItemContextMenuDelete=0x7f050065;
-        public static final int manageItemContextMenuEdit=0x7f050064;
-        public static final int manageItemContextMenuShowContent=0x7f050063;
-        public static final int manageItemMenuAddItem=0x7f050067;
-        public static final int manageItemMenuControls=0x7f050066;
-        public static final int manageItemMenuDeleteCourse=0x7f050068;
-        public static final int manageItemMenuSave=0x7f050069;
-        public static final int managePHashContextMenuControls=0x7f05006a;
-        public static final int managePHashContextMenuDelete=0x7f05006d;
-        public static final int managePHashContextMenuEdit=0x7f05006c;
-        public static final int managePHashContextMenuShowComment=0x7f05006b;
-        public static final int managePHashMenuAddPHash=0x7f05006f;
-        public static final int managePHashMenuControls=0x7f05006e;
-        public static final int managePHashMenuDeleteItem=0x7f050070;
-        public static final int managePHashMenuSave=0x7f050071;
+        public static final int mainMenuAbout=0x7f050061;
+        public static final int mainMenuContent=0x7f05005b;
+        public static final int mainMenuControls=0x7f05005f;
+        public static final int mainMenuCourse=0x7f05005d;
+        public static final int mainMenuExit=0x7f050062;
+        public static final int mainMenuPreferences=0x7f050060;
+        public static final int mainMenuSwitchCamera=0x7f05005e;
+        public static final int mainMenuSwitchMode=0x7f05005c;
+        public static final int manageItemContextMenuApplySelection=0x7f050064;
+        public static final int manageItemContextMenuControls=0x7f050063;
+        public static final int manageItemContextMenuDelete=0x7f050067;
+        public static final int manageItemContextMenuEdit=0x7f050066;
+        public static final int manageItemContextMenuShowContent=0x7f050065;
+        public static final int manageItemMenuAddItem=0x7f050069;
+        public static final int manageItemMenuControls=0x7f050068;
+        public static final int manageItemMenuDeleteCourse=0x7f05006a;
+        public static final int manageItemMenuSave=0x7f05006b;
+        public static final int managePHashContextMenuControls=0x7f05006c;
+        public static final int managePHashContextMenuDelete=0x7f05006f;
+        public static final int managePHashContextMenuEdit=0x7f05006e;
+        public static final int managePHashContextMenuShowComment=0x7f05006d;
+        public static final int managePHashMenuAddPHash=0x7f050071;
+        public static final int managePHashMenuControls=0x7f050070;
+        public static final int managePHashMenuDeleteItem=0x7f050072;
+        public static final int managePHashMenuSave=0x7f050073;
         public static final int normal=0x7f050001;
-        public static final int preferencesMenuControls=0x7f050072;
-        public static final int preferencesMenuSave=0x7f050073;
-        public static final int progressBarLoadMain=0x7f05004c;
-        public static final int progressBarShutter=0x7f050054;
+        public static final int preferencesMenuControls=0x7f050074;
+        public static final int preferencesMenuSave=0x7f050075;
+        public static final int progressBarLoadMain=0x7f05004e;
+        public static final int progressBarShutter=0x7f050056;
         public static final int scrollViewAlertDialogManageItemEdit=0x7f050030;
         public static final int scrollViewAlertDialogManagePHashEdit=0x7f050036;
-        public static final int scrollViewAlertDialogSelectCourseEdit=0x7f05003c;
-        public static final int selectCourseContextMenuControls=0x7f050074;
-        public static final int selectCourseContextMenuDelete=0x7f050077;
-        public static final int selectCourseContextMenuEdit=0x7f050076;
-        public static final int selectCourseContextMenuShowCreator=0x7f050075;
-        public static final int selectCourseMenuAddCourse=0x7f050079;
-        public static final int selectCourseMenuControls=0x7f050078;
-        public static final int selectCourseMenuSave=0x7f05007a;
+        public static final int scrollViewAlertDialogSelectCourseEdit=0x7f05003e;
+        public static final int selectCourseContextMenuControls=0x7f050076;
+        public static final int selectCourseContextMenuDelete=0x7f050079;
+        public static final int selectCourseContextMenuEdit=0x7f050078;
+        public static final int selectCourseContextMenuShowCreator=0x7f050077;
+        public static final int selectCourseMenuAddCourse=0x7f05007b;
+        public static final int selectCourseMenuControls=0x7f05007a;
+        public static final int selectCourseMenuSave=0x7f05007c;
         public static final int showCustom=0x7f050008;
         public static final int showHome=0x7f050005;
         public static final int showTitle=0x7f050007;
+        public static final int spinnerItem=0x7f050039;
         public static final int tabMode=0x7f050003;
         public static final int textViewAboutCopyright=0x7f050018;
         public static final int textViewAboutName=0x7f050013;
         public static final int textViewAboutVersion=0x7f050017;
-        public static final int textViewCategory=0x7f05003e;
-        public static final int textViewComment=0x7f05003a;
+        public static final int textViewCategory=0x7f050040;
+        public static final int textViewComment=0x7f05003c;
         public static final int textViewContent=0x7f050034;
-        public static final int textViewCreator=0x7f050040;
-        public static final int textViewHexValue=0x7f050038;
-        public static final int textViewLoadMainFooter=0x7f05004d;
-        public static final int textViewLoadMainLogo=0x7f050048;
+        public static final int textViewCreator=0x7f050042;
+        public static final int textViewHexValue=0x7f05003a;
+        public static final int textViewItem=0x7f050038;
+        public static final int textViewLoadMainFooter=0x7f05004f;
+        public static final int textViewLoadMainLogo=0x7f05004a;
         public static final int textViewTitle=0x7f050032;
         public static final int useLogo=0x7f050004;
-        public static final int viewSwitcherShutter=0x7f050052;
+        public static final int viewSwitcherShutter=0x7f050054;
         public static final int wrap_content=0x7f050000;
     }
     public static final class integer {
@@ -1056,6 +1057,7 @@ containing a value of this type.
         public static final int select_course=0x7f030020;
         public static final int sherlock_spinner_dropdown_item=0x7f030021;
         public static final int sherlock_spinner_item=0x7f030022;
+        public static final int spinner_item_activated=0x7f030023;
     }
     public static final class menu {
         public static final int main_menu=0x7f0c0000;
@@ -1178,10 +1180,12 @@ containing a value of this type.
          */
         public static final int manage_phash_context_menu_header_title=0x7f0a003b;
         public static final int manage_phash_context_menu_show_comment=0x7f0a003d;
-        public static final int manage_phash_dialog_comment_title=0x7f0a0041;
+        public static final int manage_phash_dialog_comment_title=0x7f0a0043;
+        public static final int manage_phash_dialog_hex_value_title=0x7f0a0042;
+        public static final int manage_phash_dialog_item_prompt=0x7f0a0041;
         /**  DIALOG 
          */
-        public static final int manage_phash_dialog_hex_value_title=0x7f0a0040;
+        public static final int manage_phash_dialog_item_title=0x7f0a0040;
         /**  MENU 
          */
         public static final int manage_phash_menu_add_phash=0x7f0a0038;
@@ -1190,91 +1194,97 @@ containing a value of this type.
         /**  MAIN 
          */
         public static final int manage_phash_name=0x7f0a0037;
-        public static final int preferences_category_display_key=0x7f0a0047;
-        public static final int preferences_category_display_title=0x7f0a0048;
-        public static final int preferences_category_licensing_key=0x7f0a0049;
-        public static final int preferences_category_licensing_title=0x7f0a004a;
+        public static final int preferences_category_display_key=0x7f0a0049;
+        public static final int preferences_category_display_title=0x7f0a004a;
+        public static final int preferences_category_licensing_key=0x7f0a004b;
+        public static final int preferences_category_licensing_title=0x7f0a004c;
         /**  CATEGORY 
          */
-        public static final int preferences_category_main_key=0x7f0a0045;
-        public static final int preferences_category_main_title=0x7f0a0046;
-        public static final int preferences_file_name=0x7f0a0043;
+        public static final int preferences_category_main_key=0x7f0a0047;
+        public static final int preferences_category_main_title=0x7f0a0048;
+        public static final int preferences_file_name=0x7f0a0045;
         /**  MENU 
          */
-        public static final int preferences_menu_save=0x7f0a0044;
+        public static final int preferences_menu_save=0x7f0a0046;
         /**  MAIN 
          */
-        public static final int preferences_name=0x7f0a0042;
-        public static final int prefs_key_display_is_full_screen=0x7f0a004c;
+        public static final int preferences_name=0x7f0a0044;
+        public static final int prefs_key_display_is_full_screen=0x7f0a004e;
         /**  KEYS 
          */
-        public static final int prefs_key_display_is_keep_screen_on=0x7f0a004b;
-        public static final int prefs_key_licensing_purchase=0x7f0a004d;
-        public static final int prefs_summary_display_is_full_screen=0x7f0a0052;
+        public static final int prefs_key_display_is_keep_screen_on=0x7f0a004d;
+        public static final int prefs_key_licensing_purchase=0x7f0a004f;
+        public static final int prefs_summary_display_is_full_screen=0x7f0a0054;
         /**  SUMMATY 
          */
-        public static final int prefs_summary_display_is_keep_screen_on=0x7f0a0051;
-        public static final int prefs_title_display_is_full_screen=0x7f0a004f;
+        public static final int prefs_summary_display_is_keep_screen_on=0x7f0a0053;
+        public static final int prefs_title_display_is_full_screen=0x7f0a0051;
         /**  TITLE 
          */
-        public static final int prefs_title_display_is_keep_screen_on=0x7f0a004e;
-        public static final int prefs_title_licensing_purchase=0x7f0a0050;
-        public static final int select_course_context_menu_apply_selection=0x7f0a0058;
-        public static final int select_course_context_menu_delete=0x7f0a005b;
-        public static final int select_course_context_menu_edit=0x7f0a005a;
+        public static final int prefs_title_display_is_keep_screen_on=0x7f0a0050;
+        public static final int prefs_title_licensing_purchase=0x7f0a0052;
+        public static final int select_course_context_menu_apply_selection=0x7f0a005a;
+        public static final int select_course_context_menu_delete=0x7f0a005d;
+        public static final int select_course_context_menu_edit=0x7f0a005c;
         /**  CONTEXT MENU 
          */
-        public static final int select_course_context_menu_header_title=0x7f0a0057;
-        public static final int select_course_context_menu_show_creator=0x7f0a0059;
-        public static final int select_course_dialog_category_title=0x7f0a005f;
-        public static final int select_course_dialog_creator_title=0x7f0a0060;
-        public static final int select_course_dialog_not_creator_message=0x7f0a005d;
+        public static final int select_course_context_menu_header_title=0x7f0a0059;
+        public static final int select_course_context_menu_show_creator=0x7f0a005b;
+        public static final int select_course_dialog_category_title=0x7f0a0061;
+        public static final int select_course_dialog_creator_title=0x7f0a0062;
+        public static final int select_course_dialog_not_creator_message=0x7f0a005f;
         /**  DIALOG 
          */
-        public static final int select_course_dialog_not_creator_title=0x7f0a005c;
-        public static final int select_course_dialog_title_title=0x7f0a005e;
+        public static final int select_course_dialog_not_creator_title=0x7f0a005e;
+        public static final int select_course_dialog_title_title=0x7f0a0060;
         /**  MENU 
          */
-        public static final int select_course_menu_add_course=0x7f0a0055;
-        public static final int select_course_menu_save=0x7f0a0056;
-        public static final int select_course_name_creator=0x7f0a0054;
+        public static final int select_course_menu_add_course=0x7f0a0057;
+        public static final int select_course_menu_save=0x7f0a0058;
+        public static final int select_course_name_creator=0x7f0a0056;
         /**  MAIN 
          */
-        public static final int select_course_name_viewer=0x7f0a0053;
+        public static final int select_course_name_viewer=0x7f0a0055;
     }
     public static final class style {
         public static final int DialogWindowTitle_Sherlock=0x7f0b0033;
         public static final int DialogWindowTitle_Sherlock_Light=0x7f0b0034;
+        /**  LIST ITEM 
+         */
+        public static final int ListItem=0x7f0b0058;
+        /**  LIST ITEM ACTIVATED 
+         */
+        public static final int ListItem_Activated=0x7f0b005a;
+        /**  LIST ITEM ACTIVATED SINGLE CHOICE 
+         */
+        public static final int ListItem_Activated_SingleChoice=0x7f0b005b;
         /**  LIST ITEM SINGLE CHOICE 
          */
-        public static final int ListItemSingleChoice=0x7f0b0058;
-        /**  LIST ITEM SINGLE CHOICE ACTIVATED 
-         */
-        public static final int ListItemSingleChoice_Activated=0x7f0b0059;
+        public static final int ListItem_SingleChoice=0x7f0b0059;
         /**  MAIN 
          */
-        public static final int Main=0x7f0b005a;
+        public static final int Main=0x7f0b005c;
         /**  ADMOB 
          */
-        public static final int Main_AdView=0x7f0b005b;
+        public static final int Main_AdView=0x7f0b005d;
         /**  ALERT DIALOG 
          */
-        public static final int Main_AlertDialog=0x7f0b005c;
+        public static final int Main_AlertDialog=0x7f0b005e;
         /**  ALERT DIALOG EDIT EDITVIEW 
          */
-        public static final int Main_AlertDialog_EditView=0x7f0b005e;
+        public static final int Main_AlertDialog_EditView=0x7f0b0060;
         /**  ALERT DIALOG EDIT TEXTVIEW 
          */
-        public static final int Main_AlertDialog_TextView=0x7f0b005d;
+        public static final int Main_AlertDialog_TextView=0x7f0b005f;
         /**  BUTTON MAIN 
          */
-        public static final int Main_ButtonMain=0x7f0b005f;
+        public static final int Main_ButtonMain=0x7f0b0061;
         /**  TEXTVIEW ABOUT 
          */
-        public static final int Main_ButtonMain_TextViewAbout=0x7f0b0060;
+        public static final int Main_ButtonMain_TextViewAbout=0x7f0b0062;
         /**  TEXTVIEW ABOUT INFO 
          */
-        public static final int Main_ButtonMain_TextViewAbout_Info=0x7f0b0061;
+        public static final int Main_ButtonMain_TextViewAbout_Info=0x7f0b0063;
         public static final int Sherlock___TextAppearance_Small=0x7f0b0047;
         public static final int Sherlock___Theme=0x7f0b004a;
         public static final int Sherlock___Theme_DarkActionBar=0x7f0b004c;
@@ -1288,7 +1298,7 @@ containing a value of this type.
         public static final int Sherlock___Widget_Holo_Spinner=0x7f0b0023;
         /**  MAIN ACTION BAR TITLE TEXT STYLE 
          */
-        public static final int TextAppearance_Main_Widget_ActionBar_Title=0x7f0b0065;
+        public static final int TextAppearance_Main_Widget_ActionBar_Title=0x7f0b0067;
         public static final int TextAppearance_Sherlock_DialogWindowTitle=0x7f0b0045;
         public static final int TextAppearance_Sherlock_Light_DialogWindowTitle=0x7f0b0046;
         public static final int TextAppearance_Sherlock_Light_Small=0x7f0b0049;
@@ -1311,10 +1321,10 @@ containing a value of this type.
         public static final int TextAppearance_Sherlock_Widget_TextView_SpinnerItem=0x7f0b0043;
         /**  MAIN 
          */
-        public static final int Theme_Main=0x7f0b0062;
+        public static final int Theme_Main=0x7f0b0064;
         /**  MAIN NO ACTION BAR 
          */
-        public static final int Theme_Main_NoActionBar=0x7f0b0063;
+        public static final int Theme_Main_NoActionBar=0x7f0b0065;
         public static final int Theme_Sherlock=0x7f0b004e;
         public static final int Theme_Sherlock_Dialog=0x7f0b0056;
         public static final int Theme_Sherlock_ForceOverflow=0x7f0b0053;
@@ -1328,7 +1338,7 @@ containing a value of this type.
         public static final int Widget=0x7f0b0000;
         /**  MAIN ACTION BAR 
          */
-        public static final int Widget_Main_ActionBar=0x7f0b0064;
+        public static final int Widget_Main_ActionBar=0x7f0b0066;
         public static final int Widget_Sherlock_ActionBar=0x7f0b0002;
         public static final int Widget_Sherlock_ActionBar_Solid=0x7f0b0003;
         public static final int Widget_Sherlock_ActionBar_TabBar=0x7f0b000a;

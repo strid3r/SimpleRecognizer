@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.google.ads.AdView;
 
 import ru.strider.simplerecognizer.adapter.ListArrayAdapter;
+import ru.strider.simplerecognizer.adapter.SpinnerArrayAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.model.Item;
@@ -136,8 +138,29 @@ public class ManagePHash extends SherlockListActivity {
 				return true;
 			}
 			case (R.id.managePHashMenuAddPHash): {
+				DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
+				dbAdapter.createDataBase(this);
+				dbAdapter.open();
+				
+				final List<Item> listItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
+				
+				dbAdapter.close();
+				
+				List<String> listTitle = new ArrayList<String>();
+				for (Item courseItem : listItem) {
+					listTitle.add(courseItem.getTitle());
+				}
+				
 				LayoutInflater inflater = LayoutInflater.from(this);
 				final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				
+				final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
+				
+				SpinnerArrayAdapter adapter = new SpinnerArrayAdapter(this, listTitle);
+				
+				spinnerItem.setAdapter(adapter);
+				
+				spinnerItem.setSelection(listTitle.indexOf(mItem.getTitle()));
 				
 				final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
 				
@@ -160,7 +183,7 @@ public class ManagePHash extends SherlockListActivity {
 						dbAdapter.addPHash(new PHash(
 								editTextHexValue.getText().toString(),
 								editTextComment.getText().toString(),
-								mItem.getId()
+								listItem.get(spinnerItem.getSelectedItemPosition()).getId()
 							));
 						
 						dbAdapter.close();
@@ -233,12 +256,33 @@ public class ManagePHash extends SherlockListActivity {
 				return true;
 			}
 			case (R.id.managePHashContextMenuEdit): {
+				DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
+				dbAdapter.createDataBase(this);
+				dbAdapter.open();
+				
+				final List<Item> listItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
+				
+				dbAdapter.close();
+				
+				List<String> listTitle = new ArrayList<String>();
+				for (Item courseItem : listItem) {
+					listTitle.add(courseItem.getTitle());
+				}
+				
 				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 				
 				final PHash pHash = getPHash(mAdapter.getItem(info.position).toString());
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
 				final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				
+				final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
+				
+				SpinnerArrayAdapter adapter = new SpinnerArrayAdapter(this, listTitle);
+				
+				spinnerItem.setAdapter(adapter);
+				
+				spinnerItem.setSelection(listTitle.indexOf(mItem.getTitle()));
 				
 				final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
 				editTextHexValue.setText(pHash.getHexValue());
@@ -258,6 +302,7 @@ public class ManagePHash extends SherlockListActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						pHash.setHexValue(editTextHexValue.getText().toString());
 						pHash.setComment(editTextComment.getText().toString());
+						pHash.setItemId(listItem.get(spinnerItem.getSelectedItemPosition()).getId());
 						
 						DataBaseAdapter dbAdapter = new DataBaseAdapter(ManagePHash.this);
 						dbAdapter.createDataBase(ManagePHash.this);

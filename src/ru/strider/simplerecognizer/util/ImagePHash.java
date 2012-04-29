@@ -92,7 +92,7 @@ public class ImagePHash {
 	
 	/**
 	 * Returns Hex String of a "binary string" (like, 001010111011100010),
-	 * which is easy to do a Hamming distance on.
+	 * which is easy to do a Hamming Distance on.
 	 * 
 	 * @return Hex String pHash of the image from InputStream,
 	 *         or null if the image data could not be decoded.
@@ -116,13 +116,13 @@ public class ImagePHash {
 	
 	/**
 	 * Returns Hex String of a "binary string" (like, 001010111011100010),
-	 * which is easy to do a Hamming distance on.
+	 * which is easy to do a Hamming Distance on.
 	 * 
 	 * @return Hex String pHash of the image from byte[] array,
 	 *         or null if the image data could not be decoded.
 	 */
 	public String getPHash(byte[] data) {
-		return getPHash((data != null) ? BitmapFactory.decodeByteArray(data, 0, data.length) : null);//TODO: TO TEST
+		return getPHash((data != null) ? BitmapFactory.decodeByteArray(data, 0, data.length) : null);
 	}
 	
 	private String getPHash(Bitmap bitmapImage) {
@@ -153,6 +153,9 @@ public class ImagePHash {
 				blue[i][j] = Color.blue(bitmapImage.getPixel(i, j));
 			}
 		}
+		
+		bitmapImage.recycle();
+		bitmapImage = null;
 		
 		/* 3. Compute the DCT. 
 		 * 
@@ -241,9 +244,9 @@ public class ImagePHash {
 	}
 	
 	/**
-	 * Returns a Hamming distance between two pHash Hex Strings.
+	 * Returns a Hamming Distance between two pHash Hex Strings.
 	 * 
-	 * @return int Hamming distance,
+	 * @return int Hamming Distance,
 	 *         or -1 if any pHash data could not be decoded.
 	 */
 	public static int getHammingDistance(String pHashHexSource, String pHashHexObject) {

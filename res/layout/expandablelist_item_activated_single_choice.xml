@@ -24,9 +24,9 @@
 	
 	<!-- ITEM -->
 	<ru.strider.widget.MainCheckedTextView android:id="@+id/checkedTextViewItem"
-										   android:layout_width="match_parent"
+										   android:layout_width="wrap_content"
 										   android:layout_height="wrap_content"
 										   android:layout_weight="1.0"
-										   style="@style/ListItemSingleChoice" />
+										   style="@style/ListItem.SingleChoice" />
 	
 </ru.strider.widget.CheckedLinearLayout>

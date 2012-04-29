@@ -7,11 +7,11 @@
 -->
 <resources>
 	
-	<!-- LIST ITEM SINGLE CHOICE -->
-	<style name="ListItemSingleChoice">
+	<!-- LIST ITEM -->
+	<style name="ListItem">
 		
 		<item name="android:padding">
-			14.0dp
+			8.0dp
 		</item>
 		
 		<item name="android:includeFontPadding">
@@ -74,17 +74,35 @@
 			2
 		</item>
 		
+	</style>
+	
+	
+	<!-- LIST ITEM SINGLE CHOICE -->
+	<style name="ListItem.SingleChoice"
+		   parent="@style/ListItem">
+		
 		<item name="android:checkMark">
 			?android:attr/listChoiceIndicatorSingle
 		</item>
 		
 	</style>
 	
-	<!-- LIST ITEM SINGLE CHOICE ACTIVATED -->
-	<style name="ListItemSingleChoice.Activated">
+	<!-- LIST ITEM ACTIVATED -->
+	<style name="ListItem.Activated"
+		   parent="@style/ListItem">
 		
 		<item name="android:background">
 			@drawable/activated_background
+		</item>
+		
+	</style>
+	
+	<!-- LIST ITEM ACTIVATED SINGLE CHOICE -->
+	<style name="ListItem.Activated.SingleChoice"
+		   parent="@style/ListItem.Activated">
+		
+		<item name="android:checkMark">
+			?android:attr/listChoiceIndicatorSingle
 		</item>
 		
 	</style>

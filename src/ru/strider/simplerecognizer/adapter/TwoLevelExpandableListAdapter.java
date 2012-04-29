@@ -34,15 +34,11 @@ import ru.strider.widget.RealImageView;
 public class TwoLevelExpandableListAdapter extends BaseExpandableListAdapter implements OnCreateContextMenuListener,
 		ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupCollapseListener, ExpandableListView.OnGroupExpandListener {
 	
-	private static final float PADDING_NON_LEFT_DP = 8.0f;
-	
 	private Context mContext = null;
 	
 	private LayoutInflater mInflater = null;
 	
 	private float mDensityScale = 0;
-	
-	private int mPaddingNonLeft = 0;
 	
 	private List<String> mListGroup = null;
 	private List<List<String>> mListChild = null;
@@ -53,8 +49,6 @@ public class TwoLevelExpandableListAdapter extends BaseExpandableListAdapter imp
 		mInflater = LayoutInflater.from(mContext);
 		
 		mDensityScale = mContext.getResources().getDisplayMetrics().density;
-		
-		mPaddingNonLeft = (int) (PADDING_NON_LEFT_DP * mDensityScale + 0.5f);
 		
 		mListGroup = listGroup;
 		mListChild = listChild;
@@ -68,7 +62,12 @@ public class TwoLevelExpandableListAdapter extends BaseExpandableListAdapter imp
 	public MainCheckedTextView getGenericView(ViewGroup root, int paddingLeft) {
 		MainCheckedTextView textView = (MainCheckedTextView) mInflater.inflate(R.layout.list_item_activated_single_choice, root, false);
 		
-		textView.setPadding(paddingLeft, mPaddingNonLeft, mPaddingNonLeft, mPaddingNonLeft);
+		textView.setPadding(
+				paddingLeft,
+				textView.getPaddingTop(),
+				textView.getPaddingRight(),
+				textView.getPaddingBottom()
+			);
 		
 		return textView;
 	}
@@ -102,7 +101,12 @@ public class TwoLevelExpandableListAdapter extends BaseExpandableListAdapter imp
 		
 		MainCheckedTextView textView = (MainCheckedTextView) linearLayout.findViewById(R.id.checkedTextViewItem);
 		
-		textView.setPadding(0, mPaddingNonLeft, mPaddingNonLeft, mPaddingNonLeft);
+		textView.setPadding(
+				0,
+				textView.getPaddingTop(),
+				textView.getPaddingRight(),
+				textView.getPaddingBottom()
+			);
 		textView.setText(getGroup(groupPosition).toString());
 		
 		return linearLayout;

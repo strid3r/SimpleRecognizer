@@ -26,9 +26,15 @@ import ru.strider.widget.MainCheckedTextView;
  */
 public class ListArrayAdapter extends ArrayAdapter<String> {
 	
+	private static final float PADDING_DP = 14.0f;
+	
 	private Context mContext = null;
 	
 	private LayoutInflater mInflater = null;
+	
+	private float mDensityScale = 0;
+	
+	private int mPadding = 0;
 	
 	public ListArrayAdapter(Context context, List<String> listObject) {
 		super(context, R.layout.list_item_activated_single_choice, listObject);
@@ -36,10 +42,16 @@ public class ListArrayAdapter extends ArrayAdapter<String> {
 		mContext = context;
 		
 		mInflater = LayoutInflater.from(mContext);
+		
+		mDensityScale = mContext.getResources().getDisplayMetrics().density;
+		
+		mPadding = (int) (PADDING_DP * mDensityScale + 0.5f);
 	}
 	
 	public MainCheckedTextView getGenericView(ViewGroup root) {
 		MainCheckedTextView textView = (MainCheckedTextView) mInflater.inflate(R.layout.list_item_activated_single_choice, root, false);
+		
+		textView.setPadding(mPadding, mPadding, mPadding, mPadding);
 		
 		return textView;
 	}
