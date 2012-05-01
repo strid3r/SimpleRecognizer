@@ -157,6 +157,8 @@ public class ImagePHash {
 		bitmapImage.recycle();
 		bitmapImage = null;
 		
+		System.gc();
+		
 		/* 3. Compute the DCT. 
 		 * 
 		 * The DCT separates the image into a collection of frequencies 

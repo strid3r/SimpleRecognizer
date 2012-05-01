@@ -991,12 +991,16 @@ containing a value of this type.
         public static final int scrollViewAlertDialogManagePHashEdit=0x7f050036;
         public static final int scrollViewAlertDialogSelectCourseEdit=0x7f05003e;
         public static final int selectCourseContextMenuControls=0x7f050076;
-        public static final int selectCourseContextMenuDelete=0x7f050079;
-        public static final int selectCourseContextMenuEdit=0x7f050078;
-        public static final int selectCourseContextMenuShowCreator=0x7f050077;
-        public static final int selectCourseMenuAddCourse=0x7f05007b;
-        public static final int selectCourseMenuControls=0x7f05007a;
-        public static final int selectCourseMenuSave=0x7f05007c;
+        public static final int selectCourseContextMenuDelete=0x7f05007a;
+        public static final int selectCourseContextMenuEdit=0x7f050079;
+        public static final int selectCourseContextMenuExport=0x7f050077;
+        public static final int selectCourseContextMenuShowCreator=0x7f050078;
+        public static final int selectCourseMenuAddCourse=0x7f05007f;
+        public static final int selectCourseMenuContent=0x7f05007b;
+        public static final int selectCourseMenuControls=0x7f05007d;
+        public static final int selectCourseMenuImport=0x7f05007e;
+        public static final int selectCourseMenuSave=0x7f050080;
+        public static final int selectCourseMenuSwitchMode=0x7f05007c;
         public static final int showCustom=0x7f050008;
         public static final int showHome=0x7f050005;
         public static final int showTitle=0x7f050007;
@@ -1223,24 +1227,28 @@ containing a value of this type.
          */
         public static final int prefs_title_display_is_keep_screen_on=0x7f0a0050;
         public static final int prefs_title_licensing_purchase=0x7f0a0052;
-        public static final int select_course_context_menu_apply_selection=0x7f0a005a;
-        public static final int select_course_context_menu_delete=0x7f0a005d;
-        public static final int select_course_context_menu_edit=0x7f0a005c;
+        public static final int select_course_context_menu_apply_selection=0x7f0a005d;
+        public static final int select_course_context_menu_delete=0x7f0a0061;
+        public static final int select_course_context_menu_edit=0x7f0a0060;
+        public static final int select_course_context_menu_export=0x7f0a005e;
         /**  CONTEXT MENU 
          */
-        public static final int select_course_context_menu_header_title=0x7f0a0059;
-        public static final int select_course_context_menu_show_creator=0x7f0a005b;
-        public static final int select_course_dialog_category_title=0x7f0a0061;
-        public static final int select_course_dialog_creator_title=0x7f0a0062;
-        public static final int select_course_dialog_not_creator_message=0x7f0a005f;
+        public static final int select_course_context_menu_header_title=0x7f0a005c;
+        public static final int select_course_context_menu_show_creator=0x7f0a005f;
+        public static final int select_course_dialog_category_title=0x7f0a0065;
+        public static final int select_course_dialog_creator_title=0x7f0a0066;
+        public static final int select_course_dialog_not_creator_message=0x7f0a0063;
         /**  DIALOG 
          */
-        public static final int select_course_dialog_not_creator_title=0x7f0a005e;
-        public static final int select_course_dialog_title_title=0x7f0a0060;
+        public static final int select_course_dialog_not_creator_title=0x7f0a0062;
+        public static final int select_course_dialog_title_title=0x7f0a0064;
+        public static final int select_course_menu_add_course=0x7f0a005a;
+        public static final int select_course_menu_import=0x7f0a0059;
+        public static final int select_course_menu_save=0x7f0a005b;
         /**  MENU 
          */
-        public static final int select_course_menu_add_course=0x7f0a0057;
-        public static final int select_course_menu_save=0x7f0a0058;
+        public static final int select_course_menu_switch_mode_creator=0x7f0a0057;
+        public static final int select_course_menu_switch_mode_viewer=0x7f0a0058;
         public static final int select_course_name_creator=0x7f0a0056;
         /**  MAIN 
          */

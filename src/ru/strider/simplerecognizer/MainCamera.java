@@ -177,14 +177,12 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 			return false;
 		}
 		
-		MenuItem item = menu.findItem(R.id.mainMenuSwitchMode);
+		MenuItem itemSwitchMode = menu.findItem(R.id.mainMenuSwitchMode);
 		
-		if (item != null) {
-			if (mConfigAdapter.getIsCreator()) {
-				item.setTitle(R.string.main_menu_switch_mode_viewer);
-			} else {
-				item.setTitle(R.string.main_menu_switch_mode_creator);
-			}
+		if (mConfigAdapter.getIsCreator()) {
+			itemSwitchMode.setTitle(R.string.main_menu_switch_mode_viewer);
+		} else {
+			itemSwitchMode.setTitle(R.string.main_menu_switch_mode_creator);
 		}
 		
 		return true;
@@ -474,7 +472,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 		
 		private Context mContext = null;
 		
-		private Activity mActivity = null; 
+		private Activity mActivity = null;
 		
 		private byte[] mData = null;
 		

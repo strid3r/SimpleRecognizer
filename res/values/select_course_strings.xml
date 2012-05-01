@@ -17,6 +17,18 @@
 	</string>
 	
 	<!-- MENU -->
+	<string name="select_course_menu_switch_mode_creator">
+		Switch to Creator
+	</string>
+	
+	<string name="select_course_menu_switch_mode_viewer">
+		Switch to Viewer
+	</string>
+	
+	<string name="select_course_menu_import">
+		Import
+	</string>
+	
 	<string name="select_course_menu_add_course">
 		Add Course
 	</string>
@@ -32,6 +44,10 @@
 	
 	<string name="select_course_context_menu_apply_selection">
 		Apply Selection
+	</string>
+	
+	<string name="select_course_context_menu_export">
+		Export
 	</string>
 	
 	<string name="select_course_context_menu_show_creator">

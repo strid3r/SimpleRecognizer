@@ -8,6 +8,8 @@
 
 package ru.strider.simplerecognizer.model;
 
+import java.util.List;
+
 /**
  * Model Course Class.
  * 
@@ -24,6 +26,8 @@ public class Course {
 	
 	private String mCreator = null;
 	
+	private List<Item> mListItem = null;
+	
 	public Course() {
 		//
 	}
@@ -35,6 +39,15 @@ public class Course {
 		mCreator = creator;
 	}
 	
+	public Course(String title, String category, String creator, List<Item> listItem) {
+		mTitle = title;
+		mCategory = category;
+		
+		mCreator = creator;
+		
+		mListItem = listItem;
+	}
+	
 	public Course(int id, String title, String category, String creator) {
 		mId = id;
 		
@@ -42,6 +55,17 @@ public class Course {
 		mCategory = category;
 		
 		mCreator = creator;
+	}
+	
+	public Course(int id, String title, String category, String creator, List<Item> listItem) {
+		mId = id;
+		
+		mTitle = title;
+		mCategory = category;
+		
+		mCreator = creator;
+		
+		mListItem = listItem;
 	}
 	
 	public int getId() {
@@ -74,6 +98,14 @@ public class Course {
 	
 	public void setCreator(String creator) {
 		mCreator = creator;
+	}
+	
+	public List<Item> getListItem() {
+		return mListItem;
+	}
+	
+	public void setListItem(List<Item> listItem) {
+		mListItem = listItem;
 	}
 	
 }

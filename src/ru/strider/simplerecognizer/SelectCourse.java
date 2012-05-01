@@ -8,11 +8,16 @@
 
 package ru.strider.simplerecognizer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -24,6 +29,8 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +101,8 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	protected void onPause() {
 		super.onPause();
 		
+		mConfigAdapter.setValues();
+		
 		//
 		
 		//
@@ -110,6 +119,21 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	}
 	
 	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		MenuItem itemSwitchMode = menu.findItem(R.id.selectCourseMenuSwitchMode);
+		
+		if (mConfigAdapter.getIsCreator()) {
+			itemSwitchMode.setTitle(R.string.select_course_menu_switch_mode_viewer);
+		} else {
+			itemSwitchMode.setTitle(R.string.select_course_menu_switch_mode_creator);
+		}
+		
+		menu.findItem(R.id.selectCourseMenuAddCourse).setEnabled(mConfigAdapter.getIsCreator());
+		
+		return true;
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case (android.R.id.home): {
@@ -118,6 +142,25 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				//Intent intent = new Intent(this, Main.class);
 				//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				//startActivity(intent);
+				
+				return true;
+			}
+			case (R.id.selectCourseMenuSwitchMode): {
+				mConfigAdapter.setIsCreator(!mConfigAdapter.getIsCreator());
+				
+				this.invalidateOptionsMenu();
+				
+				return true;
+			}
+			case (R.id.selectCourseMenuImport): {
+				//TODO: To get from pick file dialog
+				String dbName = "Main_Temp.sr";
+				String dbPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "Temp" + File.separator;
+				//
+				
+				File dbFile = new File(dbPath, dbName);
+				
+				new AsyncCourseImport(this).execute(dbFile);
 				
 				return true;
 			}
@@ -191,6 +234,10 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			
 			android.view.MenuInflater inflater = getMenuInflater();
 			inflater.inflate(R.menu.select_course_context_menu, menu);
+			
+			if (!mConfigAdapter.getIsCreator()) {
+				menu.removeItem(R.id.selectCourseContextMenuEdit);
+			}
 		}
 	}
 	
@@ -219,6 +266,42 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					return true;
 				}
 			}*/
+			case (R.id.selectCourseContextMenuExport): {
+				ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
+				
+				int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+				
+				if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+					int groupPos = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+					int childPos = ExpandableListView.getPackedPositionChild(info.packedPosition);
+					
+					String category = mAdapter.getGroup(groupPos).toString();
+					String title = mAdapter.getChild(groupPos, childPos).toString();
+					
+					Course course = getCourse(category, title, true);
+					
+					//
+					/*Intent intent = new Intent(Intent.ACTION_PICK);
+					//intent.setData(Uri.parse("file:///sdcard"));
+					//intent.putExtra(Intent.EXTRA_TITLE, "Choose a Folder");
+					intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+					
+					try {
+						this.startActivityForResult(intent, 10);
+					} catch (ActivityNotFoundException e) {
+						//
+					}*/
+					//
+					
+					//TODO: To get from pick directory dialog
+					String dbPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "Temp" + File.separator;
+					//
+					
+					new AsyncCourseExport(this, dbPath).execute(course);
+				}
+				
+				return true;
+			}
 			case (R.id.selectCourseContextMenuShowCreator): {
 				ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
 				
@@ -328,31 +411,21 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					String category = mAdapter.getGroup(groupPos).toString();
 					String title = mAdapter.getChild(groupPos, childPos).toString();
 					
-					final Course course = getCourse(category, title);
+					Course course = getCourse(category, title);
 					
-					if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {
-						DataBaseAdapter dbAdapter = new DataBaseAdapter(SelectCourse.this);
-						dbAdapter.createDataBase(SelectCourse.this);
-						dbAdapter.write();
-						
-						dbAdapter.deleteCourse(course.getId());
-						
-						dbAdapter.close();
-						
-						//
-						mConfigAdapter.setDefaultValues();
-						
-						reloadView();
-						//
-					} else {
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);
-						builder.setTitle(R.string.select_course_dialog_not_creator_title);
-						builder.setMessage(R.string.select_course_dialog_not_creator_message);
-						builder.setNeutralButton(R.string.dialog_button_close, null);
-						
-						AlertDialog alert = builder.create();
-						alert.show();
-					}
+					DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
+					dbAdapter.createDataBase(this);
+					dbAdapter.write();
+					
+					dbAdapter.deleteCourse(course.getId());
+					
+					dbAdapter.close();
+					
+					//
+					mConfigAdapter.setDefaultValues();
+					
+					reloadView();
+					//
 				}
 				
 				return true;
@@ -470,11 +543,15 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	}
 	
 	private Course getCourse(String category, String title) {
+		return getCourse(category, title, false);
+	}
+	
+	private Course getCourse(String category, String title, boolean isWithData) {
 		DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
 		dbAdapter.createDataBase(this);
 		dbAdapter.open();
 		
-		Course course = dbAdapter.getCourse(category, title);
+		Course course = dbAdapter.getCourse(category, title, isWithData);
 		
 		dbAdapter.close();
 		
@@ -545,7 +622,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		Course course = getCourse(category, title);
 		
 		mConfigAdapter.setCourseId(course.getId());
-		mConfigAdapter.setValues();
+		mConfigAdapter.setValues();//TODO? already onPause()...
 		
 		if (mConfigAdapter.getIsCreator()) {
 			if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {
@@ -599,6 +676,285 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				return super.onKeyUp(keyCode, event);
 			}
 		}
+	}
+	
+	/**
+	 * AsyncTask AsyncCourseExport<Course, Void, String> Class.
+	 * 
+	 * @author strider
+	 */
+	private class AsyncCourseExport extends AsyncTask<Course, Void, String> {
+		
+		private static final String LOG_TAG = "AsyncCourseExport";
+		
+		private long mInitTime = 0L;
+		private long mWorkTime = 0L;
+		
+		private Context mContext = null;
+		
+		private Activity mActivity = null;
+		
+		private String mDbPath = null;
+		
+		public AsyncCourseExport(Activity activity, String dbPath) {
+			mContext = (Context) activity;
+			
+			mActivity = activity;
+			
+			mDbPath = dbPath;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			//
+		}
+		
+		@Override
+		protected String doInBackground(Course... params) {
+			mInitTime = SystemClock.elapsedRealtime();
+			
+			//
+			StringBuilder sb = new StringBuilder("Course:");
+			
+			for (Course course : params) {
+				String dbName = course.getCategory() + "_" + course.getTitle() + ".sr";
+				
+				sb.append(SimpleRecognizer.BR_LINE).append(dbName).append(SimpleRecognizer.SEPARATOR);
+				
+				boolean isExternalStorageAvailable = false;
+				boolean isExternalStorageWritable = false;
+				
+				String state = Environment.getExternalStorageState();
+				
+				if (state.equals(Environment.MEDIA_MOUNTED)) {
+					isExternalStorageAvailable = true;
+					isExternalStorageWritable = true;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED");
+				} else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+					isExternalStorageAvailable = true;
+					isExternalStorageWritable = false;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED_READ_ONLY");
+				} else {
+					isExternalStorageAvailable = false;
+					isExternalStorageWritable = false;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_NONE");
+				}
+				
+				if (isExternalStorageAvailable) {
+					if (isExternalStorageWritable) {
+						DataBaseAdapter dbAdapter = new DataBaseAdapter(mContext, dbName);
+						dbAdapter.createDataBase(mActivity);
+						dbAdapter.write();
+						
+						dbAdapter.addCourse(course, true);
+						
+						dbAdapter.close();
+						
+						File dbDir = new File(mDbPath);
+						if (!dbDir.exists()) {
+							dbDir.mkdirs();
+						}
+						
+						// Trash //TODO
+						//File dbFile = new File(mDbPath + mDbName);
+						//if (!dbFile.exists() && dbFile.canWrite()) {
+						//	//
+						//}
+						//
+						
+						try {
+							dbAdapter.copyTo(mDbPath + dbName);
+							
+							sb.append("Exported.");
+						} catch (IOException e) {
+							Log.e(LOG_TAG, "Course File Not Copied >> " + dbName);
+							Log.w(LOG_TAG, e.getMessage());
+							
+							sb.append("Failed, IOException.");
+						} finally {
+							dbAdapter.delete();
+						}
+					} else {
+						sb.append("Failed, External Storage Not Writable.");
+					}
+				} else {
+					sb.append("Failed, External Storage Not Available.");
+				}
+			}
+			//
+			
+			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
+			
+			return sb.toString();
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			StringBuilder sb = new StringBuilder();
+			
+			if (BuildConfig.DEBUG) {
+				sb.append("Work Time: ").append(mWorkTime).append(" ms.").append(SimpleRecognizer.BR_LINE);
+			}
+			
+			sb.append(result);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setTitle(mContext.getString(R.string.select_course_context_menu_export));
+			builder.setMessage(sb.toString());
+			builder.setNeutralButton(R.string.dialog_button_close, null);
+			
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			Log.d(LOG_TAG, sb.toString());
+		}
+		
+	}
+	
+	/**
+	 * AsyncTask AsyncCourseImport<Course, Void, String> Class.
+	 * 
+	 * @author strider
+	 */
+	private class AsyncCourseImport extends AsyncTask<File, Void, String> {
+		
+		private static final String LOG_TAG = "AsyncCourseImport";
+		
+		private long mInitTime = 0L;
+		private long mWorkTime = 0L;
+		
+		private Context mContext = null;
+		
+		private Activity mActivity = null;
+		
+		public AsyncCourseImport(Activity activity) {
+			mContext = (Context) activity;
+			
+			mActivity = activity;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			//
+		}
+		
+		@Override
+		protected String doInBackground(File... params) {
+			mInitTime = SystemClock.elapsedRealtime();
+			
+			//
+			StringBuilder sb = new StringBuilder("File:");
+			
+			for (File dbFile : params) {
+				String dbName = dbFile.getName();
+				
+				sb.append(SimpleRecognizer.BR_LINE).append(dbName).append(SimpleRecognizer.SEPARATOR);
+				
+				boolean isExternalStorageAvailable = false;
+				
+				String state = Environment.getExternalStorageState();
+				
+				if (state.equals(Environment.MEDIA_MOUNTED)) {
+					isExternalStorageAvailable = true;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED");
+				} else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+					isExternalStorageAvailable = true;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED_READ_ONLY");
+				} else {
+					isExternalStorageAvailable = false;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_NONE");
+				}
+				
+				if (isExternalStorageAvailable) {
+					DataBaseAdapter dbAdapter = new DataBaseAdapter(mContext, dbName);
+					dbAdapter.createDataBase(mActivity);
+					
+					try {
+						dbAdapter.write();
+						
+						dbAdapter.copyFrom(dbFile.getPath());
+					} catch (IOException e) {
+						Log.e(LOG_TAG, "File Not Found >> " + dbName);
+						Log.w(LOG_TAG, e.getMessage());
+						
+						sb.append("Failed, IOException.");
+						
+						continue;
+					} finally {
+						dbAdapter.close();
+					}
+					
+					dbAdapter.open();
+					
+					List<Course> listCourse = dbAdapter.getListCourse(true);
+					
+					dbAdapter.close();
+					
+					dbAdapter.delete();
+					
+					//
+					dbAdapter = new DataBaseAdapter(mContext);
+					dbAdapter.createDataBase(mActivity);
+					dbAdapter.write();
+					
+					for (Course course : listCourse) {
+						Course oldCourse = dbAdapter.getCourse(course.getCategory(), course.getTitle());
+						
+						if (oldCourse != null) {//FIXME: ASK USER IF OVERWRITE
+							dbAdapter.deleteCourse(oldCourse.getId());
+							
+							mConfigAdapter.setDefaultValues();//FIXME: POSSIBLE BUG WHEN 1ST IS ALSO DELETED
+						}
+						
+						dbAdapter.addCourse(course, true);
+					}
+					
+					dbAdapter.close();
+					//
+					
+					sb.append("Imported.");
+				} else {
+					sb.append("Failed, External Storage Not Available.");
+				}
+			}
+			//
+			
+			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
+			
+			return sb.toString();
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			StringBuilder sb = new StringBuilder();
+			
+			if (BuildConfig.DEBUG) {
+				sb.append("Work Time: ").append(mWorkTime).append(" ms.").append(SimpleRecognizer.BR_LINE);
+			}
+			
+			sb.append(result);
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setTitle(mContext.getString(R.string.select_course_menu_import));
+			builder.setMessage(sb.toString());
+			builder.setNeutralButton(R.string.dialog_button_close, null);
+			
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			Log.d(LOG_TAG, sb.toString());
+			
+			//
+			reloadView();
+			//
+		}
+		
 	}
 	
 }

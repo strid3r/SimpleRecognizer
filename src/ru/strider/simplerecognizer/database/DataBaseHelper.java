@@ -2,7 +2,7 @@
  * Copyright (C) 2012 strider
  * 
  * Simple Recognizer
- * DataBase Helper Class
+ * SQLiteOpenHelper DataBaseHelper Class
  * By © strider 2012.
  */
 
@@ -29,7 +29,7 @@ import ru.strider.simplerecognizer.R;
 import ru.strider.simplerecognizer.SimpleRecognizer;
 
 /**
- * DataBase SQLiteOpenHelper Class.
+ * SQLiteOpenHelper DataBaseHelper Class.
  * 
  * @author strider
  */
@@ -37,18 +37,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	
 	private static final String LOG_TAG = "DataBaseHelper";
 	
-	private static final int DB_VERSION = 1;
-	
-	private static final String PACKAGE_DB_PATH = "databases" + File.separator;
 	private static final String ASSETS_DB_PATH = "Databases" + File.separator;
+	private static final String PACKAGE_DB_PATH = "databases" + File.separator;
 	
-	private static final String DB_NAME = "SimpleRecognizer.db";
+	private static String DB_NAME_SRC = null;
 	
+	private static String DB_NAME = null;
 	private static String DB_PATH = null;
 	
-	private final Context mContext;
+	private Context mContext = null;
 	
-	private SQLiteDatabase mDataBase; 
+	private SQLiteDatabase mDataBase = null; 
 	
 	private int mDataBaseSize = -1;
 	
@@ -57,11 +56,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	 * 
 	 * @param context
 	 */
-	public DataBaseHelper(Context context) {
-		super(context, DB_NAME, null, DB_VERSION);
+	public DataBaseHelper(Context context, String dbNameSrc, String dbName, int dbVersion) {
+		super(context, dbName, null, dbVersion);
 		
 		mContext = context;
 		
+		DB_NAME_SRC = dbNameSrc;
+		
+		DB_NAME = dbName;
 		DB_PATH = mContext.getApplicationInfo().dataDir + File.separator + PACKAGE_DB_PATH;
 		
 		AssetManager assetManager = mContext.getAssets();
@@ -69,11 +71,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		InputStream is = null;
 		
 		try {
-			is = assetManager.open(ASSETS_DB_PATH + DB_NAME);
+			is = assetManager.open(ASSETS_DB_PATH + DB_NAME_SRC);
 			
 			mDataBaseSize = is.available();
 		} catch (IOException ioe) {
-			Log.e(LOG_TAG, "Error Loading DataBase From Assets >> Assets/" + ASSETS_DB_PATH + DB_NAME);
+			Log.e(LOG_TAG, "Error Loading DataBase From Assets >> Assets/" + ASSETS_DB_PATH + DB_NAME_SRC);
 			Log.w(LOG_TAG, ioe);
 		} finally {
 			if (is != null) {
@@ -234,10 +236,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		File dbDir = new File(DB_PATH);
 		
 		if (!dbDir.exists()) {
-			dbDir.mkdir();
+			dbDir.mkdirs();
 		}
 		
-		InputStream is = assetManager.open(ASSETS_DB_PATH + DB_NAME);
+		InputStream is = assetManager.open(ASSETS_DB_PATH + DB_NAME_SRC);
 		OutputStream os = new FileOutputStream(DB_PATH + DB_NAME);
 		
 		byte[] buffer = new byte[1024];

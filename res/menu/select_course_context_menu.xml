@@ -13,17 +13,21 @@
 			  android:title="@string/select_course_context_menu_apply_selection"
 			  android:orderInCategory="0" /> -->
 		
+		<item android:id="@+id/selectCourseContextMenuExport"
+			  android:title="@string/select_course_context_menu_export"
+			  android:orderInCategory="1" />
+		
 		<item android:id="@+id/selectCourseContextMenuShowCreator"
 			  android:title="@string/select_course_context_menu_show_creator"
-			  android:orderInCategory="1" />
+			  android:orderInCategory="2" />
 		
 		<item android:id="@+id/selectCourseContextMenuEdit"
 			  android:title="@string/select_course_context_menu_edit"
-			  android:orderInCategory="2" />
+			  android:orderInCategory="3" />
 		
 		<item android:id="@+id/selectCourseContextMenuDelete"
 			  android:title="@string/select_course_context_menu_delete"
-			  android:orderInCategory="3" />
+			  android:orderInCategory="4" />
 		
 	</group>
 	
