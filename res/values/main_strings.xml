@@ -42,6 +42,14 @@
 	</string>
 	
 	<!-- DIALOG -->
+	<string name="main_dialog_no_course_message">
+		You first have to choose Course to work with.
+	</string>
+	
+	<string name="main_dialog_no_item_message">
+		You first have to choose Item to work with.
+	</string>
+	
 	<string name="main_dialog_camera_error_title">
 		Camera Error
 	</string>

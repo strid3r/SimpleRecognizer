@@ -48,6 +48,7 @@ public class DataBaseAdapter {
 	private static final String KEY_COURSE_ID = "_id";
 	private static final String KEY_COURSE_TITLE = "title";
 	private static final String KEY_COURSE_CATEGORY = "category";
+	private static final String KEY_COURSE_VERSION = "version";
 	private static final String KEY_COURSE_CREATOR = "creator";
 	
 	private static final String TABLE_ITEM = "Item";
@@ -83,8 +84,8 @@ public class DataBaseAdapter {
 	public DataBaseAdapter createDataBase(Activity activityUI) {
 		try {
 			mDataBaseHelper.createDataBase(activityUI);
-		} catch (IOException ioe) {
-			Log.e(LOG_TAG, "Unable To Create Database >> " + ioe.toString());
+		} catch (IOException e) {
+			Log.e(LOG_TAG, "Unable To Create Database >> " + e.getMessage());
 			throw new Error("UnableToCreateDatabase");
 		}
 		
@@ -97,7 +98,7 @@ public class DataBaseAdapter {
 			mDataBaseHelper.close();
 			mDataBase = mDataBaseHelper.getReadableDatabase();
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "Open DataBase >> " + sqle.toString());
+			Log.e(LOG_TAG, "Open DataBase >> " + sqle.getMessage());
 			throw sqle;
 		}
 		
@@ -111,7 +112,7 @@ public class DataBaseAdapter {
 			mDataBase = mDataBaseHelper.getWritableDatabase();
 			mDataBase.execSQL(SQL_QUERY_PRAGMA_FK_ON);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "Write DataBase >> " + sqle.toString());
+			Log.e(LOG_TAG, "Write DataBase >> " + sqle.getMessage());
 			throw sqle;
 		}
 		
@@ -128,7 +129,7 @@ public class DataBaseAdapter {
 				Log.e(LOG_TAG, "DataBase Not Deleted");
 			}
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "Delete DataBase >> " + sqle.toString());
+			Log.e(LOG_TAG, "Delete DataBase >> " + sqle.getMessage());
 			throw sqle;
 		}
 		
@@ -194,7 +195,7 @@ public class DataBaseAdapter {
 			
 			return cursor;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getAllCourse() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getAllCourse() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -210,7 +211,7 @@ public class DataBaseAdapter {
 			
 			return cursor;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getAllItem() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getAllItem() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -226,7 +227,7 @@ public class DataBaseAdapter {
 			
 			return cursor;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getAllPHash() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getAllPHash() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -236,8 +237,9 @@ public class DataBaseAdapter {
 			Course course = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_COURSE
-							+ " WHERE " + KEY_COURSE_ID + "=" + Integer.toString(id);
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_COURSE_ID + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { Integer.toString(id) });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -245,6 +247,7 @@ public class DataBaseAdapter {
 							cursor.getInt(cursor.getColumnIndex(KEY_COURSE_ID)),
 							cursor.getString(cursor.getColumnIndex(KEY_COURSE_TITLE)),
 							cursor.getString(cursor.getColumnIndex(KEY_COURSE_CATEGORY)),
+							cursor.getInt(cursor.getColumnIndex(KEY_COURSE_VERSION)),
 							cursor.getString(cursor.getColumnIndex(KEY_COURSE_CREATOR))
 						);
 				}
@@ -254,7 +257,7 @@ public class DataBaseAdapter {
 			
 			return course;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getCourse(int id) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getCourse(int id) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -264,9 +267,10 @@ public class DataBaseAdapter {
 			Course course = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_COURSE
-							+ " WHERE " + KEY_COURSE_CATEGORY + "='" + category + "'"
-							+ " AND " + KEY_COURSE_TITLE + "='" + title + "'";
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_COURSE_CATEGORY + "=?"
+							+ " AND " + KEY_COURSE_TITLE + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { category, title });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -274,6 +278,7 @@ public class DataBaseAdapter {
 							cursor.getInt(cursor.getColumnIndex(KEY_COURSE_ID)),
 							cursor.getString(cursor.getColumnIndex(KEY_COURSE_TITLE)),
 							cursor.getString(cursor.getColumnIndex(KEY_COURSE_CATEGORY)),
+							cursor.getInt(cursor.getColumnIndex(KEY_COURSE_VERSION)),
 							cursor.getString(cursor.getColumnIndex(KEY_COURSE_CREATOR))
 						);
 				}
@@ -283,7 +288,7 @@ public class DataBaseAdapter {
 			
 			return course;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getCourse(String category, String title) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getCourse(String category, String title) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -314,6 +319,7 @@ public class DataBaseAdapter {
 								cursor.getInt(cursor.getColumnIndex(KEY_COURSE_ID)),
 								cursor.getString(cursor.getColumnIndex(KEY_COURSE_TITLE)),
 								cursor.getString(cursor.getColumnIndex(KEY_COURSE_CATEGORY)),
+								cursor.getInt(cursor.getColumnIndex(KEY_COURSE_VERSION)),
 								cursor.getString(cursor.getColumnIndex(KEY_COURSE_CREATOR))
 							);
 						
@@ -326,7 +332,7 @@ public class DataBaseAdapter {
 			
 			return listCourse;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCourse() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getListCourse() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -348,10 +354,11 @@ public class DataBaseAdapter {
 			List<Course> listCourse = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_COURSE
-							+ " WHERE " + KEY_COURSE_CATEGORY + "='" + category + "'"
+							+ " WHERE " + KEY_COURSE_CATEGORY + "=?"
 							+ " GROUP BY " + KEY_COURSE_CATEGORY
 							+ " ORDER BY " + KEY_COURSE_CATEGORY;
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { category });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -362,6 +369,7 @@ public class DataBaseAdapter {
 								cursor.getInt(cursor.getColumnIndex(KEY_COURSE_ID)),
 								cursor.getString(cursor.getColumnIndex(KEY_COURSE_TITLE)),
 								cursor.getString(cursor.getColumnIndex(KEY_COURSE_CATEGORY)),
+								cursor.getInt(cursor.getColumnIndex(KEY_COURSE_VERSION)),
 								cursor.getString(cursor.getColumnIndex(KEY_COURSE_CREATOR))
 							);
 						
@@ -374,7 +382,7 @@ public class DataBaseAdapter {
 			
 			return listCourse;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCourse(String category) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getListCourse(String category) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -405,7 +413,7 @@ public class DataBaseAdapter {
 			
 			return listCategory;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCategory() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getListCategory() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -416,8 +424,9 @@ public class DataBaseAdapter {
 			
 			String sqlQuery = "SELECT DISTINCT " + KEY_COURSE_TITLE
 							+ " FROM " + TABLE_COURSE
-							+ " WHERE " + KEY_COURSE_CATEGORY + "='" + category + "'";
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_COURSE_CATEGORY + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { category });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -437,7 +446,7 @@ public class DataBaseAdapter {
 			
 			return listCourse;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCourse(String category) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getListCourse(String category) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -447,13 +456,14 @@ public class DataBaseAdapter {
 		
 		cv.put(KEY_COURSE_TITLE, course.getTitle());
 		cv.put(KEY_COURSE_CATEGORY, course.getCategory());
+		cv.put(KEY_COURSE_VERSION, course.getVersion());
 		cv.put(KEY_COURSE_CREATOR, course.getCreator());
 		
 		try {
 			return mDataBase.update(TABLE_COURSE, cv, KEY_COURSE_ID + "=?",
 					new String[] { Integer.toString(course.getId()) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "updateCourse(Course course) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "updateCourse(Course course) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -463,12 +473,13 @@ public class DataBaseAdapter {
 		
 		cv.put(KEY_COURSE_TITLE, course.getTitle());
 		cv.put(KEY_COURSE_CATEGORY, course.getCategory());
+		cv.put(KEY_COURSE_VERSION, course.getVersion());
 		cv.put(KEY_COURSE_CREATOR, course.getCreator());
 		
 		try {
 			return mDataBase.insert(TABLE_COURSE, null, cv);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "addCourse(Course course) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "addCourse(Course course) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -510,7 +521,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_COURSE, KEY_COURSE_ID + "=?",
 					new String[] { Integer.toString(id) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteCourse(int id) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "deleteCourse(int id) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -530,7 +541,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getCourseCount() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getCourseCount() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -540,8 +551,9 @@ public class DataBaseAdapter {
 			Item item = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_ITEM
-							+ " WHERE " + KEY_ITEM_ID + "=" + Integer.toString(id);
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_ITEM_ID + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { Integer.toString(id) });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -558,7 +570,7 @@ public class DataBaseAdapter {
 			
 			return item;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItem(int id) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getItem(int id) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -568,9 +580,10 @@ public class DataBaseAdapter {
 			Item item = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_ITEM
-							+ " WHERE " + KEY_ITEM_TITLE + "='" + title + "'"
-							+ " AND " + KEY_ITEM_COURSE_ID + "=" + Integer.toString(courseId);
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_ITEM_TITLE + "=?"
+							+ " AND " + KEY_ITEM_COURSE_ID + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { title, Integer.toString(courseId) });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -587,7 +600,7 @@ public class DataBaseAdapter {
 			
 			return item;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItem(String title, int courseId) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getItem(String title, int courseId) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -597,8 +610,9 @@ public class DataBaseAdapter {
 			List<Item> listItem = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_ITEM
-							+ " WHERE " + KEY_ITEM_COURSE_ID + "=" + Integer.toString(courseId);
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_ITEM_COURSE_ID + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { Integer.toString(courseId) });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -621,7 +635,7 @@ public class DataBaseAdapter {
 			
 			return listItem;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListItem(int courseId) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getListItem(int courseId) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -649,7 +663,7 @@ public class DataBaseAdapter {
 			return mDataBase.update(TABLE_ITEM, cv, KEY_ITEM_ID + "=?",
 					new String[] { Integer.toString(item.getId()) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "updateItem(Item item) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "updateItem(Item item) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -664,7 +678,7 @@ public class DataBaseAdapter {
 		try {
 			return mDataBase.insert(TABLE_ITEM, null, cv);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "addItem(Item item) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "addItem(Item item) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -706,7 +720,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_ITEM, KEY_ITEM_ID + "=?",
 					new String[] { Integer.toString(id) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteItem(int id) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "deleteItem(int id) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -716,7 +730,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_ITEM, KEY_ITEM_COURSE_ID + "=?",
 					new String[] { Integer.toString(courseId) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteListItem(int courseId) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "deleteListItem(int courseId) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -736,7 +750,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItemCount() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getItemCount() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -746,8 +760,9 @@ public class DataBaseAdapter {
 			PHash pHash = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_PHASH
-							+ " WHERE " + KEY_PHASH_ID + "=" + Integer.toString(id);
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_PHASH_ID + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { Integer.toString(id) });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -764,7 +779,7 @@ public class DataBaseAdapter {
 			
 			return pHash;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getPHash(int id) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getPHash(int id) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -774,8 +789,9 @@ public class DataBaseAdapter {
 			List<PHash> listPHash = null;
 			
 			String sqlQuery = "SELECT * FROM " + TABLE_PHASH
-							+ " WHERE " + KEY_PHASH_ITEM_ID + "=" + Integer.toString(itemId);
-			Cursor cursor = mDataBase.rawQuery(sqlQuery, null);
+							+ " WHERE " + KEY_PHASH_ITEM_ID + "=?";
+			Cursor cursor = mDataBase.rawQuery(sqlQuery,
+					new String[] { Integer.toString(itemId) });
 			
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
@@ -798,7 +814,7 @@ public class DataBaseAdapter {
 			
 			return listPHash;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListPHash(int itemId) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getListPHash(int itemId) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -814,7 +830,7 @@ public class DataBaseAdapter {
 			return mDataBase.update(TABLE_PHASH, cv, KEY_PHASH_ID + "=?",
 					new String[] { Integer.toString(pHash.getId()) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "updatePHash(PHash pHash) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "updatePHash(PHash pHash) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -829,7 +845,7 @@ public class DataBaseAdapter {
 		try {
 			return mDataBase.insert(TABLE_PHASH, null, cv);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "addPHash(PHash pHash) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "addPHash(PHash pHash) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -847,7 +863,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_PHASH, KEY_PHASH_ID + "=?",
 					new String[] { Integer.toString(id) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deletePHash(int id) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "deletePHash(int id) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -857,7 +873,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_PHASH, KEY_PHASH_ITEM_ID + "=?",
 					new String[] { Integer.toString(itemId) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteListPHash(int itemId) >> "+ sqle.toString());
+			Log.e(LOG_TAG, "deleteListPHash(int itemId) >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}
@@ -877,7 +893,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getPHashCount() >> "+ sqle.toString());
+			Log.e(LOG_TAG, "getPHashCount() >> " + sqle.getMessage());
 			throw sqle;
 		}
 	}

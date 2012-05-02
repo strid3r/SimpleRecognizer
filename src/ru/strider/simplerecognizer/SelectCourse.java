@@ -154,7 +154,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			}
 			case (R.id.selectCourseMenuImport): {
 				//TODO: To get from pick file dialog
-				String dbName = "Main_Temp.sr";
+				String dbName = "Main_Temp_v1.sr";
 				String dbPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "Temp" + File.separator;
 				//
 				
@@ -171,6 +171,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
 				
 				final EditText editTextCategory = (EditText) view.findViewById(R.id.editTextCategory);
+				
+				final EditText editTextVersion = (EditText) view.findViewById(R.id.editTextVersion);
+				editTextVersion.setText(Integer.toString(Course.INIT_VERSION));
 				
 				final EditText editTextCreator = (EditText) view.findViewById(R.id.editTextCreator);
 				editTextCreator.setText(Utils.GetEmail(this));
@@ -192,6 +195,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 						dbAdapter.addCourse(new Course(
 								editTextTitle.getText().toString(),
 								editTextCategory.getText().toString(),
+								Integer.parseInt(editTextVersion.getText().toString()),
 								editTextCreator.getText().toString()
 							));
 						
@@ -302,7 +306,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				
 				return true;
 			}
-			case (R.id.selectCourseContextMenuShowCreator): {
+			case (R.id.selectCourseContextMenuShowInfo): {
 				ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
 				
 				int type = ExpandableListView.getPackedPositionType(info.packedPosition);
@@ -316,9 +320,20 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					
 					Course course = getCourse(category, title);
 					
+					LayoutInflater inflater = LayoutInflater.from(this);
+					final View view = inflater.inflate(R.layout.alert_dialog_select_course_show_info, null);
+					
+					final EditText editTextVersion = (EditText) view.findViewById(R.id.editTextVersion);
+					editTextVersion.setText(Integer.toString(course.getVersion()));
+					editTextVersion.setEnabled(false);
+					
+					final EditText editTextCreator = (EditText) view.findViewById(R.id.editTextCreator);
+					editTextCreator.setText(course.getCreator());
+					editTextCreator.setEnabled(false);
+					
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setTitle(R.string.select_course_context_menu_show_creator);
-					builder.setMessage(course.getCreator());
+					builder.setTitle(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle());
+					builder.setView(view);
 					builder.setNeutralButton("Close", null);
 					
 					AlertDialog alert = builder.create();
@@ -343,7 +358,6 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					
 					if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {
 						LayoutInflater inflater = LayoutInflater.from(this);
-						
 						final View view = inflater.inflate(R.layout.alert_dialog_select_course_edit, null);
 						
 						final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
@@ -351,6 +365,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 						
 						final EditText editTextCategory = (EditText) view.findViewById(R.id.editTextCategory);
 						editTextCategory.setText(course.getCategory());
+						
+						final EditText editTextVersion = (EditText) view.findViewById(R.id.editTextVersion);
+						editTextVersion.setText(Integer.toString(course.getVersion()));
 						
 						final EditText editTextCreator = (EditText) view.findViewById(R.id.editTextCreator);
 						editTextCreator.setText(course.getCreator());
@@ -367,6 +384,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 							public void onClick(DialogInterface dialog, int which) {
 								course.setTitle(editTextTitle.getText().toString());
 								course.setCategory(editTextCategory.getText().toString());
+								course.setVersion(Integer.parseInt(editTextVersion.getText().toString()));
 								course.setCreator(editTextCreator.getText().toString());
 								
 								DataBaseAdapter dbAdapter = new DataBaseAdapter(SelectCourse.this);
@@ -388,7 +406,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 						alert.show();
 					} else {
 						AlertDialog.Builder builder = new AlertDialog.Builder(this);
-						builder.setTitle(R.string.select_course_dialog_not_creator_title);
+						builder.setTitle(R.string.dialog_title_forbidden);
 						builder.setMessage(R.string.select_course_dialog_not_creator_message);
 						builder.setNeutralButton(R.string.dialog_button_close, null);
 						
@@ -422,8 +440,6 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					dbAdapter.close();
 					
 					//
-					mConfigAdapter.setDefaultValues();
-					
 					reloadView();
 					//
 				}
@@ -487,6 +503,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		dbAdapter.open();
 		
 		mListCategory = dbAdapter.getListCategory();
+		if (mListCategory == null) {
+			mListCategory = new ArrayList<String>();
+		}
 		
 		mListTitle = new ArrayList<List<String>>();
 		for (int i = 0; i < mListCategory.size(); i++) {
@@ -537,7 +556,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		
 		dbAdapter.close();
 		
-		setGroupChecked(true);
+		if (mCourse != null) {
+			setGroupChecked(true);
+		}
 		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
 	}
@@ -594,17 +615,21 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		
 		mView.setItemChecked(groupPosition, true);
 		
-		setChildChecked(groupPosition);
+		if (mCourse != null) {
+			setChildChecked(groupPosition);
+		}
 	}
 	
 	@Override
 	public void onGroupCollapse(int groupPosition) {
 		mView.setItemChecked(groupPosition, false);
 		
-		if (mAdapter.getGroup(groupPosition).toString().equals(mCourse.getCategory())) {
-			mView.setItemChecked(groupPosition, true);
-		} else {
-			setGroupChecked(false);
+		if (mCourse != null) {
+			if (mAdapter.getGroup(groupPosition).toString().equals(mCourse.getCategory())) {
+				mView.setItemChecked(groupPosition, true);
+			} else {
+				setGroupChecked(false);
+			}
 		}
 	}
 	
@@ -630,7 +655,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				this.startActivity(iManageItem);
 			} else {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.select_course_dialog_not_creator_title);
+				builder.setTitle(R.string.dialog_title_forbidden);
 				builder.setMessage(R.string.select_course_dialog_not_creator_message);
 				builder.setNeutralButton(R.string.dialog_button_close, null);
 				
@@ -714,10 +739,11 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			mInitTime = SystemClock.elapsedRealtime();
 			
 			//
+			
 			StringBuilder sb = new StringBuilder("Course:");
 			
 			for (Course course : params) {
-				String dbName = course.getCategory() + "_" + course.getTitle() + ".sr";
+				String dbName = course.getCategory() + "_" + course.getTitle() + "_v" + Integer.toString(course.getVersion()) + ".sr";
 				
 				sb.append(SimpleRecognizer.BR_LINE).append(dbName).append(SimpleRecognizer.SEPARATOR);
 				
@@ -784,6 +810,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					sb.append("Failed, External Storage Not Available.");
 				}
 			}
+			
 			//
 			
 			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
@@ -846,6 +873,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			mInitTime = SystemClock.elapsedRealtime();
 			
 			//
+			
 			StringBuilder sb = new StringBuilder("File:");
 			
 			for (File dbFile : params) {
@@ -899,23 +927,24 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					dbAdapter.delete();
 					
 					//
-					dbAdapter = new DataBaseAdapter(mContext);
-					dbAdapter.createDataBase(mActivity);
-					dbAdapter.write();
-					
-					for (Course course : listCourse) {
-						Course oldCourse = dbAdapter.getCourse(course.getCategory(), course.getTitle());
+					if (listCourse != null) {
+						dbAdapter = new DataBaseAdapter(mContext);
+						dbAdapter.createDataBase(mActivity);
+						dbAdapter.write();
 						
-						if (oldCourse != null) {//FIXME: ASK USER IF OVERWRITE
-							dbAdapter.deleteCourse(oldCourse.getId());
+						for (Course course : listCourse) {
+							Course oldCourse = dbAdapter.getCourse(course.getCategory(), course.getTitle());
 							
-							mConfigAdapter.setDefaultValues();//FIXME: POSSIBLE BUG WHEN 1ST IS ALSO DELETED
+							if ((oldCourse != null)	&& oldCourse.getCreator().equals(course.getCreator())
+									&& (oldCourse.getVersion() < course.getVersion())) {
+								dbAdapter.deleteCourse(oldCourse.getId());//FIXME: ASK USER IF OVERWRITE
+							}
+							
+							dbAdapter.addCourse(course, true);
 						}
 						
-						dbAdapter.addCourse(course, true);
+						dbAdapter.close();
 					}
-					
-					dbAdapter.close();
 					//
 					
 					sb.append("Imported.");
@@ -923,6 +952,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					sb.append("Failed, External Storage Not Available.");
 				}
 			}
+			
 			//
 			
 			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;

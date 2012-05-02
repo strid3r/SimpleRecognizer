@@ -19,10 +19,14 @@ public class Course {
 	
 	//private static final String LOG_TAG = "Course";
 	
+	public static final int INIT_VERSION = 1;
+	
 	private int mId = 0;
 	
 	private String mTitle = null;
 	private String mCategory = null;
+	
+	private int mVersion = 0;
 	
 	private String mCreator = null;
 	
@@ -32,36 +36,44 @@ public class Course {
 		//
 	}
 	
-	public Course(String title, String category, String creator) {
+	public Course(String title, String category, int version, String creator) {
 		mTitle = title;
 		mCategory = category;
+		
+		mVersion = version;
 		
 		mCreator = creator;
 	}
 	
-	public Course(String title, String category, String creator, List<Item> listItem) {
+	public Course(String title, String category, int version, String creator, List<Item> listItem) {
 		mTitle = title;
 		mCategory = category;
+		
+		mVersion = version;
 		
 		mCreator = creator;
 		
 		mListItem = listItem;
 	}
 	
-	public Course(int id, String title, String category, String creator) {
+	public Course(int id, String title, String category, int version, String creator) {
 		mId = id;
 		
 		mTitle = title;
 		mCategory = category;
+		
+		mVersion = version;
 		
 		mCreator = creator;
 	}
 	
-	public Course(int id, String title, String category, String creator, List<Item> listItem) {
+	public Course(int id, String title, String category, int version, String creator, List<Item> listItem) {
 		mId = id;
 		
 		mTitle = title;
 		mCategory = category;
+		
+		mVersion = version;
 		
 		mCreator = creator;
 		
@@ -90,6 +102,14 @@ public class Course {
 	
 	public void setCategory(String category) {
 		mCategory = category;
+	}
+	
+	public int getVersion() {
+		return mVersion;
+	}
+	
+	public void setVersion(int version) {
+		mVersion = version;
 	}
 	
 	public String getCreator() {

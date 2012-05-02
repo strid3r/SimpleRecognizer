@@ -46,6 +46,14 @@
 		To use this Application, You Must Disable/Uninstall AdFree Package:
 	</string>
 	
+	<string name="dialog_title_caution">
+		Caution
+	</string>
+	
+	<string name="dialog_title_forbidden">
+		Forbidden
+	</string>
+	
 	<string name="dialog_button_buy_license">
 		Buy License
 	</string>

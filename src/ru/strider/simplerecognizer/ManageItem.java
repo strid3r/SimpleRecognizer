@@ -21,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -184,8 +185,6 @@ public class ManageItem extends SherlockListActivity {
 				dbAdapter.close();
 				
 				//
-				mConfigAdapter.setDefaultValues();
-				
 				Intent iMainCamera = new Intent(ManageItem.this, MainCamera.class);
 				iMainCamera.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				this.startActivity(iMainCamera);
@@ -302,8 +301,6 @@ public class ManageItem extends SherlockListActivity {
 				dbAdapter.close();
 				
 				//
-				mConfigAdapter.setDefaultValues();
-				
 				reloadView();
 				//
 				
@@ -366,12 +363,16 @@ public class ManageItem extends SherlockListActivity {
 		
 		mListItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
 		
+		dbAdapter.close();
+		
+		if (mListItem == null) {
+			mListItem = new ArrayList<Item>();
+		}
+		
 		mListTitle = new ArrayList<String>();
 		for (Item item : mListItem) {
 			mListTitle.add(item.getTitle());
 		}
-		
-		dbAdapter.close();
 	}
 	
 	private void reloadView() {
@@ -423,7 +424,7 @@ public class ManageItem extends SherlockListActivity {
 			}
 		}
 		
-		return -1;
+		return AdapterView.INVALID_POSITION;
 	}
 	
 	private Item getItem(String title) {
@@ -433,11 +434,7 @@ public class ManageItem extends SherlockListActivity {
 			}
 		}
 		
-		Item item = new Item();
-		item.setId(mConfigAdapter.getItemId());
-		item.setCourseId(mConfigAdapter.getCourseId());
-		
-		return item;
+		return null;
 	}
 	
 	@Override

@@ -74,9 +74,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			is = assetManager.open(ASSETS_DB_PATH + DB_NAME_SRC);
 			
 			mDataBaseSize = is.available();
-		} catch (IOException ioe) {
+		} catch (IOException e) {
 			Log.e(LOG_TAG, "Error Loading DataBase From Assets >> Assets/" + ASSETS_DB_PATH + DB_NAME_SRC);
-			Log.w(LOG_TAG, ioe);
+			Log.w(LOG_TAG, e.getMessage());
 		} finally {
 			if (is != null) {
 				try {
@@ -123,9 +123,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				copyDataBase();
 				
 				Log.i(LOG_TAG, "DataBase Copied");
-			} catch (IOException ioe) {
+			} catch (IOException e) {
 				Log.e(LOG_TAG, "DataBase Not Copied");
-				Log.w(LOG_TAG, "ErrorCopyingDataBase >> " + ioe.getMessage());
+				Log.w(LOG_TAG, "ErrorCopyingDataBase >> " + e.getMessage());
 				//throw new Error("ErrorCopyingDataBase");
 			}
 			
@@ -355,7 +355,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 					Log.w(LOG_TAG, "On Upgrade DataBase Not Deleted >> oldVersion = " + Integer.toString(oldVersion) + ", newVersion = " + Integer.toString(newVersion));
 				}
 			} catch (SQLException sqle) {
-				Log.e(LOG_TAG, "Delete DataBase On Upgrade >> oldVersion = " + Integer.toString(oldVersion) + ", newVersion = " + Integer.toString(newVersion) + " >> " + sqle.toString());
+				Log.e(LOG_TAG, "Delete DataBase On Upgrade >> oldVersion = " + Integer.toString(oldVersion) + ", newVersion = " + Integer.toString(newVersion) + " >> " + sqle.getMessage());
 				throw sqle;
 			}
 		}

@@ -22,6 +22,7 @@ CREATE TABLE Course (
 	_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title TEXT NOT NULL,
 	category TEXT,
+	version INTEGER,
 	creator TEXT
 );
 
@@ -58,16 +59,16 @@ CREATE TRIGGER fk_PHashItem_item_id
 //--------------------------------------------------------------------------------------------------------//
 
 // Course : Item : pHash
-INSERT INTO Course(title, category, creator)
-	VALUES ('Course', 'Category', 'strider.stankov@gmail.com');
+INSERT INTO Course(title, category, version, creator)
+	VALUES ('Course', 'Category', 1, 'strider.stankov@gmail.com');
 INSERT INTO Item(title, content, course_id)
 	VALUES ('Item', 'This is temp Item.<br><br>For more info blahblahblah...', 1);
 INSERT INTO PHash(hex_value, comment, item_id)
 	VALUES ('FFFFFFFFFFFF', 'This is temp pHash value.<br><br>For more info blahblahblah...', 1);
 
 // Course : Item : pHash
-INSERT INTO Course(title, category, creator)
-	VALUES ('Temp', 'Main', 'strider.stankov@gmail.com');
+INSERT INTO Course(title, category, version, creator)
+	VALUES ('Temp', 'Main', 1, 'strider.stankov@gmail.com');
 INSERT INTO Item(title, content, course_id)
 	VALUES ('Object', 'This is Object Item.<br><br>For more info blahblahblah...', 2);
 INSERT INTO PHash(hex_value, comment, item_id)

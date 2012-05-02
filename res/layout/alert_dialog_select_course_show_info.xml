@@ -2,38 +2,22 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Layout Alert Dialog Select Course Edit XML
+	 Layout Alert Dialog Select Course Show Info XML
 	 By © strider 2012.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-			android:id="@+id/scrollViewAlertDialogSelectCourseEdit"
+			android:id="@+id/scrollViewAlertDialogSelectCourseShowInfo"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
 			android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
 			android:scrollbarSize="8.0dp">
 	
-	<LinearLayout android:id="@+id/linearLayoutAlertDialogSelectCourseEdit"
+	<LinearLayout android:id="@+id/linearLayoutAlertDialogSelectCourseShowInfo"
 				  android:layout_width="match_parent"
 				  android:layout_height="wrap_content"
 				  android:orientation="vertical"
 				  android:padding="0.0dp">
-		
-		<!-- TITLE -->
-		<ru.strider.widget.MainTextView android:id="@+id/textViewTitleTitle"
-										android:text="@string/select_course_dialog_title_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
-		
-		<EditText android:id="@+id/editTextTitle"
-				  style="@style/Main.AlertDialog.EditView" />
-		
-		<!-- CATEGORY -->
-		<ru.strider.widget.MainTextView android:id="@+id/textViewCategoryTitle"
-										android:text="@string/select_course_dialog_category_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
-		
-		<EditText android:id="@+id/editTextCategory"
-				  style="@style/Main.AlertDialog.EditView" />
 		
 		<!-- VERSION -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewVersionTitle"
@@ -41,7 +25,7 @@
 										style="@style/Main.AlertDialog.TextView.Title" />
 		
 		<EditText android:id="@+id/editTextVersion"
-				  android:inputType="number"
+				  android:inputType="number|none"
 				  style="@style/Main.AlertDialog.EditView" />
 		
 		<!-- CREATOR -->
@@ -50,7 +34,7 @@
 										style="@style/Main.AlertDialog.TextView.Title" />
 		
 		<EditText android:id="@+id/editTextCreator"
-				  android:inputType="textEmailAddress"
+				  android:inputType="textEmailAddress|none"
 				  style="@style/Main.AlertDialog.EditView" />
 		
 	</LinearLayout>

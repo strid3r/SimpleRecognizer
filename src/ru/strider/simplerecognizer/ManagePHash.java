@@ -400,12 +400,16 @@ public class ManagePHash extends SherlockListActivity {
 		
 		mListPHash = dbAdapter.getListPHash(mConfigAdapter.getItemId());
 		
+		dbAdapter.close();
+		
+		if (mListPHash == null) {
+			mListPHash = new ArrayList<PHash>();
+		}
+		
 		mListTitle = new ArrayList<String>();
 		for (PHash pHash : mListPHash) {
 			mListTitle.add(pHash.getHexValue());
 		}
-		
-		dbAdapter.close();
 	}
 	
 	private void reloadView() {

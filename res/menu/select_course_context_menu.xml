@@ -17,8 +17,8 @@
 			  android:title="@string/select_course_context_menu_export"
 			  android:orderInCategory="1" />
 		
-		<item android:id="@+id/selectCourseContextMenuShowCreator"
-			  android:title="@string/select_course_context_menu_show_creator"
+		<item android:id="@+id/selectCourseContextMenuShowInfo"
+			  android:title="@string/select_course_context_menu_show_info"
 			  android:orderInCategory="2" />
 		
 		<item android:id="@+id/selectCourseContextMenuEdit"

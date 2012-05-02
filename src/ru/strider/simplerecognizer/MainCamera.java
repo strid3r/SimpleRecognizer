@@ -13,8 +13,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
-import android.content.res.Resources.NotFoundException;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
@@ -29,14 +27,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -492,12 +489,28 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 		
 		@Override
 		protected void onPreExecute() {
-			//
+			DataBaseAdapter dbAdapter = new DataBaseAdapter(mContext);
+			dbAdapter.createDataBase(mActivity);
+			dbAdapter.open();
+			
+			Course course = dbAdapter.getCourse(mConfigAdapter.getCourseId());
+			
+			dbAdapter.close();
+			
+			if (course == null) {
+				this.cancel(true);
+			}
 		}
 		
 		@Override
 		protected String doInBackground(Void... params) {
 			mInitTime = SystemClock.elapsedRealtime();
+			
+			//
+			
+			if (this.isCancelled()) {
+				return null;
+			}
 			
 			//
 			
@@ -522,6 +535,32 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 		}
 		
 		@Override
+		protected void onCancelled() {
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setTitle(R.string.dialog_title_caution);
+			builder.setMessage(R.string.main_dialog_no_course_message);
+			
+			builder.setNegativeButton(R.string.dialog_button_close, null);
+			
+			builder.setPositiveButton(R.string.main_menu_course, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent iSelectCourse = new Intent(MainCamera.this, SelectCourse.class);
+					mActivity.startActivity(iSelectCourse);
+				}
+				
+			});
+			
+			AlertDialog alert = builder.create();
+			alert.show();
+			
+			//
+			restoreCamera();
+			//
+		}
+		
+		@Override
 		protected void onPostExecute(String result) {
 			StringBuilder sb = new StringBuilder();
 			
@@ -537,14 +576,18 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				
 				final List<Item> listItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
 				
-				Item item = dbAdapter.getItem(mConfigAdapter.getItemId());
-				
 				dbAdapter.close();
 				
 				if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(mContext, course.getCreator())) {
+					int itemPosition = AdapterView.INVALID_POSITION;
+					
 					List<String> listTitle = new ArrayList<String>();
-					for (Item courseItem : listItem) {
-						listTitle.add(courseItem.getTitle());
+					for (Item item : listItem) {
+						listTitle.add(item.getTitle());
+						
+						if (item.getId() == mConfigAdapter.getItemId()) {
+							itemPosition = listTitle.indexOf(item.getTitle());
+						}
 					}
 					
 					LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -556,7 +599,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					
 					spinnerItem.setAdapter(adapter);
 					
-					spinnerItem.setSelection(listTitle.indexOf(item.getTitle()));
+					spinnerItem.setSelection(itemPosition);
 					
 					final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
 					editTextHexValue.setText(result);
@@ -573,15 +616,27 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							dbAdapter.write();
+							int itemPosition = spinnerItem.getSelectedItemPosition();
 							
-							dbAdapter.addPHash(new PHash(
-									editTextHexValue.getText().toString(),
-									editTextComment.getText().toString(),
-									listItem.get(spinnerItem.getSelectedItemPosition()).getId()
-								));
-							
-							dbAdapter.close();
+							if (itemPosition != AdapterView.INVALID_POSITION) {
+								dbAdapter.write();
+								
+								dbAdapter.addPHash(new PHash(
+										editTextHexValue.getText().toString(),
+										editTextComment.getText().toString(),
+										listItem.get(spinnerItem.getSelectedItemPosition()).getId()
+									));
+								
+								dbAdapter.close();
+							} else {
+								AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+								builder.setTitle(R.string.dialog_title_caution);
+								builder.setMessage(R.string.main_dialog_no_item_message);
+								builder.setNeutralButton(R.string.dialog_button_close, null);
+								
+								AlertDialog alert = builder.create();
+								alert.show();
+							}
 						}
 						
 					});
@@ -590,7 +645,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					alert.show();
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-					builder.setTitle(R.string.select_course_dialog_not_creator_title);
+					builder.setTitle(R.string.dialog_title_forbidden);
 					builder.setMessage(R.string.select_course_dialog_not_creator_message);
 					builder.setNeutralButton(R.string.dialog_button_close, null);
 					
@@ -625,7 +680,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				
 				sb.append(SimpleRecognizer.BR_LINE).append("Hamming Distance List:");
 				
-				if (pHashMin.getHammingDistance() < ImagePHash.HAMMING_DISTANCE_THRESHOLD) {
+				if ((pHashMin != null) && (pHashMin.getHammingDistance() < ImagePHash.HAMMING_DISTANCE_THRESHOLD)) {
 					//PROFIT!!!
 					for (Item item : listItem) {
 						if (item.getId() == pHashMin.getItemId()) {
@@ -658,8 +713,14 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				alert.show();
 			}
 			
-			//
+			Log.d(LOG_TAG, sb.toString());
 			
+			//
+			restoreCamera();
+			//
+		}
+		
+		private void restoreCamera() {
 			try {
 				mCamera.startPreview();
 			} catch (Exception e) {
@@ -667,130 +728,6 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 			}
 			
 			mViewSwitcher.setDisplayedChild(VIEW_BUTTON_SHUTTER_POSITION);
-			
-			//
-			
-			Log.d(LOG_TAG, sb.toString());
-		}
-		
-	}
-	
-	/**
-	 * AsyncTask AsyncTemp<Void, Void, Integer> Class.
-	 * 
-	 * @author strider
-	 */
-	private class AsyncTemp extends AsyncTask<Void, Void, Integer> {
-		
-		private static final String LOG_TAG = "AsyncTemp";
-		
-		//private static final long WORK_INTERVAL = 750L;
-		
-		private long mInitTime = 0L;
-		private long mWorkTime = 0L;
-		
-		private Context mContext = null;
-		
-		private ImagePHash mImagePHash = null;
-		
-		public AsyncTemp(Context context) {
-			mContext = context;
-		}
-		
-		@Override
-		protected void onPreExecute() {
-			mImagePHash = new ImagePHash(
-					//ImagePHash.DCT_SIZE_FAST,
-					//ImagePHash.DCT_LOW_SIZE
-				);
-		}
-		
-		@Override
-		protected Integer doInBackground(Void... params) {
-			mInitTime = SystemClock.elapsedRealtime();
-			
-			//
-			int hammingDistance = -1;
-			
-			InputStream is = null;
-			
-			String pHashHexSource = null;
-			
-			try {
-				is = mContext.getResources().openRawResource(R.drawable.ic_launcher_camera);
-			} catch (NotFoundException e) {
-				Log.e(LOG_TAG, "Error Loading Image From Raw Resources");
-				Log.w(LOG_TAG, e);
-			} finally {
-				if (is != null) {
-					pHashHexSource = mImagePHash.getPHash(is);
-					
-					Log.d(LOG_TAG, "pHashSource: " + pHashHexSource);
-					
-					try {
-						is.close();
-						is = null;
-					} catch (IOException e) {
-						//
-					}
-				}
-			}
-			
-			AssetManager assetManager = mContext.getAssets();
-			
-			String pHashHexObject = null;
-			
-			try {
-				is = assetManager.open("Images/ic_launcher_application.png");
-			} catch (IOException e) {
-				Log.e(LOG_TAG, "Error Loading Image From Assets >> Assets/" + "Images/ic_launcher_application.png");
-				Log.w(LOG_TAG, e);
-			} finally {
-				if (is != null) {
-					pHashHexObject = mImagePHash.getPHash(is);
-					
-					Log.d(LOG_TAG, "pHashObject: " + pHashHexObject);
-					
-					try {
-						is.close();
-						is = null;
-					} catch (IOException e) {
-						//
-					}
-				}
-			}
-			
-			hammingDistance = ImagePHash.getHammingDistance(pHashHexSource, pHashHexObject);
-			//
-			
-			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
-			
-			//if (workTime < WORK_INTERVAL) {
-			//	this.wait(WORK_INTERVAL - workTime);
-			//}
-			
-			return hammingDistance;
-		}
-		
-		@Override
-		protected void onPostExecute(Integer result) {
-			String msg = "Work Time: " + Long.toString(mWorkTime) + " ms.";
-			
-			if (result != -1) {
-				msg += "\nHamming Distance: " + result;
-			} else {
-				msg += "\nHamming Distance = -1 :: Smth went wrong";
-			}
-			
-			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setTitle("Title");
-			builder.setMessage(msg);
-			builder.setNeutralButton(R.string.dialog_button_close, null);
-			
-			AlertDialog alert = builder.create();
-			alert.show();
-			
-			Log.d(LOG_TAG, msg);
 		}
 		
 	}

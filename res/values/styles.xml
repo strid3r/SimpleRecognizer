@@ -156,6 +156,12 @@
 			left
 		</item>
 		
+	</style>
+	
+	<!-- ALERT DIALOG EDIT TEXTVIEW TITLE -->
+	<style name="Main.AlertDialog.TextView.Title"
+		   parent="@style/Main.AlertDialog.TextView">
+		
 		<item name="android:textSize">
 			24sp
 		</item>
