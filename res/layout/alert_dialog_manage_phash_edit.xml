@@ -22,7 +22,7 @@
 		<!-- ITEM -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewItemTitle"
 										android:text="@string/manage_phash_dialog_item_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<Spinner android:id="@+id/spinnerItem"
 				 android:prompt="@string/manage_phash_dialog_item_prompt"
@@ -31,7 +31,7 @@
 		<!-- HEX VALUE -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewHexValueTitle"
 										android:text="@string/manage_phash_dialog_hex_value_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextHexValue"
 				  style="@style/Main.AlertDialog.EditView" />
@@ -39,7 +39,7 @@
 		<!-- COMMENT -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewCommentTitle"
 										android:text="@string/manage_phash_dialog_comment_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextComment"
 				  style="@style/Main.AlertDialog.EditView" />

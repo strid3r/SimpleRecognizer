@@ -28,6 +28,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
@@ -166,7 +167,11 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			}
 			case (R.id.selectCourseMenuAddCourse): {
 				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				final View view = inflater.inflate(R.layout.alert_dialog_select_course_edit, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.select_course_menu_add_course);
 				
 				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
 				
@@ -179,7 +184,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				editTextCreator.setText(Utils.GetEmail(this));
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.select_course_menu_add_course);
+				builder.setCustomTitle(viewTitle);
 				builder.setView(view);
 				
 				builder.setNegativeButton(R.string.dialog_button_cancel, null);
@@ -321,7 +326,11 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					Course course = getCourse(category, title);
 					
 					LayoutInflater inflater = LayoutInflater.from(this);
+					final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 					final View view = inflater.inflate(R.layout.alert_dialog_select_course_show_info, null);
+					
+					final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+					textViewTitle.setText(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle());
 					
 					final EditText editTextVersion = (EditText) view.findViewById(R.id.editTextVersion);
 					editTextVersion.setText(Integer.toString(course.getVersion()));
@@ -332,7 +341,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					editTextCreator.setEnabled(false);
 					
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setTitle(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle());
+					builder.setCustomTitle(viewTitle);
 					builder.setView(view);
 					builder.setNeutralButton("Close", null);
 					
@@ -358,7 +367,11 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					
 					if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {
 						LayoutInflater inflater = LayoutInflater.from(this);
+						final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 						final View view = inflater.inflate(R.layout.alert_dialog_select_course_edit, null);
+						
+						final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+						textViewTitle.setText(R.string.select_course_context_menu_edit);
 						
 						final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
 						editTextTitle.setText(course.getTitle());
@@ -373,7 +386,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 						editTextCreator.setText(course.getCreator());
 						
 						AlertDialog.Builder builder = new AlertDialog.Builder(this);
-						builder.setTitle(R.string.select_course_context_menu_edit);
+						builder.setCustomTitle(viewTitle);
 						builder.setView(view);
 						
 						builder.setNegativeButton(R.string.dialog_button_cancel, null);
@@ -647,7 +660,6 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		Course course = getCourse(category, title);
 		
 		mConfigAdapter.setCourseId(course.getId());
-		mConfigAdapter.setValues();//TODO? already onPause()...
 		
 		if (mConfigAdapter.getIsCreator()) {
 			if (/*TODO: TEMP*/BuildConfig.DEBUG || SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {

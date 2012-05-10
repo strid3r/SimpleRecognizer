@@ -25,6 +25,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +153,11 @@ public class ManagePHash extends SherlockListActivity {
 				}
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.manage_phash_menu_add_phash);
 				
 				final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
 				
@@ -167,7 +172,7 @@ public class ManagePHash extends SherlockListActivity {
 				final EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.manage_phash_menu_add_phash);
+				builder.setCustomTitle(viewTitle);
 				builder.setView(view);
 				
 				builder.setNegativeButton(R.string.dialog_button_cancel, null);
@@ -245,8 +250,15 @@ public class ManagePHash extends SherlockListActivity {
 			case (R.id.managePHashContextMenuShowComment): {
 				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 				
+				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.manage_phash_context_menu_show_comment);
+				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.manage_phash_context_menu_show_comment);
+				builder.setCustomTitle(viewTitle);
 				builder.setMessage(Html.fromHtml(getPHash(mAdapter.getItem(info.position).toString()).getComment()));
 				builder.setNeutralButton(R.string.dialog_button_close, null);
 				
@@ -274,7 +286,11 @@ public class ManagePHash extends SherlockListActivity {
 				final PHash pHash = getPHash(mAdapter.getItem(info.position).toString());
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.manage_phash_context_menu_edit);
 				
 				final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
 				
@@ -291,7 +307,7 @@ public class ManagePHash extends SherlockListActivity {
 				editTextComment.setText(pHash.getComment());
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.manage_phash_context_menu_edit);
+				builder.setCustomTitle(viewTitle);
 				builder.setView(view);
 				
 				builder.setNegativeButton(R.string.dialog_button_cancel, null);

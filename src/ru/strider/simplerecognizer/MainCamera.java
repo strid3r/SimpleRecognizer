@@ -31,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -524,7 +525,15 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 			try {
 				pHashHex = mImagePHash.getPHash(mData);
 			} catch (OutOfMemoryError e) {
-				//FIXME: Temp Handler For Strange Behavior
+				//FIXME: Temp Handler For Not Intended Behavior
+				mActivity.runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						Toast.makeText(mContext, "[ DEBUG ] OutOfMemoryError", Toast.LENGTH_SHORT).show();
+					}
+					
+				});
 			}
 			
 			//
@@ -591,7 +600,11 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					}
 					
 					LayoutInflater inflater = LayoutInflater.from(mContext);
+					final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 					final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+					
+					final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+					textViewTitle.setText(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle());
 					
 					final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
 					
@@ -607,7 +620,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					final EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
 					
 					AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-					builder.setTitle(course.getCategory() + SimpleRecognizer.SEPARATOR + course.getTitle());
+					builder.setCustomTitle(viewTitle);
 					builder.setView(view);
 					
 					builder.setNegativeButton(R.string.dialog_button_cancel, null);
@@ -697,9 +710,16 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				
 				//
 				
+				LayoutInflater inflater = LayoutInflater.from(mContext);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText((itemResult != null) ? itemResult.getTitle() : "Item not found");
+				
 				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				builder.setTitle((itemResult != null) ? itemResult.getTitle() : "Item not found");
+				builder.setCustomTitle(viewTitle);
 				builder.setMessage(sb.toString());
+				
 				builder.setNeutralButton(R.string.dialog_button_close, new DialogInterface.OnClickListener() {
 					
 					@Override

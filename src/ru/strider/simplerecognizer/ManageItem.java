@@ -25,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,14 +136,18 @@ public class ManageItem extends SherlockListActivity {
 			}
 			case (R.id.manageItemMenuAddItem): {
 				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				final View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.manage_item_menu_add_item);
 				
 				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
 				
 				final EditText editTextContent = (EditText) view.findViewById(R.id.editTextContent);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.manage_item_menu_add_item);
+				builder.setCustomTitle(viewTitle);
 				builder.setView(view);
 				
 				builder.setNegativeButton(R.string.dialog_button_cancel, null);
@@ -232,8 +237,14 @@ public class ManageItem extends SherlockListActivity {
 			case (R.id.manageItemContextMenuShowContent): {
 				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 				
+				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.manage_item_context_menu_show_content);
+				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.manage_item_context_menu_show_content);
+				builder.setCustomTitle(viewTitle);
 				builder.setMessage(Html.fromHtml(getItem(mAdapter.getItem(info.position).toString()).getContent()));
 				builder.setNeutralButton("Close", null);
 				
@@ -248,7 +259,11 @@ public class ManageItem extends SherlockListActivity {
 				final Item courseItem = getItem(mAdapter.getItem(info.position).toString());
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
+				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				final View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
+				
+				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(R.string.manage_item_context_menu_edit);
 				
 				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
 				editTextTitle.setText(courseItem.getTitle());
@@ -257,7 +272,7 @@ public class ManageItem extends SherlockListActivity {
 				editTextContent.setText(courseItem.getContent());
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.manage_item_context_menu_edit);
+				builder.setCustomTitle(viewTitle);
 				builder.setView(view);
 				
 				builder.setNegativeButton(R.string.dialog_button_cancel, null);

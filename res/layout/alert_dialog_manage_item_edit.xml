@@ -22,7 +22,7 @@
 		<!-- TITLE -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewTitleTitle"
 										android:text="@string/manage_item_dialog_title_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextTitle"
 				  style="@style/Main.AlertDialog.EditView" />
@@ -30,7 +30,7 @@
 		<!-- CONTENT -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewContentTitle"
 										android:text="@string/manage_item_dialog_content_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextContent"
 				  style="@style/Main.AlertDialog.EditView" />

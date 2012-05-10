@@ -98,17 +98,24 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public String getPHash(InputStream is) {
-		Bitmap bitmap = null;
+		if (is == null) {
+			return null;
+		}
 		
-		if (is != null) {
-			bitmap = BitmapFactory.decodeStream(is);
-			
-			try {
-				is.close();
-				is = null;
-			} catch (IOException e) {
-				//
-			}
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeStream(is, null, options);
+		
+		options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
+		options.inJustDecodeBounds = false;
+		
+		Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+		
+		try {
+			is.close();
+			is = null;
+		} catch (IOException e) {
+			//
 		}
 		
 		return getPHash(bitmap);
@@ -122,7 +129,18 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public String getPHash(byte[] data) {
-		return getPHash((data != null) ? BitmapFactory.decodeByteArray(data, 0, data.length) : null);
+		if (data == null) {
+			return null;
+		}
+		
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeByteArray(data, 0, data.length, options);
+		
+		options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
+		options.inJustDecodeBounds = false;
+		
+		return getPHash(BitmapFactory.decodeByteArray(data, 0, data.length, options));
 	}
 	
 	private String getPHash(Bitmap bitmapImage) {
@@ -156,8 +174,6 @@ public class ImagePHash {
 		
 		bitmapImage.recycle();
 		bitmapImage = null;
-		
-		System.gc();
 		
 		/* 3. Compute the DCT. 
 		 * 
@@ -228,7 +244,52 @@ public class ImagePHash {
 		return Long.toHexString(pHashValue).toUpperCase();
 	}
 	
-	private Bitmap convertToGrayscale(Bitmap bitmap) {
+	/**
+	 * Calculate an inSampleSize for use in a {@link BitmapFactory.Options} object when decoding
+	 * bitmaps using the decode* methods from {@link BitmapFactory}. This implementation calculates
+	 * the closest inSampleSize that will result in the final decoded bitmap having a width and
+	 * height equal to or larger than the requested width and height. This implementation does not
+	 * ensure a power of 2 is returned for inSampleSize which can be faster when decoding but
+	 * results in a larger bitmap which isn't as useful for caching purposes.
+	 * 
+	 * @param options An options object with out* params already populated (run through a decode*
+	 *            method with inJustDecodeBounds==true
+	 * @param reqWidth The requested width of the resulting bitmap
+	 * @param reqHeight The requested height of the resulting bitmap
+	 * 
+	 * @return The value to be used for inSampleSize
+	 */
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		int inSampleSize = 1;
+		
+		final int width = options.outWidth;
+		final int height = options.outHeight;
+		
+		if ((width > reqWidth) || (height > reqHeight)) {
+			if (width > height) {
+				inSampleSize = Math.round((float) height / (float) reqHeight);
+			} else {
+				inSampleSize = Math.round((float) width / (float) reqWidth);
+			}
+			
+			final float totalPixels = width * height;
+			
+			final float totalReqPixelsCap = reqWidth * reqHeight * 2;
+			
+			while ((totalPixels / (inSampleSize * inSampleSize)) > totalReqPixelsCap) {
+				inSampleSize++;
+			}
+		}
+		
+		return inSampleSize;
+	}
+	
+	/**
+	 * Converts bitmap to grayscale.
+	 * 
+	 * @return Bitmap Grayscale.
+	 */
+	public static Bitmap convertToGrayscale(Bitmap bitmap) {
 		ColorMatrix matrix = new ColorMatrix();
 		matrix.setSaturation(SATURATION_GRAYSCALE);
 		
@@ -241,6 +302,9 @@ public class ImagePHash {
 		
 		Canvas canvas = new Canvas(bitmapGrayscale);
 		canvas.drawBitmap(bitmap, CANVAS_BITMAP_POS, CANVAS_BITMAP_POS, paint);
+		
+		bitmap.recycle();
+		bitmap = null;
 		
 		return bitmapGrayscale;
 	}

@@ -22,7 +22,7 @@
 		<!-- VERSION -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewVersionTitle"
 										android:text="@string/select_course_dialog_version_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextVersion"
 				  android:inputType="number|none"
@@ -31,7 +31,7 @@
 		<!-- CREATOR -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewCreatorTitle"
 										android:text="@string/select_course_dialog_creator_title"
-										style="@style/Main.AlertDialog.TextView.Title" />
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextCreator"
 				  android:inputType="textEmailAddress|none"
