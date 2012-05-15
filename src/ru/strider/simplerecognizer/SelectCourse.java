@@ -70,6 +70,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	private TwoLevelExpandableListAdapter mAdapter = null;
 	private ExpandableListView mView = null;
 	
+	private AsyncCourseExport mAsyncCourseExport = null;
+	private AsyncCourseImport mAsyncCourseImport = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -154,14 +157,10 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				return true;
 			}
 			case (R.id.selectCourseMenuImport): {
-				//TODO: To get from pick file dialog
-				String dbName = "Main_Temp_v1.sr";
-				String dbPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "Temp" + File.separator;
-				//
+				mAsyncCourseImport = new AsyncCourseImport(this);
 				
-				File dbFile = new File(dbPath, dbName);
-				
-				new AsyncCourseImport(this).execute(dbFile);
+				Intent iPickFile = new Intent(SelectCourse.this, PickFile.class);
+				this.startActivityForResult(iPickFile, PickFile.PICK_FILE_REQUEST);
 				
 				return true;
 			}
@@ -289,6 +288,8 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					
 					Course course = getCourse(category, title, true);
 					
+					mAsyncCourseExport = new AsyncCourseExport(this, course);
+					
 					//
 					/*Intent intent = new Intent(Intent.ACTION_PICK);
 					//intent.setData(Uri.parse("file:///sdcard"));
@@ -302,11 +303,8 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					}*/
 					//
 					
-					//TODO: To get from pick directory dialog
-					String dbPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "Temp" + File.separator;
-					//
-					
-					new AsyncCourseExport(this, dbPath).execute(course);
+					Intent iPickDirectory = new Intent(SelectCourse.this, PickDirectory.class);
+					this.startActivityForResult(iPickDirectory, PickDirectory.PICK_DIRECTORY_REQUEST);
 				}
 				
 				return true;
@@ -531,9 +529,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	private void reloadView() {
 		initData();
 		
-		mAdapter = new TwoLevelExpandableListAdapter(this, mListCategory, mListTitle);
-		
-		mView.setAdapter(mAdapter);
+		mAdapter.initData(mListCategory, mListTitle);
 		
 		useConfigValues();
 	}
@@ -715,12 +711,37 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		}
 	}
 	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == PickDirectory.PICK_DIRECTORY_REQUEST) {
+			if ((resultCode == RESULT_OK) && (data != null)) {
+				String dbPath = data.getStringExtra(PickDirectory.KEY_PICK_DIRECTORY);
+				
+				if ((dbPath != null) && (mAsyncCourseExport != null)) {
+					mAsyncCourseExport.execute(dbPath);
+				}
+			}
+			
+			mAsyncCourseExport = null;
+		} else if (requestCode == PickFile.PICK_FILE_REQUEST) {
+			if ((resultCode == RESULT_OK) && (data != null)) {
+				String dbPath = data.getStringExtra(PickFile.KEY_PICK_FILE);
+				
+				if ((dbPath != null) && (mAsyncCourseImport != null)) {
+					mAsyncCourseImport.execute(dbPath);
+				}
+			}
+			
+			mAsyncCourseImport = null;
+		}
+	}
+	
 	/**
-	 * AsyncTask AsyncCourseExport<Course, Void, String> Class.
+	 * AsyncTask AsyncCourseExport<String, Void, String> Class.
 	 * 
 	 * @author strider
 	 */
-	private class AsyncCourseExport extends AsyncTask<Course, Void, String> {
+	private class AsyncCourseExport extends AsyncTask<String, Void, String> {
 		
 		private static final String LOG_TAG = "AsyncCourseExport";
 		
@@ -731,14 +752,14 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		
 		private Activity mActivity = null;
 		
-		private String mDbPath = null;
+		private Course mCourse = null;
 		
-		public AsyncCourseExport(Activity activity, String dbPath) {
+		public AsyncCourseExport(Activity activity, Course course) {
 			mContext = (Context) activity;
 			
 			mActivity = activity;
 			
-			mDbPath = dbPath;
+			mCourse = course;
 		}
 		
 		@Override
@@ -747,64 +768,66 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		}
 		
 		@Override
-		protected String doInBackground(Course... params) {
+		protected String doInBackground(String... params) {
 			mInitTime = SystemClock.elapsedRealtime();
 			
 			//
 			
 			StringBuilder sb = new StringBuilder("Course:");
 			
-			for (Course course : params) {
-				String dbName = course.getCategory() + "_" + course.getTitle() + "_v" + Integer.toString(course.getVersion()) + ".sr";
+			String dbName = mCourse.getCategory() + "_" + mCourse.getTitle() + "_v" + Integer.toString(mCourse.getVersion()) + ".sr";
+			
+			sb.append(SimpleRecognizer.BR_LINE).append(dbName);
+			
+			boolean isExternalStorageAvailable = false;
+			boolean isExternalStorageWritable = false;
+			
+			String state = Environment.getExternalStorageState();
+			
+			if (!Environment.isExternalStorageRemovable() || state.equals(Environment.MEDIA_MOUNTED)) {
+				isExternalStorageAvailable = true;
+				isExternalStorageWritable = true;
 				
-				sb.append(SimpleRecognizer.BR_LINE).append(dbName).append(SimpleRecognizer.SEPARATOR);
+				SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_WRITABLE");
+			} else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+				isExternalStorageAvailable = true;
+				isExternalStorageWritable = false;
 				
-				boolean isExternalStorageAvailable = false;
-				boolean isExternalStorageWritable = false;
+				SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_AVAILABLE");
+			} else {
+				isExternalStorageAvailable = false;
+				isExternalStorageWritable = false;
 				
-				String state = Environment.getExternalStorageState();
-				
-				if (state.equals(Environment.MEDIA_MOUNTED)) {
-					isExternalStorageAvailable = true;
-					isExternalStorageWritable = true;
+				SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_N/A");
+			}
+			
+			if (isExternalStorageAvailable) {
+				if (isExternalStorageWritable) {
+					DataBaseAdapter dbAdapter = new DataBaseAdapter(mContext, dbName);
+					dbAdapter.createDataBase(mActivity);
+					dbAdapter.write();
 					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED");
-				} else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-					isExternalStorageAvailable = true;
-					isExternalStorageWritable = false;
+					dbAdapter.addCourse(mCourse, true);
 					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED_READ_ONLY");
-				} else {
-					isExternalStorageAvailable = false;
-					isExternalStorageWritable = false;
+					dbAdapter.close();
 					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_NONE");
-				}
-				
-				if (isExternalStorageAvailable) {
-					if (isExternalStorageWritable) {
-						DataBaseAdapter dbAdapter = new DataBaseAdapter(mContext, dbName);
-						dbAdapter.createDataBase(mActivity);
-						dbAdapter.write();
-						
-						dbAdapter.addCourse(course, true);
-						
-						dbAdapter.close();
-						
-						File dbDir = new File(mDbPath);
+					for (String dbPath : params) {
+						File dbDir = new File(dbPath + File.separator);
 						if (!dbDir.exists()) {
 							dbDir.mkdirs();
 						}
 						
 						// Trash //TODO
-						//File dbFile = new File(mDbPath + mDbName);
+						//File dbFile = new File(mDbPath + File.separator + mDbName);
 						//if (!dbFile.exists() && dbFile.canWrite()) {
 						//	//
 						//}
 						//
 						
+						sb.append(SimpleRecognizer.BR_LINE).append(dbPath + File.separator).append(SimpleRecognizer.SEPARATOR);
+						
 						try {
-							dbAdapter.copyTo(mDbPath + dbName);
+							dbAdapter.copyTo(dbPath + File.separator + dbName);
 							
 							sb.append("Exported.");
 						} catch (IOException e) {
@@ -812,15 +835,15 @@ public class SelectCourse extends SherlockExpandableListActivity {
 							Log.w(LOG_TAG, e.getMessage());
 							
 							sb.append("Failed, IOException.");
-						} finally {
-							dbAdapter.delete();
 						}
-					} else {
-						sb.append("Failed, External Storage Not Writable.");
 					}
+					
+					dbAdapter.delete();
 				} else {
-					sb.append("Failed, External Storage Not Available.");
+					sb.append("Failed, External Storage Not Writable.");
 				}
+			} else {
+				sb.append("Failed, External Storage Not Available.");
 			}
 			
 			//
@@ -840,8 +863,14 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			
 			sb.append(result);
 			
+			LayoutInflater inflater = LayoutInflater.from(mContext);
+			final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			
+			final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText(R.string.select_course_context_menu_export);
+			
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setTitle(mContext.getString(R.string.select_course_context_menu_export));
+			builder.setCustomTitle(viewTitle);
 			builder.setMessage(sb.toString());
 			builder.setNeutralButton(R.string.dialog_button_close, null);
 			
@@ -854,11 +883,11 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	}
 	
 	/**
-	 * AsyncTask AsyncCourseImport<Course, Void, String> Class.
+	 * AsyncTask AsyncCourseImport<String, Void, String> Class.
 	 * 
 	 * @author strider
 	 */
-	private class AsyncCourseImport extends AsyncTask<File, Void, String> {
+	private class AsyncCourseImport extends AsyncTask<String, Void, String> {
 		
 		private static final String LOG_TAG = "AsyncCourseImport";
 		
@@ -881,15 +910,15 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		}
 		
 		@Override
-		protected String doInBackground(File... params) {
+		protected String doInBackground(String... params) {
 			mInitTime = SystemClock.elapsedRealtime();
 			
 			//
 			
 			StringBuilder sb = new StringBuilder("File:");
 			
-			for (File dbFile : params) {
-				String dbName = dbFile.getName();
+			for (String dbPath : params) {
+				String dbName = new File(dbPath).getName();
 				
 				sb.append(SimpleRecognizer.BR_LINE).append(dbName).append(SimpleRecognizer.SEPARATOR);
 				
@@ -897,18 +926,15 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				
 				String state = Environment.getExternalStorageState();
 				
-				if (state.equals(Environment.MEDIA_MOUNTED)) {
+				if (!Environment.isExternalStorageRemovable() || state.equals(Environment.MEDIA_MOUNTED)
+						|| state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
 					isExternalStorageAvailable = true;
 					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED");
-				} else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-					isExternalStorageAvailable = true;
-					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_MOUNTED_READ_ONLY");
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_AVAILABLE");
 				} else {
 					isExternalStorageAvailable = false;
 					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_NONE");
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_N/A");
 				}
 				
 				if (isExternalStorageAvailable) {
@@ -918,7 +944,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					try {
 						dbAdapter.write();
 						
-						dbAdapter.copyFrom(dbFile.getPath());
+						dbAdapter.copyFrom(dbPath);
 					} catch (IOException e) {
 						Log.e(LOG_TAG, "File Not Found >> " + dbName);
 						Log.w(LOG_TAG, e.getMessage());
@@ -982,8 +1008,14 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			
 			sb.append(result);
 			
+			LayoutInflater inflater = LayoutInflater.from(mContext);
+			final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			
+			final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText(R.string.select_course_menu_import);
+			
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setTitle(mContext.getString(R.string.select_course_menu_import));
+			builder.setCustomTitle(viewTitle);
 			builder.setMessage(sb.toString());
 			builder.setNeutralButton(R.string.dialog_button_close, null);
 			

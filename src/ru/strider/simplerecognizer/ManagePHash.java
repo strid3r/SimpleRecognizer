@@ -431,9 +431,7 @@ public class ManagePHash extends SherlockListActivity {
 	private void reloadView() {
 		initData();
 		
-		mAdapter = new ListArrayAdapter(ManagePHash.this, mListTitle);
-		
-		mView.setAdapter(mAdapter);
+		mAdapter.initData(mListTitle);
 		
 		useConfigValues();
 	}

@@ -30,7 +30,9 @@ public class ImagePHash {
 	
 	private static final String LOG_TAG = "ImagePHash";
 	
+	public static final int DCT_SIZE = 32;
 	public static final int DCT_SIZE_FAST = 16;
+	
 	public static final int DCT_LOW_SIZE = 8;
 	
 	public static final int HAMMING_DISTANCE_THRESHOLD = 15;
@@ -39,8 +41,8 @@ public class ImagePHash {
 	
 	private static final float CANVAS_BITMAP_POS = 0.0f;
 	
-	private int mSize = 32;
-	private int mLowSize = 8;
+	private int mSize = DCT_SIZE;
+	private int mLowSize = DCT_LOW_SIZE;
 	
 	private double[] mCoeff = null;
 	
@@ -98,27 +100,29 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public String getPHash(InputStream is) {
-		if (is == null) {
-			return null;
+		String pHash = null;
+		
+		if (is != null) {
+			final BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeStream(is, null, options);
+			
+			options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
+			options.inJustDecodeBounds = false;
+			
+			Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
+			
+			try {
+				is.close();
+				is = null;
+			} catch (IOException e) {
+				//
+			}
+			
+			pHash = getPHash(bitmap);
 		}
 		
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeStream(is, null, options);
-		
-		options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
-		options.inJustDecodeBounds = false;
-		
-		Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
-		
-		try {
-			is.close();
-			is = null;
-		} catch (IOException e) {
-			//
-		}
-		
-		return getPHash(bitmap);
+		return pHash;
 	}
 	
 	/**
@@ -129,18 +133,20 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public String getPHash(byte[] data) {
-		if (data == null) {
-			return null;
+		String pHash = null;
+		
+		if (data != null) {
+			final BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeByteArray(data, 0, data.length, options);
+			
+			options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
+			options.inJustDecodeBounds = false;
+			
+			pHash = getPHash(BitmapFactory.decodeByteArray(data, 0, data.length, options));
 		}
 		
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeByteArray(data, 0, data.length, options);
-		
-		options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
-		options.inJustDecodeBounds = false;
-		
-		return getPHash(BitmapFactory.decodeByteArray(data, 0, data.length, options));
+		return pHash;
 	}
 	
 	private String getPHash(Bitmap bitmapImage) {

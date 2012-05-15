@@ -66,6 +66,14 @@
 		<activity android:name=".SelectCourse"
 				  android:label="@string/select_course_name_viewer" />
 		
+		<!-- PICK DIRECTORY -->
+		<activity android:name=".PickDirectory"
+				  android:label="@string/pick_directory_name" />
+		
+		<!-- PICK FILE -->
+		<activity android:name=".PickFile"
+				  android:label="@string/pick_file_name" />
+		
 		<!-- MANAGE ITEM -->
 		<activity android:name=".ManageItem"
 				  android:label="@string/manage_item_name" />

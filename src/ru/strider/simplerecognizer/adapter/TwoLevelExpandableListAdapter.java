@@ -60,6 +60,13 @@ public class TwoLevelExpandableListAdapter extends BaseExpandableListAdapter imp
 		mListChild = listChild;
 	}
 	
+	public void initData(List<String> listGroup, List<List<String>> listChild) {
+		mListGroup = listGroup;
+		mListChild = listChild;
+		
+		this.notifyDataSetChanged();
+	}
+	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		//

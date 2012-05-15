@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Pick Directory XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="pick_directory_name">
+		Pick Directory
+	</string>
+	
+	<!-- MENU -->
+	<string name="pick_directory_menu_export">
+		Export
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="pick_directory_control_cancel">
+		Cancel
+	</string>
+	
+	<string name="pick_directory_control_export">
+		Export
+	</string>
+	
+</resources>

@@ -393,9 +393,7 @@ public class ManageItem extends SherlockListActivity {
 	private void reloadView() {
 		initData();
 		
-		mAdapter = new ListArrayAdapter(ManageItem.this, mListTitle);
-		
-		mView.setAdapter(mAdapter);
+		mAdapter.initData(mListTitle);
 		
 		useConfigValues();
 	}

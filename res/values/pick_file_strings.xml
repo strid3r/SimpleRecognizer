@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Pick File XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="pick_file_name">
+		Pick File
+	</string>
+	
+	<!-- MENU -->
+	<string name="pick_file_menu_import">
+		Import
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="pick_file_control_cancel">
+		Cancel
+	</string>
+	
+	<string name="pick_file_control_import">
+		Import
+	</string>
+	
+</resources>

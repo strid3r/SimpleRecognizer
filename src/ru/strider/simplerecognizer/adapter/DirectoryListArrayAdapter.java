@@ -2,7 +2,7 @@
  * Copyright (C) 2012 strider
  * 
  * Simple Recognizer
- * Array Adapter Spinner Class
+ * Array Adapter Directory List Class
  * By © strider 2012.
  */
 
@@ -20,24 +20,22 @@ import ru.strider.simplerecognizer.R;
 import ru.strider.widget.MainTextView;
 
 /**
- * Array Adapter Spinner Class.
+ * Array Adapter Directory List Class.
  * 
  * @author strider
  */
-public class SpinnerArrayAdapter extends ArrayAdapter<String> {
+public class DirectoryListArrayAdapter extends ArrayAdapter<String> {
 	
 	private Context mContext = null;
 	
 	private LayoutInflater mInflater = null;
 	
-	public SpinnerArrayAdapter(Context context, List<String> listObject) {
-		super(context, R.layout.spinner_item_activated, listObject);
+	public DirectoryListArrayAdapter(Context context, List<String> listObject) {
+		super(context, R.layout.list_item_activated, listObject);
 		
 		mContext = context;
 		
 		mInflater = LayoutInflater.from(mContext);
-		
-		this.setDropDownViewResource(R.layout.list_item_activated_single_choice);
 	}
 	
 	public void initData(List<String> listObject) {
@@ -49,7 +47,7 @@ public class SpinnerArrayAdapter extends ArrayAdapter<String> {
 	}
 	
 	public MainTextView getGenericView(ViewGroup root) {
-		MainTextView textView = (MainTextView) mInflater.inflate(R.layout.spinner_item_activated, root, false);
+		MainTextView textView = (MainTextView) mInflater.inflate(R.layout.list_item_activated, root, false);
 		
 		return textView;
 	}
