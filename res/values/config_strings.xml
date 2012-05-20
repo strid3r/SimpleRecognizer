@@ -29,6 +29,10 @@
 		IS_CREATOR
 	</string>
 	
+	<string name="config_key_directory">
+		DIRECTORY
+	</string>
+	
 	<!-- DEFAULT VALUE -->
 	<!-- Place Holder -->
 	

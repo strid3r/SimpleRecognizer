@@ -2,7 +2,7 @@
  * Copyright (C) 2012 strider
  * 
  * Simple Recognizer
- * ListActivity Pick Directory Class
+ * ListActivity PHash Import Class
  * By © strider 2012.
  */
 
@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.io.File;
@@ -30,37 +31,40 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.ads.AdView;
 
-import ru.strider.simplerecognizer.adapter.DirectoryListArrayAdapter;
+import ru.strider.simplerecognizer.adapter.FileListArrayAdapter;
+import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
 
 /**
- * ListActivity Pick Directory Class.
+ * ListActivity PHash Import Class.
  * 
  * @author strider
  */
-public class PickDirectory extends SherlockListActivity {
+public class PHashImport extends SherlockListActivity {
 	
-	private static final String LOG_TAG = "PickDirectory";
+	private static final String LOG_TAG = "PHashImport";
 	
-	public static final int PICK_DIRECTORY_REQUEST = 0;
+	public static final int PICK_FILE_REQUEST = 1;
 	
-	public static final String KEY_PICK_DIRECTORY = "PickDirectory";
+	public static final String KEY_PICK_FILE = "PickFile";
 	
+	private static final String KEY_FILE = "File";
 	private static final String KEY_DIRECTORY = "Directory";
 	
 	private static final String PARENT_DIR = ".." + File.separator;
 	
 	private PrefsAdapter mPrefsAdapter = null;
-	//private ConfigAdapter mConfigAdapter = null;
+	private ConfigAdapter mConfigAdapter = null;
 	
 	private boolean mIsRoot = false;
 	
+	private File mFile = null;
 	private File mDirectory = null;
 	
 	private List<File> mListFile = null;
 	private List<String> mListTitle = null;
 	
-	private DirectoryListArrayAdapter mAdapter = null;
+	private FileListArrayAdapter mAdapter = null;
 	private ListView mView = null;
 	
 	@Override
@@ -72,6 +76,12 @@ public class PickDirectory extends SherlockListActivity {
 		if (savedInstanceState == null) {
 			SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "SIS is NULL");
 		} else {
+			String file = savedInstanceState.getString(KEY_FILE);
+			
+			if (file != null) {
+				mFile = new File(file);
+			}
+			
 			String directory = savedInstanceState.getString(KEY_DIRECTORY);
 			
 			if (directory != null) {
@@ -92,7 +102,7 @@ public class PickDirectory extends SherlockListActivity {
 		
 		usePreferencesValues();
 		
-		//useConfigValues();
+		useConfigValues();
 		
 		//
 		
@@ -106,6 +116,10 @@ public class PickDirectory extends SherlockListActivity {
 		super.onSaveInstanceState(outState);
 		
 		if (outState != null) {
+			if (mFile != null) {
+				outState.putString(KEY_FILE, mFile.getPath());
+			}
+			
 			outState.putString(KEY_DIRECTORY, mDirectory.getPath());
 		}
 		
@@ -115,6 +129,9 @@ public class PickDirectory extends SherlockListActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		
+		mConfigAdapter.setDirectory(mDirectory.getPath());
+		mConfigAdapter.setValues();
 		
 		//
 		
@@ -137,7 +154,7 @@ public class PickDirectory extends SherlockListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.pick_directory_menu, menu);
+		inflater.inflate(R.menu.phash_import_menu, menu);
 		
 		return true;
 	}
@@ -154,8 +171,8 @@ public class PickDirectory extends SherlockListActivity {
 				
 				return true;
 			}
-			case (R.id.pickDirectoryMenuExport): {
-				returnDirectory();
+			case (R.id.pHashImportMenuImport): {
+				returnFile();
 				
 				return true;
 			}
@@ -167,17 +184,26 @@ public class PickDirectory extends SherlockListActivity {
 	
 	private void doInit() {
 		mPrefsAdapter = new PrefsAdapter(this);
-		//mConfigAdapter = new ConfigAdapter(this);
+		mConfigAdapter = new ConfigAdapter(this);
 		
-		mDirectory = File.listRoots()[0];
+		File file = new File(mConfigAdapter.getDirectory());
+		
+		if (file.isDirectory() && file.canRead()) {
+			mDirectory = file;
+		} else {
+			mDirectory = File.listRoots()[0];
+		}
+		
+		mListFile = new ArrayList<File>();
+		mListTitle = new ArrayList<String>();
 		
 		initData();
 		
 		this.setTitle(mDirectory.getAbsolutePath());
 		
-		this.setContentView(R.layout.pick_directory);
+		this.setContentView(R.layout.phash_import);
 		
-		mAdapter = new DirectoryListArrayAdapter(this, mListTitle);
+		mAdapter = new FileListArrayAdapter(this, mListTitle);
 		mView = this.getListView();
 		
 		mView.setAdapter(mAdapter);
@@ -186,10 +212,10 @@ public class PickDirectory extends SherlockListActivity {
 		
 		mView.setTextFilterEnabled(true);
 		//mView.setItemsCanFocus(false);
-		//mView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		mView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		
 		//SimpleRecognizer.initLisence(//TODO: TO ENABLE
-		//		PickDirectory.this,
+		//		PickFile.this,
 		//		(LinearLayout) this.findViewById(R.id.linearLayoutAdView)
 		//	);
 		
@@ -212,8 +238,8 @@ public class PickDirectory extends SherlockListActivity {
 	private void initData() {
 		mIsRoot = mDirectory.equals(File.listRoots()[0]);
 		
-		mListFile = new ArrayList<File>();
-		mListTitle = new ArrayList<String>();
+		mListFile.clear();
+		mListTitle.clear();
 		
 		if (!mIsRoot) {
 			mListFile.add(mDirectory.getParentFile());
@@ -226,16 +252,31 @@ public class PickDirectory extends SherlockListActivity {
 		
 		FilenameFilter filter = new FilenameFilter() {
 			
-			@Override
-			public boolean accept(File dir, String filename) {
-				File file = new File(dir, filename);
+			private boolean isImageFileType(String fileName) {
+				int extensionIndex = fileName.lastIndexOf(".");
 				
-				return (!file.isHidden() && (file.isDirectory() || file.isFile()));
+				if (extensionIndex != -1) {
+					String extension = fileName.substring(extensionIndex);
+					
+					if (extension.equalsIgnoreCase(".jpg") || extension.equalsIgnoreCase(".gif")
+							|| extension.equalsIgnoreCase(".png") || extension.equalsIgnoreCase(".bmp")) {
+						return true;
+					}
+				}
+				
+				return false;
+			}
+			
+			@Override
+			public boolean accept(File dir, String fileName) {
+				File file = new File(dir, fileName);
+				
+				return (!file.isHidden() && (file.isDirectory() || (file.isFile() && isImageFileType(fileName))));
 			}
 			
 		};
 		
-		for (File file : mDirectory.listFiles(filter)) {//TODO: CHECK ON POSSIBLE NULL POINTER
+		for (File file : mDirectory.listFiles(filter)) {
 			if (file.isDirectory()) {
 				listDir.add(file);
 			} else {
@@ -261,22 +302,24 @@ public class PickDirectory extends SherlockListActivity {
 	private void reloadView() {
 		initData();
 		
-		mAdapter.initData(mListTitle);
+		mAdapter.notifyDataSetChanged();
 		
 		this.setTitle(mDirectory.getAbsolutePath());
 		
-		//useConfigValues();
+		useConfigValues();
 	}
 	
-	private void returnDirectory() {
-		Intent iData = new Intent();
-		iData.putExtra(KEY_PICK_DIRECTORY, mDirectory.getPath());
+	private void returnFile() {
+		if (mFile != null) {
+			Intent iData = new Intent();
+			iData.putExtra(KEY_PICK_FILE, mFile.getPath());
+			
+			this.setResult(RESULT_OK, iData);
+			
+			this.finish();
+		}
 		
-		this.setResult(RESULT_OK, iData);
-		
-		this.finish();
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "returnDirectory() called");
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "returnFile() called");
 	}
 	
 	private void usePreferencesValues() {
@@ -298,17 +341,44 @@ public class PickDirectory extends SherlockListActivity {
 		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "usePreferencesValues() called");
 	}
-	/*
+	
 	private void useConfigValues() {
 		//mConfigAdapter.getValues();
 		
-		//
-		
-		//
+		if (mFile != null) {
+			mView.setItemChecked(getFilePosition(), true);
+		}
 		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
 	}
-	*/
+	
+	private int getFilePosition() {//FIXME: Entire method, plus "../" case
+		for (File file : mListFile) {
+			if ((file.isDirectory() && mFile.getPath().startsWith(file.getPath()))
+					|| (file.isFile() && file.equals(mFile))) {
+				for (int i = 0; i < mAdapter.getCount(); i++) {
+					if ((file.isDirectory() && mAdapter.getItem(i).toString().equals(file.getName() + File.separator))
+							|| (file.isFile() && mAdapter.getItem(i).toString().equals(file.getName()))) {
+						return i;
+					}
+				}
+			}
+		}
+		
+		for (File file : mListFile) {
+			if (!mIsRoot && file.isDirectory() && (file.getParent() != null)
+					&& mFile.getPath().startsWith(file.getParent())) {
+				for (int i = 0; i < mAdapter.getCount(); i++) {
+					if (mAdapter.getItem(i).toString().equals(PARENT_DIR)) {
+						return i;
+					}
+				}
+			}
+		}
+		
+		return AdapterView.INVALID_POSITION;
+	}
+	
 	private File getFile(String title) {
 		for (File file : mListFile) {
 			String fileName = file.getName();
@@ -341,6 +411,10 @@ public class PickDirectory extends SherlockListActivity {
 			} else {
 				//TODO: Couldn't read alert
 			}
+		} else if (file.isFile()) {
+			l.setItemChecked(position, true);
+			
+			mFile = file;
 		}
 	}
 	
@@ -348,8 +422,8 @@ public class PickDirectory extends SherlockListActivity {
 		this.finish();
 	}
 	
-	public void onClickButtonExport(View view) {
-		returnDirectory();
+	public void onClickButtonImport(View view) {
+		returnFile();
 	}
 	
 	@Override

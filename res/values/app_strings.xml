@@ -82,4 +82,8 @@
 		Cancel
 	</string>
 	
+	<string name="dialog_button_close_controls">
+		‹‹ Close  ››
+	</string>
+	
 </resources>

@@ -19,6 +19,14 @@
 			@style/TextAppearance.Main.Widget.ActionBar.Title
 		</item>
 		
+		<item name="indeterminateProgressStyle">
+			@style/Widget.Main.ProgressBar.Indeterminate
+		</item>
+		
+		<item name="android:indeterminateProgressStyle">
+			@style/Widget.Main.ProgressBar.Indeterminate
+		</item>
+		
 	</style>
 	
 	<!-- MAIN ACTION BAR TITLE TEXT STYLE -->
@@ -31,6 +39,16 @@
 		
 		<item name="android:textColor">
 			@color/main
+		</item>
+		
+	</style>
+	
+	<!-- MAIN PROGRESSBAR INDETERMINATE STYLE -->
+	<style name="Widget.Main.ProgressBar.Indeterminate"
+		   parent="@style/Widget.Sherlock.ProgressBar">
+		
+		<item name="android:indeterminateDrawable">
+			@drawable/progress_indeterminate
 		</item>
 		
 	</style>

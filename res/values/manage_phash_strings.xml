@@ -13,6 +13,10 @@
 	</string>
 	
 	<!-- MENU -->
+	<string name="manage_phash_menu_import">
+		Import
+	</string>
+	
 	<string name="manage_phash_menu_add_phash">
 		Add PHash
 	</string>

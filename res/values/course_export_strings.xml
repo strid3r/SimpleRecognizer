@@ -2,27 +2,27 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Strings Pick Directory XML
+	 Strings Course Export XML
 	 By © strider 2012.
 -->
 <resources>
 	
     <!-- MAIN -->
-	<string name="pick_directory_name">
-		Pick Directory
+	<string name="course_export_name">
+		Course Export
 	</string>
 	
 	<!-- MENU -->
-	<string name="pick_directory_menu_export">
+	<string name="course_export_menu_export">
 		Export
 	</string>
 	
 	<!-- CONTROLS -->
-	<string name="pick_directory_control_cancel">
+	<string name="course_export_control_cancel">
 		Cancel
 	</string>
 	
-	<string name="pick_directory_control_export">
+	<string name="course_export_control_export">
 		Export
 	</string>
 	

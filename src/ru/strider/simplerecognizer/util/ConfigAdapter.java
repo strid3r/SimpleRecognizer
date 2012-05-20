@@ -14,6 +14,8 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.util.Log;
 
+import java.io.File;
+
 import ru.strider.simplerecognizer.R;
 import ru.strider.simplerecognizer.SimpleRecognizer;
 
@@ -31,12 +33,16 @@ public class ConfigAdapter {
 	
 	public static final boolean DEFAULT_VALUE_IS_CREATOR = false;
 	
+	public static final String DEFAULT_VALUE_DIRECTORY = File.listRoots()[0].getPath();
+	
 	private final Context mContext;
 	
 	private int mCourseId = 0;
 	private int mItemId = 0;
 	
 	private boolean mIsCreator = false; 
+	
+	private String mDirectory = null;
 	
 	public ConfigAdapter(Context context) {
 		mContext = context;
@@ -58,6 +64,8 @@ public class ConfigAdapter {
 		
 		mIsCreator = config.getBoolean(res.getString(R.string.config_key_is_creator), DEFAULT_VALUE_IS_CREATOR);
 		
+		mDirectory = config.getString(res.getString(R.string.config_key_directory), DEFAULT_VALUE_DIRECTORY);
+		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "getValues() called");
 	}
 	
@@ -75,6 +83,8 @@ public class ConfigAdapter {
 		
 		editor.putBoolean(res.getString(R.string.config_key_is_creator), mIsCreator);
 		
+		editor.putString(res.getString(R.string.config_key_directory), mDirectory);
+		
 		editor.commit();
 		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "setValues() called");
@@ -91,6 +101,8 @@ public class ConfigAdapter {
 		if (isWithSwitchMode) {
 			setIsCreator(DEFAULT_VALUE_IS_CREATOR);
 		}
+		
+		setDirectory(DEFAULT_VALUE_DIRECTORY);
 		
 		setValues();
 		
@@ -119,6 +131,14 @@ public class ConfigAdapter {
 	
 	public void setIsCreator(boolean isCreator) {
 		mIsCreator = isCreator;
+	}
+	
+	public String getDirectory() {
+		return mDirectory;
+	}
+	
+	public void setDirectory(String directory) {
+		mDirectory = directory;
 	}
 	
 }

@@ -159,8 +159,8 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			case (R.id.selectCourseMenuImport): {
 				mAsyncCourseImport = new AsyncCourseImport(this);
 				
-				Intent iPickFile = new Intent(SelectCourse.this, PickFile.class);
-				this.startActivityForResult(iPickFile, PickFile.PICK_FILE_REQUEST);
+				Intent iPickFile = new Intent(SelectCourse.this, CourseImport.class);
+				this.startActivityForResult(iPickFile, CourseImport.PICK_FILE_REQUEST);
 				
 				return true;
 			}
@@ -303,8 +303,8 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					}*/
 					//
 					
-					Intent iPickDirectory = new Intent(SelectCourse.this, PickDirectory.class);
-					this.startActivityForResult(iPickDirectory, PickDirectory.PICK_DIRECTORY_REQUEST);
+					Intent iPickDirectory = new Intent(SelectCourse.this, CourseExport.class);
+					this.startActivityForResult(iPickDirectory, CourseExport.PICK_DIRECTORY_REQUEST);
 				}
 				
 				return true;
@@ -467,6 +467,8 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		mPrefsAdapter = new PrefsAdapter(this);
 		mConfigAdapter = new ConfigAdapter(this);
 		
+		mListTitle = new ArrayList<List<String>>();
+		
 		initData();
 		
 		if (mConfigAdapter.getIsCreator()) {
@@ -518,7 +520,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			mListCategory = new ArrayList<String>();
 		}
 		
-		mListTitle = new ArrayList<List<String>>();
+		mListTitle.clear();
 		for (int i = 0; i < mListCategory.size(); i++) {
 			mListTitle.add(dbAdapter.getListCourse(mListCategory.get(i)));
 		}
@@ -713,9 +715,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == PickDirectory.PICK_DIRECTORY_REQUEST) {
+		if (requestCode == CourseExport.PICK_DIRECTORY_REQUEST) {
 			if ((resultCode == RESULT_OK) && (data != null)) {
-				String dbPath = data.getStringExtra(PickDirectory.KEY_PICK_DIRECTORY);
+				String dbPath = data.getStringExtra(CourseExport.KEY_PICK_DIRECTORY);
 				
 				if ((dbPath != null) && (mAsyncCourseExport != null)) {
 					mAsyncCourseExport.execute(dbPath);
@@ -723,9 +725,9 @@ public class SelectCourse extends SherlockExpandableListActivity {
 			}
 			
 			mAsyncCourseExport = null;
-		} else if (requestCode == PickFile.PICK_FILE_REQUEST) {
+		} else if (requestCode == CourseImport.PICK_FILE_REQUEST) {
 			if ((resultCode == RESULT_OK) && (data != null)) {
-				String dbPath = data.getStringExtra(PickFile.KEY_PICK_FILE);
+				String dbPath = data.getStringExtra(CourseImport.KEY_PICK_FILE);
 				
 				if ((dbPath != null) && (mAsyncCourseImport != null)) {
 					mAsyncCourseImport.execute(dbPath);

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Course Import XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="course_import_name">
+		Course Import
+	</string>
+	
+	<!-- MENU -->
+	<string name="course_import_menu_import">
+		Import
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="course_import_control_cancel">
+		Cancel
+	</string>
+	
+	<string name="course_import_control_import">
+		Import
+	</string>
+	
+</resources>

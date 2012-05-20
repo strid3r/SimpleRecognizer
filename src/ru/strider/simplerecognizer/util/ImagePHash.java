@@ -96,6 +96,32 @@ public class ImagePHash {
 	 * Returns Hex String of a "binary string" (like, 001010111011100010),
 	 * which is easy to do a Hamming Distance on.
 	 * 
+	 * @return Hex String pHash of the image from File by pathName,
+	 *         or null if the image data could not be decoded.
+	 */
+	public String getPHash(String pathName) {
+		String pHash = null;
+		
+		if (pathName != null) {
+			final BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(pathName, options);
+			
+			options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
+			options.inJustDecodeBounds = false;
+			
+			Bitmap bitmap = BitmapFactory.decodeFile(pathName, options);
+			
+			pHash = getPHash(bitmap);
+		}
+		
+		return pHash;
+	}
+	
+	/**
+	 * Returns Hex String of a "binary string" (like, 001010111011100010),
+	 * which is easy to do a Hamming Distance on.
+	 * 
 	 * @return Hex String pHash of the image from InputStream,
 	 *         or null if the image data could not be decoded.
 	 */

@@ -23,6 +23,12 @@
 												   android:layout_width="match_parent"
 				 								   android:layout_height="match_parent" />
 		
+		<!-- ADMOB -->
+		<LinearLayout android:id="@+id/linearLayoutAdView"
+					  android:layout_width="wrap_content"
+					  android:layout_gravity="center_horizontal|top"
+					  style="@style/Main.AdView" />
+		
 		<!-- SHUTTER -->
 		<LinearLayout android:id="@+id/linearLayoutShutter"
 					  android:layout_width="match_parent"

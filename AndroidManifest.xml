@@ -8,7 +8,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="ru.strider.simplerecognizer"
 		  android:versionCode="1"
-		  android:versionName="0.6.0"
+		  android:versionName="0.7.0"
 		  android:installLocation="auto">
 	
 	<uses-sdk android:minSdkVersion="5"
@@ -66,13 +66,13 @@
 		<activity android:name=".SelectCourse"
 				  android:label="@string/select_course_name_viewer" />
 		
-		<!-- PICK DIRECTORY -->
-		<activity android:name=".PickDirectory"
-				  android:label="@string/pick_directory_name" />
+		<!-- COURSE EXPORT -->
+		<activity android:name=".CourseExport"
+				  android:label="@string/course_export_name" />
 		
-		<!-- PICK FILE -->
-		<activity android:name=".PickFile"
-				  android:label="@string/pick_file_name" />
+		<!-- COURSE IMPORT -->
+		<activity android:name=".CourseImport"
+				  android:label="@string/course_import_name" />
 		
 		<!-- MANAGE ITEM -->
 		<activity android:name=".ManageItem"
@@ -81,6 +81,10 @@
 		<!-- MANAGE PHASH -->
 		<activity android:name=".ManagePHash"
 				  android:label="@string/manage_phash_name" />
+		
+		<!-- PHASH IMPORT -->
+		<activity android:name=".PHashImport"
+				  android:label="@string/phash_import_name" />
 		
 	</application>
 	

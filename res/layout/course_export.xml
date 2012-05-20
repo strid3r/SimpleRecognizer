@@ -2,12 +2,12 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Layout Pick File XML
+	 Layout Course Export XML
 	 By © strider 2012.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			  xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
-			  android:id="@+id/linearLayoutPickFile"
+			  android:id="@+id/linearLayoutCourseExport"
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent"
 			  android:orientation="vertical"
@@ -29,7 +29,7 @@
 				  style="@style/Main.AdView" />
 	
 	<!-- CONTROLS -->
-	<LinearLayout android:id="@+id/linearLayoutPickFileControls"
+	<LinearLayout android:id="@+id/linearLayoutCourseExportControls"
 				  android:layout_width="match_parent"
 				  android:layout_height="wrap_content"
 				  android:layout_weight="0.0"
@@ -38,7 +38,7 @@
 		
 		<!-- CANCEL -->
 		<ru.strider.widget.MainButton android:id="@+id/buttonControlCancel"
-									  android:text="@string/pick_file_control_cancel"
+									  android:text="@string/course_export_control_cancel"
 									  android:layout_weight="0.5"
 									  android:textColor="@color/main"
 									  style="@style/Main.ButtonMain.TextViewAbout.Info"
@@ -46,11 +46,11 @@
 		
 		<!-- EXPORT -->
 		<ru.strider.widget.MainButton android:id="@+id/buttonControlExport"
-									  android:text="@string/pick_file_control_import"
+									  android:text="@string/course_export_control_export"
 									  android:layout_weight="0.5"
 									  android:textColor="@color/main"
 									  style="@style/Main.ButtonMain.TextViewAbout.Info"
-									  android:onClick="onClickButtonImport" />
+									  android:onClick="onClickButtonExport" />
 		
 	</LinearLayout>
 	

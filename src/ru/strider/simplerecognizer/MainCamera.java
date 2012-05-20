@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -42,6 +43,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.ads.AdView;
 
 import ru.strider.simplerecognizer.adapter.SpinnerArrayAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
@@ -52,6 +54,7 @@ import ru.strider.simplerecognizer.util.BuildConfig;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.ImagePHash;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
+import ru.strider.widget.MainButton;
 
 /**
  * Activity Main Class.
@@ -152,11 +155,11 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 	
 	@Override
 	protected void onDestroy() {
-		//AdView adView = (AdView) this.findViewById(R.id.adView);
+		AdView adView = (AdView) this.findViewById(R.id.adView);
 		
-		//if (adView != null) {
-		//	adView.destroy();
-		//}
+		if (adView != null) {
+			adView.destroy();
+		}
 		
 		super.onDestroy();
 	}
@@ -220,7 +223,9 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 			case (R.id.mainMenuExit): {
 				Log.i(LOG_TAG, "Application Exit called");
 				
-				super.onDestroy();
+				onPause();
+				
+				onDestroy();
 				
 				Process.killProcess(Process.myPid());
 				//System.runFinalizersOnExit(true);
@@ -708,28 +713,44 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 					sb.append(" NO MATCH FOUND");
 				}
 				
+				if (itemResult != null) {//TODO
+					sb.append(SimpleRecognizer.BR_LINE).append(SimpleRecognizer.BR_LINE);
+					sb.append(itemResult.getContent());
+				}
+				
 				//
 				
 				LayoutInflater inflater = LayoutInflater.from(mContext);
-				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View viewContent = inflater.inflate(R.layout.alert_dialog_item, null);
 				
-				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 				textViewTitle.setText((itemResult != null) ? itemResult.getTitle() : "Item not found");
+				
+				TextView textViewContent = (TextView) viewContent.findViewById(R.id.textViewItem);
+				textViewContent.setText(Html.fromHtml(sb.toString().replace("\n", "<br />")));
+				
+				MainButton buttonClose = (MainButton) viewContent.findViewById(R.id.buttonAlertDialogClose);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 				builder.setCustomTitle(viewTitle);
-				builder.setMessage(sb.toString());
+				builder.setView(viewContent);
+				builder.setCancelable(true);
 				
-				builder.setNeutralButton(R.string.dialog_button_close, new DialogInterface.OnClickListener() {
+				final AlertDialog alert = builder.create();
+				alert.setCanceledOnTouchOutside(true);
+				//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);
+				//alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+				
+				buttonClose.setOnClickListener(new View.OnClickListener() {
 					
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						//
+					public void onClick(View v) {
+						alert.dismiss();
 					}
 					
 				});
 				
-				AlertDialog alert = builder.create();
 				alert.show();
 			}
 			

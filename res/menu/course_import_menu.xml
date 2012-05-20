@@ -2,15 +2,15 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Menu Pick Directory XML
+	 Menu Course Import XML
 	 By © strider 2012.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	
-    <group android:id="@+id/pickDirectoryMenuControls">
+    <group android:id="@+id/courseImportMenuControls">
 		
-		<item android:id="@+id/pickDirectoryMenuExport"
-		      android:title="@string/pick_directory_menu_export"
+		<item android:id="@+id/courseImportMenuImport"
+		      android:title="@string/course_import_menu_import"
 		      android:icon="@drawable/ic_menu_save"
 		      android:showAsAction="ifRoom|withText"
 		      android:orderInCategory="0" />

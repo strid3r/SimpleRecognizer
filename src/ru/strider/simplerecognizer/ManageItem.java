@@ -331,6 +331,8 @@ public class ManageItem extends SherlockListActivity {
 		mPrefsAdapter = new PrefsAdapter(this);
 		mConfigAdapter = new ConfigAdapter(this);
 		
+		mListTitle = new ArrayList<String>();
+		
 		initData();
 		
 		this.setTitle(mCourse.getCategory() + SimpleRecognizer.SEPARATOR + mCourse.getTitle());
@@ -384,7 +386,7 @@ public class ManageItem extends SherlockListActivity {
 			mListItem = new ArrayList<Item>();
 		}
 		
-		mListTitle = new ArrayList<String>();
+		mListTitle.clear();
 		for (Item item : mListItem) {
 			mListTitle.add(item.getTitle());
 		}
@@ -393,7 +395,7 @@ public class ManageItem extends SherlockListActivity {
 	private void reloadView() {
 		initData();
 		
-		mAdapter.initData(mListTitle);
+		mAdapter.notifyDataSetChanged();
 		
 		useConfigValues();
 	}
