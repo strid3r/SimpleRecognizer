@@ -209,15 +209,22 @@ public class ManagePHash extends SherlockListActivity {
 			case (R.id.managePHashContextMenuShowComment): {
 				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 				
-				LayoutInflater inflater = LayoutInflater.from(this);
-				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				PHash pHash = getPHash(mAdapter.getItem(info.position).toString());
 				
-				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.manage_phash_context_menu_show_comment);
+				LayoutInflater inflater = LayoutInflater.from(this);
+				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View view = inflater.inflate(R.layout.alert_dialog_manage_phash_show_comment, null);
+				
+				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(pHash.getHexValue());
+				
+				EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
+				editTextComment.setText(Html.fromHtml(pHash.getComment()));
+				editTextComment.setEnabled(false);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCustomTitle(viewTitle);
-				builder.setMessage(Html.fromHtml(getPHash(mAdapter.getItem(info.position).toString()).getComment()));
+				builder.setView(view);
 				builder.setNeutralButton(R.string.dialog_button_close, null);
 				
 				AlertDialog alert = builder.create();
@@ -244,10 +251,10 @@ public class ManagePHash extends SherlockListActivity {
 				final PHash pHash = getPHash(mAdapter.getItem(info.position).toString());
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
-				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
 				
-				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 				textViewTitle.setText(R.string.manage_phash_context_menu_edit);
 				
 				final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
@@ -400,7 +407,7 @@ public class ManagePHash extends SherlockListActivity {
 		showAddPHash(null);
 	}
 	
-	private void showAddPHash(String pHash) {
+	private void showAddPHash(String pHashHex) {
 		DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
 		dbAdapter.createDataBase(this);
 		dbAdapter.open();
@@ -415,10 +422,10 @@ public class ManagePHash extends SherlockListActivity {
 		}
 		
 		LayoutInflater inflater = LayoutInflater.from(this);
-		final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-		final View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+		View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+		View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
 		
-		final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+		TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 		textViewTitle.setText(R.string.manage_phash_menu_add_phash);
 		
 		final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
@@ -430,8 +437,8 @@ public class ManagePHash extends SherlockListActivity {
 		spinnerItem.setSelection(listTitle.indexOf(mItem.getTitle()));
 		
 		final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
-		if (pHash != null) {
-			editTextHexValue.setText(pHash);
+		if (pHashHex != null) {
+			editTextHexValue.setText(pHashHex);
 		}
 		
 		final EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
@@ -665,8 +672,8 @@ public class ManagePHash extends SherlockListActivity {
 			}
 			//
 			
-			for (String pHash : result) {
-				showAddPHash(pHash);
+			for (String pHashHex : result) {
+				showAddPHash(pHashHex);
 			}
 		}
 		

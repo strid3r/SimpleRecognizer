@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 RU Strings PHash Import XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="phash_import_name">
+		Импорт PHash
+	</string>
+	
+	<!-- MENU -->
+	<string name="phash_import_menu_import">
+		Импорт
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="phash_import_control_cancel">
+		Отмена
+	</string>
+	
+	<string name="phash_import_control_import">
+		Импорт
+	</string>
+	
+</resources>

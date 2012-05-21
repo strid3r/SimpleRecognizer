@@ -23,6 +23,7 @@ public class Item {
 	
 	private String mTitle = null;
 	private String mContent = null;
+	private String mVideoUri = null;
 	
 	private int mCourseId = 0;
 	
@@ -32,36 +33,40 @@ public class Item {
 		//
 	}
 	
-	public Item(String title, String content, int courseId) {
+	public Item(String title, String content, String videoUri, int courseId) {
 		mTitle = title;
 		mContent = content;
+		mVideoUri = videoUri;
 		
 		mCourseId = courseId;
 	}
 	
-	public Item(String title, String content, int courseId, List<PHash> listPHash) {
+	public Item(String title, String content, String videoUri, int courseId, List<PHash> listPHash) {
 		mTitle = title;
 		mContent = content;
+		mVideoUri = videoUri;
 		
 		mCourseId = courseId;
 		
 		mListPHash = listPHash;
 	}
 	
-	public Item(int id, String title, String content, int courseId) {
+	public Item(int id, String title, String content, String videoUri, int courseId) {
 		mId = id;
 		
 		mTitle = title;
 		mContent = content;
+		mVideoUri = videoUri;
 		
 		mCourseId = courseId;
 	}
 	
-	public Item(int id, String title, String content, int courseId, List<PHash> listPHash) {
+	public Item(int id, String title, String content, String videoUri, int courseId, List<PHash> listPHash) {
 		mId = id;
 		
 		mTitle = title;
 		mContent = content;
+		mVideoUri = videoUri;
 		
 		mCourseId = courseId;
 		
@@ -90,6 +95,14 @@ public class Item {
 	
 	public void setContent(String content) {
 		mContent = content;
+	}
+	
+	public String getVideoUri() {
+		return mVideoUri;
+	}
+	
+	public void setVideoUri(String videoUri) {
+		mVideoUri = videoUri;
 	}
 	
 	public int getCourseId() {

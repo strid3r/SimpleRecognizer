@@ -136,15 +136,17 @@ public class ManageItem extends SherlockListActivity {
 			}
 			case (R.id.manageItemMenuAddItem): {
 				LayoutInflater inflater = LayoutInflater.from(this);
-				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				final View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
+				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
 				
-				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 				textViewTitle.setText(R.string.manage_item_menu_add_item);
 				
 				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
 				
 				final EditText editTextContent = (EditText) view.findViewById(R.id.editTextContent);
+				
+				final EditText editTextVideoUri = (EditText) view.findViewById(R.id.editTextVideoUri);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCustomTitle(viewTitle);
@@ -163,6 +165,7 @@ public class ManageItem extends SherlockListActivity {
 						dbAdapter.addItem(new Item(
 								editTextTitle.getText().toString(),
 								editTextContent.getText().toString(),
+								editTextVideoUri.getText().toString(),
 								mCourse.getId()
 							));
 						
@@ -237,16 +240,27 @@ public class ManageItem extends SherlockListActivity {
 			case (R.id.manageItemContextMenuShowContent): {
 				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 				
-				LayoutInflater inflater = LayoutInflater.from(this);
-				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				Item courseItem = getItem(mAdapter.getItem(info.position).toString());
 				
-				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.manage_item_context_menu_show_content);
+				LayoutInflater inflater = LayoutInflater.from(this);
+				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View view = inflater.inflate(R.layout.alert_dialog_manage_item_show_content, null);
+				
+				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				textViewTitle.setText(courseItem.getTitle());
+				
+				EditText editTextContent = (EditText) view.findViewById(R.id.editTextContent);
+				editTextContent.setText(Html.fromHtml(courseItem.getContent()));
+				editTextContent.setEnabled(false);
+				
+				EditText editTextVideoUri = (EditText) view.findViewById(R.id.editTextVideoUri);
+				editTextVideoUri.setText(courseItem.getVideoUri());
+				editTextVideoUri.setEnabled(false);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCustomTitle(viewTitle);
-				builder.setMessage(Html.fromHtml(getItem(mAdapter.getItem(info.position).toString()).getContent()));
-				builder.setNeutralButton("Close", null);
+				builder.setView(view);
+				builder.setNeutralButton(R.string.dialog_button_close, null);
 				
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -259,10 +273,10 @@ public class ManageItem extends SherlockListActivity {
 				final Item courseItem = getItem(mAdapter.getItem(info.position).toString());
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
-				final View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				final View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
+				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+				View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
 				
-				final TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 				textViewTitle.setText(R.string.manage_item_context_menu_edit);
 				
 				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
@@ -270,6 +284,9 @@ public class ManageItem extends SherlockListActivity {
 				
 				final EditText editTextContent = (EditText) view.findViewById(R.id.editTextContent);
 				editTextContent.setText(courseItem.getContent());
+				
+				final EditText editTextVideoUri = (EditText) view.findViewById(R.id.editTextVideoUri);
+				editTextVideoUri.setText(courseItem.getVideoUri());
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCustomTitle(viewTitle);
@@ -283,6 +300,7 @@ public class ManageItem extends SherlockListActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						courseItem.setTitle(editTextTitle.getText().toString());
 						courseItem.setContent(editTextContent.getText().toString());
+						courseItem.setVideoUri(editTextVideoUri.getText().toString());
 						
 						DataBaseAdapter dbAdapter = new DataBaseAdapter(ManageItem.this);
 						dbAdapter.createDataBase(ManageItem.this);

@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Process;
@@ -24,6 +25,7 @@ import android.util.Log;
 import android.widget.LinearLayout;
 
 import java.io.File;
+import java.util.Locale;
 
 import org.json.JSONException;
 
@@ -36,6 +38,7 @@ import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
 import ru.strider.simplerecognizer.util.BuildConfig;
+import ru.strider.simplerecognizer.util.PrefsAdapter;
 
 /**
  * Application Simple Recognizer Class.
@@ -70,9 +73,23 @@ public class SimpleRecognizer extends Application {
 			LinearLayout.LayoutParams.WRAP_CONTENT
 		);
 	
+	private PrefsAdapter mPrefsAdapter = null;
+	
+	private Locale mLocale = null;
+	
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+		
+		if (mLocale != null) {
+			Resources res = this.getBaseContext().getResources();
+			
+			Locale.setDefault(mLocale);
+			
+			newConfig.locale = mLocale;
+			
+			res.updateConfiguration(newConfig, res.getDisplayMetrics());
+		}
 		
 		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Configuration Changed");
 	}
@@ -82,6 +99,8 @@ public class SimpleRecognizer extends Application {
 		super.onCreate();
 		
 		//PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		
+		doInit();
 		
 		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Launched");
 	}
@@ -98,6 +117,35 @@ public class SimpleRecognizer extends Application {
 		super.onTerminate();
 		
 		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Terminated");
+	}
+	
+	private void doInit() {
+		mPrefsAdapter = new PrefsAdapter(this);
+		
+		usePreferencesValues();
+	}
+	
+	private void usePreferencesValues() {
+		mPrefsAdapter.getValues();
+		
+		Resources res = this.getBaseContext().getResources();
+		
+		Configuration config = res.getConfiguration();
+		
+		String languageCode = mPrefsAdapter.getLanguageCode();
+		
+		if (!languageCode.equals(res.getString(R.string.locale_language_code_default))
+				&& !config.locale.getLanguage().equals(languageCode)) {
+			Locale locale = new Locale(languageCode);
+			
+			Locale.setDefault(locale);
+			
+			config.locale = locale;
+			
+			res.updateConfiguration(config, res.getDisplayMetrics());
+		}
+		
+		logIfDebug(Log.INFO, LOG_TAG, "usePreferencesValues() called");
 	}
 	
 	public static final Typeface getTypefaceMain(Context context) {

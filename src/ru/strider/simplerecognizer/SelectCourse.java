@@ -150,9 +150,17 @@ public class SelectCourse extends SherlockExpandableListActivity {
 				return true;
 			}
 			case (R.id.selectCourseMenuSwitchMode): {
-				mConfigAdapter.setIsCreator(!mConfigAdapter.getIsCreator());
+				boolean wasCreator = mConfigAdapter.getIsCreator();
+				
+				mConfigAdapter.setIsCreator(!wasCreator);
 				
 				this.invalidateOptionsMenu();
+				
+				if (!wasCreator) {
+					this.setTitle(R.string.select_course_name_creator);
+				} else {
+					this.setTitle(R.string.select_course_name_viewer);
+				}
 				
 				return true;
 			}
@@ -341,7 +349,7 @@ public class SelectCourse extends SherlockExpandableListActivity {
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setCustomTitle(viewTitle);
 					builder.setView(view);
-					builder.setNeutralButton("Close", null);
+					builder.setNeutralButton(R.string.dialog_button_close, null);
 					
 					AlertDialog alert = builder.create();
 					alert.show();

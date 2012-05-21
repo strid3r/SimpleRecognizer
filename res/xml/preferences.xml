@@ -17,6 +17,21 @@
 		
 	<!-- </PreferenceCategory> -->
 	
+	<!-- LOCALIZATION SETTINGS -->
+	<PreferenceCategory android:key="@string/preferences_category_localization_key"
+						android:title="@string/preferences_category_localization_title">
+		
+		<!-- LOCALE -->
+		<ListPreference android:key="@string/prefs_key_localization_language_code"
+						android:title="@string/prefs_title_localization_language"
+						android:summary="@string/prefs_summary_localization_language"
+						android:entries="@array/entry_titles_localization_language_list"
+						android:entryValues="@array/entry_values_localization_language_code_list"
+						android:dialogTitle="@string/prefs_dialog_title_localization_language"
+						android:defaultValue="@string/prefs_default_value_localization_language_code" />
+		
+	</PreferenceCategory>
+	
 	<!-- DISPLAY SETTINGS -->
 	<PreferenceCategory android:key="@string/preferences_category_display_key"
 						android:title="@string/preferences_category_display_title">

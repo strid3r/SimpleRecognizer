@@ -30,6 +30,7 @@ CREATE TABLE Item (
 	_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title TEXT NOT NULL,
 	content TEXT NOT NULL,
+	video_uri TEXT,
 	course_id INTEGER NOT NULL,
 	FOREIGN KEY (course_id) REFERENCES Course(_id) ON DELETE CASCADE
 );
@@ -61,17 +62,17 @@ CREATE TRIGGER fk_PHashItem_item_id
 // Course : Item : pHash
 INSERT INTO Course(title, category, version, creator)
 	VALUES ('Course', 'Category', 1, 'strider.stankov@gmail.com');
-INSERT INTO Item(title, content, course_id)
-	VALUES ('Item', 'This is temp Item.<br><br>For more info blahblahblah...', 1);
+INSERT INTO Item(title, content, video_uri, course_id)
+	VALUES ('Item', 'This is temp Item.<br /><br />For more info blahblahblah...', 'http://www.youtube.com/watch?v=rT2LzCLhbOE', 1);
 INSERT INTO PHash(hex_value, comment, item_id)
-	VALUES ('FFFFFFFFFFFF', 'This is temp pHash value.<br><br>For more info blahblahblah...', 1);
+	VALUES ('FFFFFFFFFFFF', 'This is temp pHash value.<br /><br />For more info blahblahblah...', 1);
 
 // Course : Item : pHash
 INSERT INTO Course(title, category, version, creator)
 	VALUES ('Temp', 'Main', 1, 'strider.stankov@gmail.com');
-INSERT INTO Item(title, content, course_id)
-	VALUES ('Object', 'This is Object Item.<br><br>For more info blahblahblah...', 2);
+INSERT INTO Item(title, content, video_uri, course_id)
+	VALUES ('Object', 'This is Object Item.<br /><br />For more info blahblahblah...', 'http://www.youtube.com/watch?v=rT2LzCLhbOE', 2);
 INSERT INTO PHash(hex_value, comment, item_id)
-	VALUES ('FFFFFFFFFFFF', 'This is Object pHash value.<br><br>For more info blahblahblah...', 2);
+	VALUES ('FFFFFFFFFFFF', 'This is Object pHash value.<br /><br />For more info blahblahblah...', 2);
 
 

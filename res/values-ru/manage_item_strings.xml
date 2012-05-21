@@ -2,61 +2,61 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Strings Manage Item XML
+	 RU Strings Manage Item XML
 	 By © strider 2012.
 -->
 <resources>
 	
     <!-- MAIN -->
 	<string name="manage_item_name">
-		Manage Item
+		Управление Объектами
 	</string>
 	
 	<!-- MENU -->
 	<string name="manage_item_menu_add_item">
-		Add Item
+		Добавить Объект
 	</string>
 	
 	<string name="manage_item_menu_delete_course">
-		Delete Course
+		Удалить Объект
 	</string>
 	
 	<string name="manage_item_menu_save">
-		Save
+		Сохранить
 	</string>
 	
 	<!-- CONTEXT MENU -->
 	<string name="manage_item_context_menu_header_title">
-		Confirmation Menu
+		Меню Подтверждения
 	</string>
 	
 	<string name="manage_item_context_menu_apply_selection">
-		Apply Selection
+		Применить Выбор
 	</string>
 	
 	<string name="manage_item_context_menu_show_content">
-		Show Content
+		Показать Содержимое
 	</string>
 	
 	<string name="manage_item_context_menu_edit">
-		Edit Item
+		Изменить Объект
 	</string>
 	
 	<string name="manage_item_context_menu_delete">
-		Delete Item
+		Удалить Объект
 	</string>
 	
 	<!-- DIALOG -->
 	<string name="manage_item_dialog_title_title">
-		Title
+		Название
 	</string>
 	
 	<string name="manage_item_dialog_content_title">
-		Content
+		Содержимое
 	</string>
 	
 	<string name="manage_item_dialog_video_uri_title">
-		Video URI
+		Видео URI
 	</string>
 	
 </resources>

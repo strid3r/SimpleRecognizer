@@ -36,11 +36,32 @@
 	</ScrollView>
 	
 	<!-- CONTROLS -->
-	<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogClose"
-								  android:text="@string/dialog_button_close_controls"
-								  android:layout_margin="4.0dp"
-								  android:textSize="24sp"
-								  android:textColor="@color/main"
-								  style="@style/Main.ButtonMain.TextViewAbout.Info" />
+	<LinearLayout android:id="@+id/linearLayoutAlertDialogControls"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:layout_weight="0.0"
+				  android:orientation="horizontal"
+				  android:weightSum="1.0">
+		
+		<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogVideo"
+									  android:text="@string/dialog_button_video_controls"
+									  android:layout_width="0dp"
+									  android:layout_weight="0.5"
+									  android:layout_margin="4.0dp"
+									  android:textSize="24sp"
+									  android:textColor="@color/silver"
+									  style="@style/Main.ButtonMain.TextViewAbout.Info"
+									  android:clickable="false" />
+		
+		<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogClose"
+									  android:text="@string/dialog_button_close_controls"
+									  android:layout_width="0dp"
+									  android:layout_weight="0.5"
+									  android:layout_margin="4.0dp"
+									  android:textSize="24sp"
+									  android:textColor="@color/main"
+									  style="@style/Main.ButtonMain.TextViewAbout.Info" />
+		
+	</LinearLayout>
 	
 </LinearLayout>

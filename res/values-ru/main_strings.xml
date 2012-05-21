@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 RU Strings Main XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="main_name">
+		Главная Камера
+	</string>
+	
+	<!-- MENU -->
+	<string name="main_menu_switch_mode_creator">
+		К Создателю
+	</string>
+	
+	<string name="main_menu_switch_mode_viewer">
+		К Зрителю
+	</string>
+	
+	<string name="main_menu_course">
+		Курс
+	</string>
+	
+	<string name="main_menu_switch_camera">
+		Переключить Камеру
+	</string>
+	
+	<string name="main_menu_preferences">
+		Настройки
+	</string>
+	
+	<string name="main_menu_about">
+		О Приложении
+	</string>
+	
+	<string name="main_menu_exit">
+		Выход
+	</string>
+	
+	<!-- DIALOG -->
+	<string name="main_dialog_no_course_message">
+		Для начала нужно выбрать Курс для работы с ним.
+	</string>
+	
+	<string name="main_dialog_no_item_message">
+		Для начала нужно выбрать Объект для работы с ним.
+	</string>
+	
+	<string name="main_dialog_camera_error_title">
+		Ошибка Камеры
+	</string>
+	
+	<string name="main_dialog_camera_alert_title">
+		Предупреждение Камеры
+	</string>
+	
+	<string name="main_dialog_camera_alert_message">
+		Извините, но данное Устройство имеет только одну Камеру.
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="key_button_back_double_press">
+		‹‹ Нажмите Кнопку Назад ещё раз, чтобы закрыть Приложение ››
+	</string>
+	
+</resources>

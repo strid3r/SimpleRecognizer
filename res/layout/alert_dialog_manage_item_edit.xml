@@ -35,6 +35,14 @@
 		<EditText android:id="@+id/editTextContent"
 				  style="@style/Main.AlertDialog.EditView" />
 		
+		<!-- VIDEO URI -->
+		<ru.strider.widget.MainTextView android:id="@+id/textViewVideoUriTitle"
+										android:text="@string/manage_item_dialog_video_uri_title"
+										style="@style/Main.AlertDialog.TextView.Title.Sub" />
+		
+		<EditText android:id="@+id/editTextVideoUri"
+				  style="@style/Main.AlertDialog.EditView" />
+		
 	</LinearLayout>
 	
 </ScrollView>

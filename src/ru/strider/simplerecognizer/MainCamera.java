@@ -17,6 +17,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
@@ -696,7 +697,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				
 				PHash pHashMin = Item.findPHashMin(listPHash);
 				
-				sb.append(SimpleRecognizer.BR_LINE).append("Hamming Distance List:");
+				sb.append(SimpleRecognizer.BR_LINE).append("Item Hamming Distance List:");
 				
 				if ((pHashMin != null) && (pHashMin.getHammingDistance() < ImagePHash.HAMMING_DISTANCE_THRESHOLD)) {
 					//PROFIT!!!
@@ -725,10 +726,32 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				View viewContent = inflater.inflate(R.layout.alert_dialog_item, null);
 				
 				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText((itemResult != null) ? itemResult.getTitle() : "Item not found");
+				textViewTitle.setText((itemResult != null) ? itemResult.getTitle() : "Item not Found");
 				
 				TextView textViewContent = (TextView) viewContent.findViewById(R.id.textViewItem);
 				textViewContent.setText(Html.fromHtml(sb.toString().replace("\n", "<br />")));
+				
+				MainButton buttonVideo = (MainButton) viewContent.findViewById(R.id.buttonAlertDialogVideo);
+				if (itemResult != null) {
+					String videoUri = itemResult.getVideoUri();
+					
+					if (videoUri != null) {
+						final Uri uri = Uri.parse(videoUri);
+						
+						buttonVideo.setTextColor(mContext.getResources().getColor(R.color.main));
+						buttonVideo.setClickable(true);
+						
+						buttonVideo.setOnClickListener(new View.OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								Intent iVideoUri = new Intent(Intent.ACTION_VIEW, uri);
+								mActivity.startActivity(iVideoUri);
+							}
+							
+						});
+					}
+				}
 				
 				MainButton buttonClose = (MainButton) viewContent.findViewById(R.id.buttonAlertDialogClose);
 				
@@ -739,7 +762,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				
 				final AlertDialog alert = builder.create();
 				alert.setCanceledOnTouchOutside(true);
-				//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);
+				//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);//TODO: TO FIND WAY FOR TRANSPARENCY
 				//alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
 				
 				buttonClose.setOnClickListener(new View.OnClickListener() {
@@ -773,7 +796,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 		
 	}
 	
-	/*
+	/*// TRASH
 	//implements OnSharedPreferenceChangeListener //@class
 	//getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this); //@onResume
 	//getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this); //@onPause

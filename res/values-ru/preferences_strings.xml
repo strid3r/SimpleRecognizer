@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 RU Strings Preferences XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="preferences_name">
+		Настройки Приложения
+	</string>
+	
+	<!-- <string name="preferences_file_name">
+		Preferences
+	</string> -->
+	
+	<!-- MENU -->
+	<string name="preferences_menu_save">
+		Сохранить
+	</string>
+	
+	<!-- CATEGORY -->
+	<!-- <string name="preferences_category_main_key">
+		MAIN_SETTINGS
+	</string> -->
+	
+	<string name="preferences_category_main_title">
+		Главные Настройки
+	</string>
+	
+	<!-- <string name="preferences_category_localization_key">
+		LOCALIZATION_SETTINGS
+	</string> -->
+	
+	<string name="preferences_category_localization_title">
+		Настройки Локализации
+	</string>
+	
+	<!-- <string name="preferences_category_display_key">
+		DISPLAY_SETTINGS
+	</string> -->
+	
+	<string name="preferences_category_display_title">
+		Настройки Экрана
+	</string>
+	
+	<!-- <string name="preferences_category_licensing_key">
+		LICENSING
+	</string> -->
+	
+	<string name="preferences_category_licensing_title">
+		Лицензирование
+	</string>
+	
+	<!-- KEYS -->
+	<!-- <string name="prefs_key_localization_language_code">
+		LANGUAGE_CODE
+	</string> -->
+	
+	<!-- <string name="prefs_key_display_is_keep_screen_on">
+		IS_KEEP_SCREEN_ON
+	</string> -->
+	
+	<!-- <string name="prefs_key_display_is_full_screen">
+		IS_FULL_SCREEN
+	</string> -->
+	
+	<!-- <string name="prefs_key_licensing_purchase">
+		PURCHASE
+	</string> -->
+	
+	<!-- TITLE -->
+	<string name="prefs_title_localization_language">
+		Язык Локализации
+	</string>
+	
+	<string name="prefs_title_display_is_keep_screen_on">
+		Держать Экран Включенным
+	</string>
+	
+	<string name="prefs_title_display_is_full_screen">
+		Полноэкранный Режим
+	</string>
+	
+	<string name="prefs_title_licensing_purchase">
+		Убрать Рекламу &amp; поддержать разработчика.
+	</string>
+	
+	<!-- SUMMATY -->
+	<string name="prefs_summary_localization_language">
+		Язык текущей Локализации\n(требует перезапуска Приложения)
+	</string>
+	
+	<string name="prefs_summary_display_is_keep_screen_on">
+		Не давать выключаться экрану\nпока Приложение используется
+	</string>
+	
+	<string name="prefs_summary_display_is_full_screen">
+		Включить полноэкранный режим,\nспрятав строку уведомлений
+	</string>
+	
+	<!-- DEFAULT VALUE -->
+	<!-- <string name="prefs_default_value_localization_language_code">
+		@string/locale_language_code_default
+	</string> -->
+	
+</resources>

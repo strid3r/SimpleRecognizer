@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 RU Strings Select Course XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="select_course_name_viewer">
+		Выбор Курса
+	</string>
+	
+	<string name="select_course_name_creator">
+		Управление Курсами
+	</string>
+	
+	<!-- MENU -->
+	<string name="select_course_menu_switch_mode_creator">
+		К Создателю
+	</string>
+	
+	<string name="select_course_menu_switch_mode_viewer">
+		К Зрителю
+	</string>
+	
+	<string name="select_course_menu_import">
+		Импорт
+	</string>
+	
+	<string name="select_course_menu_add_course">
+		Добавить Курс
+	</string>
+	
+	<string name="select_course_menu_save">
+		Сохранить
+	</string>
+	
+	<!-- CONTEXT MENU -->
+	<string name="select_course_context_menu_header_title">
+		Меню Подтверждения
+	</string>
+	
+	<string name="select_course_context_menu_apply_selection">
+		Применить Выбор
+	</string>
+	
+	<string name="select_course_context_menu_export">
+		Экспорт
+	</string>
+	
+	<string name="select_course_context_menu_show_info">
+		Показать Инфо
+	</string>
+	
+	<string name="select_course_context_menu_edit">
+		Изменить Курс
+	</string>
+	
+	<string name="select_course_context_menu_delete">
+		Удалить Курс
+	</string>
+	
+	<!-- DIALOG -->
+	<string name="select_course_dialog_not_creator_message">
+		Вы не можете управлять этим курсом,\nпотому что Вы не его создатель.
+	</string>
+	
+	<string name="select_course_dialog_title_title">
+		Название
+	</string>
+	
+	<string name="select_course_dialog_category_title">
+		Категория
+	</string>
+	
+	<string name="select_course_dialog_version_title">
+		Версия
+	</string>
+	
+	<string name="select_course_dialog_creator_title">
+		Создатель
+	</string>
+	
+</resources>

@@ -2,7 +2,7 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Bools Preferences XML
+	 Strings Preferences XML
 	 By © strider 2012.
 -->
 <resources>
@@ -30,6 +30,14 @@
 		Main Settings
 	</string>
 	
+	<string name="preferences_category_localization_key">
+		LOCALIZATION_SETTINGS
+	</string>
+	
+	<string name="preferences_category_localization_title">
+		Localization Settings
+	</string>
+	
 	<string name="preferences_category_display_key">
 		DISPLAY_SETTINGS
 	</string>
@@ -47,6 +55,10 @@
 	</string>
 	
 	<!-- KEYS -->
+	<string name="prefs_key_localization_language_code">
+		LANGUAGE_CODE
+	</string>
+	
 	<string name="prefs_key_display_is_keep_screen_on">
 		IS_KEEP_SCREEN_ON
 	</string>
@@ -60,6 +72,10 @@
 	</string>
 	
 	<!-- TITLE -->
+	<string name="prefs_title_localization_language">
+		Locale Language
+	</string>
+	
 	<string name="prefs_title_display_is_keep_screen_on">
 		Keep Screen On
 	</string>
@@ -73,6 +89,10 @@
 	</string>
 	
 	<!-- SUMMATY -->
+	<string name="prefs_summary_localization_language">
+		Current Localization Language\n(reqires an Application restart)
+	</string>
+	
 	<string name="prefs_summary_display_is_keep_screen_on">
 		Prevent screen from turning off\nwhile Application is in use
 	</string>
@@ -82,6 +102,8 @@
 	</string>
 	
 	<!-- DEFAULT VALUE -->
-	<!-- Place Holder -->
+	<string name="prefs_default_value_localization_language_code">
+		@string/locale_language_code_default
+	</string>
 	
 </resources>

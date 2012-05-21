@@ -2,39 +2,39 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Layout Alert Dialog Select Course Show Info XML
+	 Layout Alert Dialog Manage Item Show Content XML
 	 By © strider 2012.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-			android:id="@+id/scrollViewAlertDialogSelectCourseShowInfo"
+			android:id="@+id/scrollViewAlertDialogManageItemShowContent"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
 			android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
 			android:scrollbarSize="8.0dp">
 	
-	<LinearLayout android:id="@+id/linearLayoutAlertDialogSelectCourseShowInfo"
+	<LinearLayout android:id="@+id/linearLayoutAlertDialogManageItemShowContent"
 				  android:layout_width="match_parent"
 				  android:layout_height="wrap_content"
 				  android:orientation="vertical"
 				  android:padding="0.0dp">
 		
-		<!-- VERSION -->
-		<ru.strider.widget.MainTextView android:id="@+id/textViewVersionTitle"
-										android:text="@string/select_course_dialog_version_title"
+		<!-- CONTENT -->
+		<ru.strider.widget.MainTextView android:id="@+id/textViewContentTitle"
+										android:text="@string/manage_item_dialog_content_title"
 										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
-		<EditText android:id="@+id/editTextVersion"
-				  android:inputType="number|none"
+		<EditText android:id="@+id/editTextContent"
+				  android:inputType="textMultiLine|none"
 				  style="@style/Main.AlertDialog.EditView" />
 		
-		<!-- CREATOR -->
-		<ru.strider.widget.MainTextView android:id="@+id/textViewCreatorTitle"
-										android:text="@string/select_course_dialog_creator_title"
+		<!-- VIDEO URI -->
+		<ru.strider.widget.MainTextView android:id="@+id/textViewVideoUriTitle"
+										android:text="@string/manage_item_dialog_video_uri_title"
 										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
-		<EditText android:id="@+id/editTextCreator"
-				  android:inputType="textMultiLine|textEmailAddress|none"
+		<EditText android:id="@+id/editTextVideoUri"
+				  android:inputType="textMultiLine|textUri|none"
 				  style="@style/Main.AlertDialog.EditView" />
 		
 	</LinearLayout>

@@ -2,7 +2,7 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Strings Application XML
+	 RU Strings Application XML
 	 By © strider 2012.
 -->
 <resources>
@@ -13,24 +13,24 @@
 	</string>
 	
 	<string name="app_footer">
-		Loading...
+		Загрузка...
 	</string>
 	
 	<string name="app_version">
-		Version:
+		Версия:
 	</string>
 	
 	<string name="app_copyright">
-		Copyright © 2012 Dmitry Stankov.
+		Copyright © 2012 Дмитрий Станков.
 	</string>
 	
 	<!-- DATABASE -->
 	<string name="database_create_error_title">
-		Unable to create DataBase file
+		Не удалось создать файл базы данных
 	</string>
 	
 	<string name="database_create_error_tip_1">
-		1. Please try to Clear App Data and launch it again:
+		1. Пожалуйста, попробуйте очистить данные приложения и запустить его заново:
 	</string>
 	
 	<string name="database_create_error_tip_1_help">
@@ -38,20 +38,20 @@
 	</string>
 	
 	<string name="database_create_error_tip_2">
-		2. Also check the available free space on Internal Memory.
+		2. Также проверьте наличие доступного свободного места во внутренней памяти
 	</string>
 	
 	<!-- DIALOG -->
 	<string name="dialog_ad_free_found">
-		To use this Application, You Must Disable/Uninstall AdFree Package:
+		Чтобы использовать данное Приложение, Вы Должны Отключить/Удалить AdFree Package:
 	</string>
 	
 	<string name="dialog_title_caution">
-		Caution
+		Внимание
 	</string>
 	
 	<string name="dialog_title_forbidden">
-		Forbidden
+		Запрещено
 	</string>
 	
 	<string name="dialog_button_buy_license">
@@ -59,11 +59,11 @@
 	</string>
 	
 	<string name="dialog_button_try_next">
-		Try Next
+		Попробовать следующую
 	</string>
 	
 	<string name="dialog_button_exit">
-		Exit
+		Выход
 	</string>
 	
 	<string name="dialog_button_ok">
@@ -71,23 +71,23 @@
 	</string>
 	
 	<string name="dialog_button_save">
-		Save
+		Сохранить
 	</string>
 	
 	<string name="dialog_button_close">
-		Close
+		Закрыть
 	</string>
 	
 	<string name="dialog_button_cancel">
-		Cancel
+		Отмена
 	</string>
 	
 	<string name="dialog_button_video_controls">
-		‹‹ Video ››
+		‹‹ Видео ››
 	</string>
 	
 	<string name="dialog_button_close_controls">
-		‹‹ Close ››
+		‹‹ Закрыть ››
 	</string>
 	
 </resources>

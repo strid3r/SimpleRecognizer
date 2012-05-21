@@ -55,6 +55,7 @@ public class DataBaseAdapter {
 	private static final String KEY_ITEM_ID = "_id";
 	private static final String KEY_ITEM_TITLE = "title";
 	private static final String KEY_ITEM_CONTENT = "content";
+	private static final String KEY_ITEM_VIDEO_URI = "video_uri";
 	private static final String KEY_ITEM_COURSE_ID = "course_id";
 	
 	private static final String TABLE_PHASH = "PHash";
@@ -561,6 +562,7 @@ public class DataBaseAdapter {
 							cursor.getInt(cursor.getColumnIndex(KEY_ITEM_ID)),
 							cursor.getString(cursor.getColumnIndex(KEY_ITEM_TITLE)),
 							cursor.getString(cursor.getColumnIndex(KEY_ITEM_CONTENT)),
+							cursor.getString(cursor.getColumnIndex(KEY_ITEM_VIDEO_URI)),
 							cursor.getInt(cursor.getColumnIndex(KEY_ITEM_COURSE_ID))
 						);
 				}
@@ -591,6 +593,7 @@ public class DataBaseAdapter {
 							cursor.getInt(cursor.getColumnIndex(KEY_ITEM_ID)),
 							cursor.getString(cursor.getColumnIndex(KEY_ITEM_TITLE)),
 							cursor.getString(cursor.getColumnIndex(KEY_ITEM_CONTENT)),
+							cursor.getString(cursor.getColumnIndex(KEY_ITEM_VIDEO_URI)),
 							cursor.getInt(cursor.getColumnIndex(KEY_ITEM_COURSE_ID))
 						);
 				}
@@ -623,6 +626,7 @@ public class DataBaseAdapter {
 								cursor.getInt(cursor.getColumnIndex(KEY_ITEM_ID)),
 								cursor.getString(cursor.getColumnIndex(KEY_ITEM_TITLE)),
 								cursor.getString(cursor.getColumnIndex(KEY_ITEM_CONTENT)),
+								cursor.getString(cursor.getColumnIndex(KEY_ITEM_VIDEO_URI)),
 								cursor.getInt(cursor.getColumnIndex(KEY_ITEM_COURSE_ID))
 							);
 						
@@ -657,6 +661,7 @@ public class DataBaseAdapter {
 		
 		cv.put(KEY_ITEM_TITLE, item.getTitle());
 		cv.put(KEY_ITEM_CONTENT, item.getContent());
+		cv.put(KEY_ITEM_VIDEO_URI, item.getVideoUri());
 		cv.put(KEY_ITEM_COURSE_ID, item.getCourseId());
 		
 		try {
@@ -673,6 +678,7 @@ public class DataBaseAdapter {
 		
 		cv.put(KEY_ITEM_TITLE, item.getTitle());
 		cv.put(KEY_ITEM_CONTENT, item.getContent());
+		cv.put(KEY_ITEM_VIDEO_URI, item.getVideoUri());
 		cv.put(KEY_ITEM_COURSE_ID, item.getCourseId());
 		
 		try {

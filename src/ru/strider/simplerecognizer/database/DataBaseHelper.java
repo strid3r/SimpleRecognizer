@@ -297,6 +297,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				+ "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "title TEXT NOT NULL,"
 				+ "content TEXT NOT NULL,"
+				+ "video_uri TEXT,"
 				+ "course_id INTEGER NOT NULL,"
 				+ "FOREIGN KEY (course_id) REFERENCES Course(_id)"
 			+ ");";
@@ -331,12 +332,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				+ "VALUES ('Course', 'Category', 'strider.stankov@gmail.com');";
 		db.execSQL(INSERT_COURSE);
 		
-		String INSERT_ITEM = "INSERT INTO Item(title, content, course_id)"
-				+ "VALUES ('Item', 'This is temp Item.\nFor more info blahblahblah...', 1);";
+		String INSERT_ITEM = "INSERT INTO Item(title, content, video_uri, course_id)"
+				+ "VALUES ('Item', 'This is temp Item.<br /><br />For more info blahblahblah...', 'http://www.youtube.com/watch?v=rT2LzCLhbOE', 1);";
 		db.execSQL(INSERT_ITEM);
 		
 		String INSERT_PHASH = "INSERT INTO PHash(hex_value, comment, item_id)"
-				+ "VALUES ('FFFFFFFFFFFF', 'This is temp pHash value.\nFor more info blahblahblah...', 1);";
+				+ "VALUES ('FFFFFFFFFFFF', 'This is temp pHash value.<br /><br />For more info blahblahblah...', 1);";
 		db.execSQL(INSERT_PHASH);
         */
 		

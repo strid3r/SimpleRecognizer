@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 RU Strings Preferences Arrays XML
+	 By © strider 2012.
+-->
+<resources>
+	
+	<!-- DIALOG TITLE -->
+	<string name="prefs_dialog_title_localization_language">
+		Выберите Язык Локализации:
+	</string>
+	
+	<!-- ENTRY TITLES -->
+	<!-- <string-array name="entry_titles_localization_language_list">
+		
+		<item>
+			@string/locale_language_default_title
+		</item>
+		
+		<item>
+			@string/locale_language_english_title
+		</item>
+		
+		<item>
+			@string/locale_language_russian_title
+		</item>
+		
+	</string-array> -->
+	
+	<!-- ENTRY VALUES -->
+	<!-- <string-array name="entry_values_localization_language_code_list">
+		
+		<item>
+			@string/locale_language_code_default
+		</item>
+		
+		<item>
+			@string/locale_language_code_en
+		</item>
+		
+		<item>
+			@string/locale_language_code_ru
+		</item>
+		
+	</string-array> -->
+	
+	<!-- EXTRA -->
+	<string name="locale_language_default_title">
+		По Умолчанию
+	</string>
+	
+	<!-- <string name="locale_language_english_title">
+		English
+	</string> -->
+	
+	<!-- <string name="locale_language_russian_title">
+		Русский
+	</string> -->
+	
+	<!-- <string name="locale_language_code_default">
+		NULL
+	</string> -->
+	
+	<!-- <string name="locale_language_code_en">
+		en
+	</string> -->
+	
+	<!-- <string name="locale_language_code_ru">
+		ru
+	</string> -->
+	
+</resources>

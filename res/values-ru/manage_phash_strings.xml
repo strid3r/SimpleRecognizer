@@ -2,69 +2,69 @@
 <!-- Copyright (C) 2012 strider
 	 
 	 Simple Recognizer
-	 Strings Manage PHash XML
+	 RU Strings Manage PHash XML
 	 By © strider 2012.
 -->
 <resources>
 	
     <!-- MAIN -->
 	<string name="manage_phash_name">
-		Manage PHash
+		Управление Перцептивным Хэшем
 	</string>
 	
 	<!-- MENU -->
 	<string name="manage_phash_menu_import">
-		Import
+		Импорт
 	</string>
 	
 	<string name="manage_phash_menu_add_phash">
-		Add PHash
+		Добавить PHash
 	</string>
 	
 	<string name="manage_phash_menu_delete_item">
-		Delete Item
+		Удалить Объект
 	</string>
 	
 	<string name="manage_phash_menu_save">
-		Save
+		Сохранить
 	</string>
 	
 	<!-- CONTEXT MENU -->
 	<string name="manage_phash_context_menu_header_title">
-		Confirmation Menu
+		Меню Подтверждения
 	</string>
 	
 	<string name="manage_phash_context_menu_apply_selection">
-		Apply Selection
+		Применить Выбор
 	</string>
 	
 	<string name="manage_phash_context_menu_show_comment">
-		Show Comment
+		Показать комментарий
 	</string>
 	
 	<string name="manage_phash_context_menu_edit">
-		Edit PHash
+		Изменить PHash
 	</string>
 	
 	<string name="manage_phash_context_menu_delete">
-		Delete PHash
+		Удалить PHash
 	</string>
 	
 	<!-- DIALOG -->
 	<string name="manage_phash_dialog_item_title">
-		Item
+		Объект
 	</string>
 	
 	<string name="manage_phash_dialog_item_prompt">
-		Choose an Item
+		Выберите Объект
 	</string>
 	
 	<string name="manage_phash_dialog_hex_value_title">
-		Hex Value
+		Значение Hex
 	</string>
 	
 	<string name="manage_phash_dialog_comment_title">
-		Comment
+		Комментарий
 	</string>
 	
 </resources>
