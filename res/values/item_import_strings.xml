@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Strings Item Import XML
+	 By © strider 2012.
+-->
+<resources>
+	
+    <!-- MAIN -->
+	<string name="item_import_name">
+		Item Import
+	</string>
+	
+	<!-- MENU -->
+	<string name="item_import_menu_import">
+		Import
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="item_import_control_cancel">
+		Cancel
+	</string>
+	
+	<string name="item_import_control_import">
+		Import
+	</string>
+	
+</resources>

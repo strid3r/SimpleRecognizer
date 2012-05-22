@@ -8,11 +8,16 @@
 
 package ru.strider.simplerecognizer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SystemClock;
 import android.text.Html;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -27,6 +32,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +44,14 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.google.ads.AdView;
 
 import ru.strider.simplerecognizer.adapter.ListArrayAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.model.Item;
+import ru.strider.simplerecognizer.util.BuildConfig;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
 
@@ -64,9 +75,13 @@ public class ManageItem extends SherlockListActivity {
 	private ListArrayAdapter mAdapter = null;
 	private ListView mView = null;
 	
+	private AsyncItemImport mAsyncItemImport = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		doInit();
 		
@@ -134,52 +149,16 @@ public class ManageItem extends SherlockListActivity {
 				
 				return true;
 			}
+			case (R.id.manageItemMenuImport): {
+				mAsyncItemImport = new AsyncItemImport(this);
+				
+				Intent iPickFile = new Intent(ManageItem.this, ItemImport.class);
+				this.startActivityForResult(iPickFile, ItemImport.PICK_FILE_REQUEST);
+				
+				return true;
+			}
 			case (R.id.manageItemMenuAddItem): {
-				LayoutInflater inflater = LayoutInflater.from(this);
-				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
-				
-				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.manage_item_menu_add_item);
-				
-				final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
-				
-				final EditText editTextContent = (EditText) view.findViewById(R.id.editTextContent);
-				
-				final EditText editTextVideoUri = (EditText) view.findViewById(R.id.editTextVideoUri);
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setCustomTitle(viewTitle);
-				builder.setView(view);
-				
-				builder.setNegativeButton(R.string.dialog_button_cancel, null);
-				
-				builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						DataBaseAdapter dbAdapter = new DataBaseAdapter(ManageItem.this);
-						dbAdapter.createDataBase(ManageItem.this);
-						dbAdapter.write();
-						
-						dbAdapter.addItem(new Item(
-								editTextTitle.getText().toString(),
-								editTextContent.getText().toString(),
-								editTextVideoUri.getText().toString(),
-								mCourse.getId()
-							));
-						
-						dbAdapter.close();
-						
-						//
-						reloadView();
-						//
-					}
-					
-				});
-				
-				AlertDialog alert = builder.create();
-				alert.show();
+				showAddItem();
 				
 				return true;
 			}
@@ -357,6 +336,8 @@ public class ManageItem extends SherlockListActivity {
 		
 		this.setContentView(R.layout.manage_item);
 		
+		this.setSupportProgressBarIndeterminateVisibility(false);
+		
 		mAdapter = new ListArrayAdapter(this, mListTitle);
 		mView = this.getListView();
 		
@@ -416,6 +397,61 @@ public class ManageItem extends SherlockListActivity {
 		mAdapter.notifyDataSetChanged();
 		
 		useConfigValues();
+	}
+	
+	private void showAddItem() {
+		showAddItem(null);
+	}
+	
+	private void showAddItem(String content) {
+		LayoutInflater inflater = LayoutInflater.from(this);
+		View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+		View view = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
+		
+		TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+		textViewTitle.setText(R.string.manage_item_menu_add_item);
+		
+		final EditText editTextTitle = (EditText) view.findViewById(R.id.editTextTitle);
+		
+		final EditText editTextContent = (EditText) view.findViewById(R.id.editTextContent);
+		if (content != null) {
+			editTextContent.setText(content);
+		}
+		
+		final EditText editTextVideoUri = (EditText) view.findViewById(R.id.editTextVideoUri);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setCustomTitle(viewTitle);
+		builder.setView(view);
+		
+		builder.setNegativeButton(R.string.dialog_button_cancel, null);
+		
+		builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				DataBaseAdapter dbAdapter = new DataBaseAdapter(ManageItem.this);
+				dbAdapter.createDataBase(ManageItem.this);
+				dbAdapter.write();
+				
+				dbAdapter.addItem(new Item(
+						editTextTitle.getText().toString(),
+						editTextContent.getText().toString(),
+						editTextVideoUri.getText().toString(),
+						mCourse.getId()
+					));
+				
+				dbAdapter.close();
+				
+				//
+				reloadView();
+				//
+			}
+			
+		});
+		
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 	
 	private void usePreferencesValues() {
@@ -513,6 +549,176 @@ public class ManageItem extends SherlockListActivity {
 				return super.onKeyUp(keyCode, event);
 			}
 		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == ItemImport.PICK_FILE_REQUEST) {
+			if ((resultCode == RESULT_OK) && (data != null)) {
+				String contentPath = data.getStringExtra(ItemImport.KEY_PICK_FILE);
+				
+				if ((contentPath != null) && (mAsyncItemImport != null)) {
+					mAsyncItemImport.execute(contentPath);
+				}
+			}
+			
+			mAsyncItemImport = null;
+		}
+	}
+	
+	/**
+	 * AsyncTask AsyncItemImport<String, Void, List<String>> Class.
+	 * 
+	 * @author strider
+	 */
+	private class AsyncItemImport extends AsyncTask<String, Void, List<String>> {
+		
+		private static final String LOG_TAG = "AsyncItemImport";
+		
+		private long mInitTime = 0L;
+		private long mWorkTime = 0L;
+		
+		private Context mContext = null;
+		
+		private Activity mActivity = null;
+		
+		public AsyncItemImport(Activity activity) {
+			mContext = (Context) activity;
+			
+			mActivity = activity;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			ManageItem.this.setSupportProgressBarIndeterminateVisibility(true);
+		}
+		
+		@Override
+		protected List<String> doInBackground(String... params) {
+			mInitTime = SystemClock.elapsedRealtime();
+			
+			//
+			
+			List<String> listContent = new ArrayList<String>();
+			
+			for (String contentPath : params) {
+				boolean isExternalStorageAvailable = false;
+				
+				String state = Environment.getExternalStorageState();
+				
+				if (!Environment.isExternalStorageRemovable() || state.equals(Environment.MEDIA_MOUNTED)
+						|| state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+					isExternalStorageAvailable = true;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_AVAILABLE");
+				} else {
+					isExternalStorageAvailable = false;
+					
+					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_N/A");
+				}
+				
+				if (isExternalStorageAvailable) {
+					String content = null;
+					
+					// 1st Implementation //TODO FIND WAY TO READ RUSSIAN CHARS
+					BufferedReader buffer = null;
+					
+					StringBuilder sb = new StringBuilder();
+					
+					try {
+						buffer = new BufferedReader(new FileReader(contentPath));
+						
+						String line = null;
+						
+						while ((line = buffer.readLine()) != null) {
+							sb.append(line).append(SimpleRecognizer.BR_LINE);
+						}
+						
+						content = sb.toString();
+					} catch (FileNotFoundException e) {
+						//TODO: SOME FEEDBACK
+					} catch (IOException e) {
+						//TODO: SOME FEEDBACK
+					} finally {
+						if (buffer != null) {
+							try {
+								buffer.close();
+							} catch (IOException e) {
+								//
+							} finally {
+								buffer = null;
+							}
+						}
+					}
+					/*// 2nd Implementation
+					FileInputStream fis = null;
+					FileChannel fc = null;
+					
+					MappedByteBuffer buffer = null;
+					
+					try {
+						fis = new FileInputStream(contentPath);
+						fc = fis.getChannel();
+						
+						buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+						
+						content = Charset.defaultCharset().decode(buffer).toString();
+					} catch (FileNotFoundException e) {
+						//TODO: SOME FEEDBACK
+					} catch (IOException e) {
+						//TODO: SOME FEEDBACK
+					} finally {
+						if (fis != null) {
+							try {
+								fis.close();
+							} catch (IOException e) {
+								//
+							} finally {
+								fis = null;
+							}
+						}
+						
+						if (fc != null) {
+							try {
+								fc.close();
+							} catch (IOException e) {
+								//
+							} finally {
+								fc = null;
+							}
+						}
+					}
+					*/
+					listContent.add(content);
+				} else {
+					//TODO: "Failed, External Storage Not Available."
+				}
+			}
+			
+			//
+			
+			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
+			
+			return listContent;
+		}
+		
+		@Override
+		protected void onPostExecute(List<String> result) {
+			ManageItem.this.setSupportProgressBarIndeterminateVisibility(false);
+			
+			//
+			StringBuilder sb = new StringBuilder();
+			
+			if (BuildConfig.DEBUG) {
+				sb.append("Work Time: ").append(mWorkTime).append(" ms.").append(SimpleRecognizer.BR_LINE);
+			}
+			//
+			
+			for (String content : result) {
+				showAddItem(content);
+			}
+		}
+		
 	}
 	
 }

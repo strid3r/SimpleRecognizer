@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012 strider
+	 
+	 Simple Recognizer
+	 Menu Item Import XML
+	 By © strider 2012.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+    <group android:id="@+id/itemImportMenuControls">
+		
+		<item android:id="@+id/itemImportMenuImport"
+		      android:title="@string/item_import_menu_import"
+		      android:icon="@drawable/ic_menu_save"
+		      android:showAsAction="ifRoom|withText"
+		      android:orderInCategory="0" />
+		
+	</group>
+	
+</menu>

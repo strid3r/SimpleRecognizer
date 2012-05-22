@@ -13,6 +13,10 @@
 	</string>
 	
 	<!-- MENU -->
+	<string name="manage_item_menu_import">
+		Импорт
+	</string>
+	
 	<string name="manage_item_menu_add_item">
 		Добавить Объект
 	</string>

@@ -17,7 +17,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -142,45 +141,117 @@ public class DataBaseAdapter {
 	}
 	
 	public void copyFrom(String srcPath) throws IOException {
+		FileInputStream srcStream = null;
+		FileInputStream dstStream = null;
+		
 		FileChannel srcChannel = null;
 		FileChannel dstChannel = null;
 		
 		try {
-			srcChannel = new FileInputStream(srcPath).getChannel();
-			dstChannel = new FileOutputStream(mDataBase.getPath()).getChannel();
+			srcStream = new FileInputStream(srcPath);
+			dstStream = new FileInputStream(mDataBase.getPath());
+			
+			srcChannel = srcStream.getChannel();
+			dstChannel = dstStream.getChannel();
 			
 			dstChannel.transferFrom(srcChannel, 0L, srcChannel.size());
 		} finally {
+			if (srcStream != null) {
+				try {
+					srcStream.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					srcStream = null;
+				}
+			}
+			
+			if (dstStream != null) {
+				try {
+					dstStream.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					dstStream = null;
+				}
+			}
+			
 			if (srcChannel != null) {
-				srcChannel.close();
-				srcChannel = null;
+				try {
+					srcChannel.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					srcChannel = null;
+				}
 			}
 			
 			if (dstChannel != null) {
-				dstChannel.close();
-				dstChannel = null;
+				try {
+					dstChannel.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					dstChannel = null;
+				}
 			}
 		}
 	}
 	
 	public void copyTo(String dstPath) throws IOException {
+		FileInputStream srcStream = null;
+		FileInputStream dstStream = null;
+		
 		FileChannel srcChannel = null;
 		FileChannel dstChannel = null;
 		
 		try {
-			srcChannel = new FileInputStream(mDataBase.getPath()).getChannel();
-			dstChannel = new FileOutputStream(dstPath).getChannel();
+			srcStream = new FileInputStream(mDataBase.getPath());
+			dstStream = new FileInputStream(dstPath);
+			
+			srcChannel = srcStream.getChannel();
+			dstChannel = dstStream.getChannel();
 			
 			dstChannel.transferFrom(srcChannel, 0L, srcChannel.size());
 		} finally {
+			if (srcStream != null) {
+				try {
+					srcStream.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					srcStream = null;
+				}
+			}
+			
+			if (dstStream != null) {
+				try {
+					dstStream.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					dstStream = null;
+				}
+			}
+			
 			if (srcChannel != null) {
-				srcChannel.close();
-				srcChannel = null;
+				try {
+					srcChannel.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					srcChannel = null;
+				}
 			}
 			
 			if (dstChannel != null) {
-				dstChannel.close();
-				dstChannel = null;
+				try {
+					dstChannel.close();
+				} catch (IOException e) {
+					//
+				} finally {
+					dstChannel = null;
+				}
 			}
 		}
 	}

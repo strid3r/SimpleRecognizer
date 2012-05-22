@@ -8,7 +8,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="ru.strider.simplerecognizer"
 		  android:versionCode="1"
-		  android:versionName="0.8.0"
+		  android:versionName="0.8.1"
 		  android:installLocation="auto">
 	
 	<uses-sdk android:minSdkVersion="5"
@@ -77,6 +77,10 @@
 		<!-- MANAGE ITEM -->
 		<activity android:name=".ManageItem"
 				  android:label="@string/manage_item_name" />
+		
+		<!-- ITEM IMPORT -->
+		<activity android:name=".ItemImport"
+				  android:label="@string/item_import_name" />
 		
 		<!-- MANAGE PHASH -->
 		<activity android:name=".ManagePHash"

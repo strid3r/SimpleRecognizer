@@ -729,7 +729,7 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 				textViewTitle.setText((itemResult != null) ? itemResult.getTitle() : "Item not Found");
 				
 				TextView textViewContent = (TextView) viewContent.findViewById(R.id.textViewItem);
-				textViewContent.setText(Html.fromHtml(sb.toString().replace("\n", "<br />")));
+				textViewContent.setText(Html.fromHtml(sb.toString().replace("\n", "<br />")));//FIXME: HANDLE "\n"
 				
 				MainButton buttonVideo = (MainButton) viewContent.findViewById(R.id.buttonAlertDialogVideo);
 				if (itemResult != null) {

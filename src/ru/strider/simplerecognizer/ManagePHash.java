@@ -151,7 +151,7 @@ public class ManagePHash extends SherlockListActivity {
 				
 				return true;
 			}
-			case (R.id.managePHashMenuImport): {//TODO: OPTION TO ADD PHASH FROM FILE
+			case (R.id.managePHashMenuImport): {
 				mAsyncPHashImport = new AsyncPHashImport(this);
 				
 				Intent iPickFile = new Intent(ManagePHash.this, PHashImport.class);
