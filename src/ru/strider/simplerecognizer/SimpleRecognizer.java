@@ -68,6 +68,10 @@ public class SimpleRecognizer extends Application {
 	
 	private static final String ADMOB_PUBLISHER_ID = "a14f8f618f8b291";
 	
+	private static final String EMULATOR_INTEL_ATOM_X86 = "6501C509CD383EC804D00651B5FB19DB";
+	private static final String DEVICE_SAMSUNG_GALAXY_S = "CC37D88448286ACC82EC41CB988E5E97";
+	private static final String DEVICE_HTC_DESIRE = "BBA022EC80EAA9F63042D98D032734E1";
+	
 	private static final LinearLayout.LayoutParams LAYOUT_PARAMS = new LinearLayout.LayoutParams(
 			LinearLayout.LayoutParams.MATCH_PARENT,
 			LinearLayout.LayoutParams.WRAP_CONTENT
@@ -357,7 +361,7 @@ public class SimpleRecognizer extends Application {
 				}
 				
 				if (adView == null) {
-					adView = new AdView(mActivity, AdSize.BANNER, ADMOB_PUBLISHER_ID);
+					adView = new AdView(mActivity, AdSize.SMART_BANNER, ADMOB_PUBLISHER_ID);
 					
 					adView.setId(R.id.adView);
 					
@@ -367,8 +371,9 @@ public class SimpleRecognizer extends Application {
 				AdRequest adRequest = new AdRequest();
 				
 				adRequest.addTestDevice(AdRequest.TEST_EMULATOR);
-				adRequest.addTestDevice("CC37D88448286ACC82EC41CB988E5E97");//SAMSUNG_GALAXY_S
-				adRequest.addTestDevice("BBA022EC80EAA9F63042D98D032734E1");//HTC_DESIRE
+				adRequest.addTestDevice(EMULATOR_INTEL_ATOM_X86);
+				adRequest.addTestDevice(DEVICE_SAMSUNG_GALAXY_S);
+				adRequest.addTestDevice(DEVICE_HTC_DESIRE);
 				
 				adView.loadAd(adRequest);
 			}

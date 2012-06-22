@@ -21,7 +21,7 @@ import android.widget.LinearLayout;
  */
 public class CheckedLinearLayout extends LinearLayout implements Checkable {
 	
-	private MainCheckedTextView checkedTextView = null;
+	private MainCheckedTextView mCheckedTextView = null;
 	
 	public CheckedLinearLayout(Context context) {
 		super(context);
@@ -43,27 +43,27 @@ public class CheckedLinearLayout extends LinearLayout implements Checkable {
 			View child = this.getChildAt(i);
 			
 			if (child instanceof MainCheckedTextView) {
-				checkedTextView = (MainCheckedTextView) child;
+				mCheckedTextView = (MainCheckedTextView) child;
 			}
 		}
 	}
 	
 	@Override
-	public void setChecked(boolean checked) {
-		if (checkedTextView != null) {
-			checkedTextView.setChecked(checked);
+	public void setChecked(boolean isChecked) {
+		if (mCheckedTextView != null) {
+			mCheckedTextView.setChecked(isChecked);
 		}
 	}
 	
 	@Override
 	public boolean isChecked() {
-		return (checkedTextView != null) ? checkedTextView.isChecked() : false;
+		return ((mCheckedTextView != null) ? mCheckedTextView.isChecked() : false);
 	}
 	
 	@Override
 	public void toggle() {
-		if (checkedTextView != null) {
-			checkedTextView.toggle();
+		if (mCheckedTextView != null) {
+			mCheckedTextView.toggle();
 		}
 	}
 	

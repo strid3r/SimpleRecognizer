@@ -14,11 +14,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.os.SystemClock;
@@ -244,15 +244,19 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 		mPrefsAdapter = new PrefsAdapter(this);
 		mConfigAdapter = new ConfigAdapter(this);
 		
-		mNumberOfCameras = Camera.getNumberOfCameras();//TODO: SINCE API 9
-		
-		CameraInfo cameraInfo = new CameraInfo();
-		
-		for (int i = 0; i < mNumberOfCameras; i++) {
-			Camera.getCameraInfo(i, cameraInfo);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
+			//
+		} else {
+			mNumberOfCameras = Camera.getNumberOfCameras();//TODO: SINCE API 9
 			
-			if (cameraInfo.facing == CameraInfo.CAMERA_FACING_BACK) {
-				mCurrentCamera = mDefaultCameraId = i;
+			Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+			
+			for (int i = 0; i < mNumberOfCameras; i++) {
+				Camera.getCameraInfo(i, cameraInfo);
+				
+				if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+					mCurrentCamera = mDefaultCameraId = i;
+				}
 			}
 		}
 		
@@ -454,7 +458,11 @@ public class MainCamera extends SherlockActivity implements ShutterCallback, Pic
 		Camera camera = null;
 		
 		try {
-			camera = Camera.open(cameraId);
+			if (cameraId == -1) {
+				camera = Camera.open();
+			} else {
+				camera = Camera.open(cameraId);
+			}
 		} catch (Exception e) {
 			//
 		}

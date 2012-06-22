@@ -42,6 +42,7 @@ import com.actionbarsherlock.app.SherlockExpandableListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.ads.AdView;
 
 import ru.strider.simplerecognizer.adapter.TwoLevelExpandableListAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
@@ -112,6 +113,17 @@ public class SelectCourse extends SherlockExpandableListActivity {
 		//
 		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onPause() called");
+	}
+	
+	@Override
+	protected void onDestroy() {
+		AdView adView = (AdView) this.findViewById(R.id.adView);
+		
+		if (adView != null) {
+			adView.destroy();
+		}
+		
+		super.onDestroy();
 	}
 	
 	@Override

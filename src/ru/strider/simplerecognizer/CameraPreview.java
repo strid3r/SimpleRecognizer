@@ -5,6 +5,7 @@
  * ViewGroup Camera Preview Class
  * By © strider 2012.
  */
+
 package ru.strider.simplerecognizer;
 
 import android.content.Context;
@@ -127,12 +128,14 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			//
 		}
 		
-		Camera.Parameters parameters = mCamera.getParameters();
-		parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-		
-		this.requestLayout();
-		
-		mCamera.setParameters(parameters);
+		if (mPreviewSize != null) {
+			Camera.Parameters parameters = mCamera.getParameters();
+			parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+			
+			this.requestLayout();
+			
+			mCamera.setParameters(parameters);
+		}
 		
 		try {
 			mCamera.setPreviewDisplay(mHolder);//TODO: NEW
@@ -168,7 +171,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, widthSize, heightSize);
 		}
 		
-		if (mCamera != null) {
+		if ((mCamera != null) && (mPreviewSize != null)) {
 			Camera.Parameters parameters = mCamera.getParameters();
 			parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
 			
@@ -208,12 +211,12 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		}
 	}
 	
-	private Size getOptimalPreviewSize(List<Size> sizes, int w, int h) {
+	private Size getOptimalPreviewSize(List<Size> listSize, int w, int h) {
 		final double ASPECT_TOLERANCE = 0.1;
 		
 		double targetRatio = (double) w / (double) h;
 		
-		if (sizes == null) {
+		if (listSize == null) {
 			return null;
 		}
 		
@@ -223,7 +226,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		
 		int targetHeight = h;
 		
-		for (Size size : sizes) {
+		for (Size size : listSize) {
 			double ratio = (double) size.width / size.height;
 			
 			if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) {
@@ -239,7 +242,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		if (optimalSize == null) {
 			minDiff = Double.MAX_VALUE;
 			
-			for (Size size : sizes) {
+			for (Size size : listSize) {
 				if (Math.abs(size.height - targetHeight) < minDiff) {
 					optimalSize = size;
 					minDiff = Math.abs(size.height - targetHeight);

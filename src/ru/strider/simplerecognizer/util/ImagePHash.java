@@ -175,7 +175,14 @@ public class ImagePHash {
 		return pHash;
 	}
 	
-	private String getPHash(Bitmap bitmapImage) {
+	/**
+	 * Returns Hex String of a "binary string" (like, 001010111011100010),
+	 * which is easy to do a Hamming Distance on.
+	 * 
+	 * @return Hex String pHash of the image from Bitmap,
+	 *         or null if bitmap image is null.
+	 */
+	public String getPHash(Bitmap bitmapImage) {
 		if (bitmapImage == null) {
 			return null;
 		}
