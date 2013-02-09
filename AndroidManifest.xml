@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Application Manifest XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="ru.strider.simplerecognizer"
 		  android:versionCode="1"
-		  android:versionName="0.8.1"
+		  android:versionName="0.9.0"
 		  android:installLocation="auto">
 	
 	<uses-sdk android:minSdkVersion="5"
-			  android:targetSdkVersion="15" />
+			  android:targetSdkVersion="17" />
 	
 	<uses-permission android:name="android.permission.CAMERA" />
 	
@@ -33,24 +33,44 @@
 				 android:label="@string/app_name"
 				 android:icon="@drawable/ic_launcher_camera"
 				 android:theme="@style/Theme.Main"
-				 android:hardwareAccelerated="true">
+				 android:hardwareAccelerated="true"
+				 android:allowBackup="true">
 		
 		<!-- ADMOB -->
 		<activity android:name="com.google.ads.AdActivity"
 				  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 		
-		<!-- MAIN -->
+		<!-- MEDIA RECEIVER -->
+		<receiver android:name="ru.strider.app.MediaReceiver" />
+		
+		<!-- MAIN CAMERA -->
 		<activity android:name=".MainCamera"
 				  android:label="@string/app_name"
-				  android:screenOrientation="landscape"
-				  android:theme="@style/Theme.Main.NoActionBar">
+				  android:screenOrientation="sensorLandscape"
+				  android:theme="@style/Theme.Main.ActionBarOverlay">
 			
 			<intent-filter>
-			    <action android:name="android.intent.action.MAIN" />
-			    <category android:name="android.intent.category.LAUNCHER" />
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 			
 		</activity>
+		
+		<!-- SELECT COURSE -->
+		<activity android:name=".SelectCourse"
+				  android:label="@string/select_course_name_viewer" />
+		
+		<!-- MANAGE ITEM -->
+		<activity android:name=".ManageItem"
+				  android:label="@string/manage_item_name" />
+		
+		<!-- MANAGE PHASH -->
+		<activity android:name=".ManagePHash"
+				  android:label="@string/manage_phash_name" />
+		
+		<!-- FILE MANAGER -->
+		<activity android:name=".FileManager"
+				  android:label="@string/file_manager_name" />
 		
 		<!-- PREFERENCES -->
 		<activity android:name=".Preferences"
@@ -60,35 +80,7 @@
 		<activity android:name=".About"
 				  android:label="@string/about_name"
 				  android:configChanges="keyboardHidden|orientation"
-				  android:screenOrientation="portrait" />
-		
-		<!-- SELECT COURSE -->
-		<activity android:name=".SelectCourse"
-				  android:label="@string/select_course_name_viewer" />
-		
-		<!-- COURSE EXPORT -->
-		<activity android:name=".CourseExport"
-				  android:label="@string/course_export_name" />
-		
-		<!-- COURSE IMPORT -->
-		<activity android:name=".CourseImport"
-				  android:label="@string/course_import_name" />
-		
-		<!-- MANAGE ITEM -->
-		<activity android:name=".ManageItem"
-				  android:label="@string/manage_item_name" />
-		
-		<!-- ITEM IMPORT -->
-		<activity android:name=".ItemImport"
-				  android:label="@string/item_import_name" />
-		
-		<!-- MANAGE PHASH -->
-		<activity android:name=".ManagePHash"
-				  android:label="@string/manage_phash_name" />
-		
-		<!-- PHASH IMPORT -->
-		<activity android:name=".PHashImport"
-				  android:label="@string/phash_import_name" />
+				  android:screenOrientation="sensorPortrait" />
 		
 	</application>
 	

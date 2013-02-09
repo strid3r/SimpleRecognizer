@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Menu Manage Item XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	
-    <group android:id="@+id/manageItemMenuControls">
+	<!-- OVERFLOW -->
+	<item android:id="@+id/mainActionOverflow"
+		  android:title="@string/menu_action_overflow"
+		  android:icon="@drawable/ic_action_overflow"
+		  android:showAsAction="always"
+		  android:orderInCategory="0" />
+	
+	<!-- CONTENT -->
+	<group android:id="@+id/manageItemMenuContent">
 		
-    	<item android:id="@+id/manageItemMenuImport"
-		      android:title="@string/manage_item_menu_import"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="0" />
-    	
+		<item android:id="@+id/manageItemMenuImport"
+			  android:title="@string/manage_item_menu_import"
+			  android:icon="@drawable/ic_menu_save"
+			  android:showAsAction="never"
+			  android:orderInCategory="1" />
+		
 		<item android:id="@+id/manageItemMenuAddItem"
-		      android:title="@string/manage_item_menu_add_item"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="1" />
+			  android:title="@string/manage_item_menu_add_item"
+			  android:icon="@drawable/ic_menu_add"
+			  android:showAsAction="never"
+			  android:orderInCategory="2" />
+		
+	</group>
+	
+	<!-- CONTROLS -->
+	<group android:id="@+id/mainMenuControls">
 		
 		<item android:id="@+id/manageItemMenuDeleteCourse"
-		      android:title="@string/manage_item_menu_delete_course"
-		      android:icon="@drawable/ic_menu_gallery"
-		      android:orderInCategory="2" />
-		
-		<item android:id="@+id/manageItemMenuSave"
-		      android:title="@string/manage_item_menu_save"
-		      android:icon="@drawable/ic_menu_save"
-		      android:orderInCategory="3" />
+			  android:title="@string/manage_item_menu_delete_course"
+			  android:icon="@drawable/ic_menu_delete"
+			  android:showAsAction="never"
+			  android:orderInCategory="3" />
 		
 	</group>
 	

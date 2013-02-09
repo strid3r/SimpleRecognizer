@@ -1,27 +1,29 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
  * PreferenceActivity Preferences Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.simplerecognizer;
 
-import android.os.Build;
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.ads.AdView;
 
+import ru.strider.simplerecognizer.util.AdMob;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
 
 /**
@@ -29,67 +31,66 @@ import ru.strider.simplerecognizer.util.PrefsAdapter;
  * 
  * @author strider
  */
-public class Preferences extends SherlockPreferenceActivity {
+public class Preferences extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener {
 	
-	private static final String LOG_TAG = "Preferences";
+	private static final String LOG_TAG = Preferences.class.getSimpleName();
 	
-	private PrefsAdapter mPrefsAdapter = null;
+	private static int sRequestedOrientation = Configuration.ORIENTATION_UNDEFINED;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		doInit();
-		
 		if (savedInstanceState == null) {
 			SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "SIS is NULL");
 		} else {
 			SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "SIS is ~NULL");
 		}
+		
+		super.onCreate(savedInstanceState);
+		
+		doInit();
 	}
 	
 	@Override
 	protected void onResume() {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onResume() called");
+		
 		super.onResume();
 		
-		usePreferencesValues();
+		//AdMob.initLisenceAsync(this); // FIXME: ENABLE FOR DEPLOYMENT
 		
-		//
+		usePreferencesValues(this);
 		
-		//
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onResume() called");
+		this.getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 	}
 	
 	@Override
 	protected void onPause() {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onPause() called");
+		
 		super.onPause();
 		
-		//
+		AdMob.removeAdView(this);
 		
-		//
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onPause() called");
+		this.getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
 	
 	@Override
 	protected void onDestroy() {
-		AdView adView = (AdView) this.findViewById(R.id.adView);
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onDestroy() called");
 		
-		if (adView != null) {
-			adView.destroy();
-		}
+		AdMob.destroyAdView(this);
 		
 		super.onDestroy();
 	}
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = this.getSupportMenuInflater();
 		inflater.inflate(R.menu.preferences_menu, menu);
 		
 		return true;
 	}
-	
+	*/
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -98,12 +99,7 @@ public class Preferences extends SherlockPreferenceActivity {
 				
 				//Intent intent = new Intent(this, Main.class);
 				//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				//startActivity(intent);
-				
-				return true;
-			}
-			case (R.id.preferencesMenuSave): {
-				this.finish();
+				//this.startActivity(intent);
 				
 				return true;
 			}
@@ -114,64 +110,34 @@ public class Preferences extends SherlockPreferenceActivity {
 	}
 	
 	private void doInit() {
-		mPrefsAdapter = new PrefsAdapter(this);
+		SimpleRecognizer.initActionBar(this, this.getSupportActionBar());
 		
 		this.setContentView(R.layout.preferences);
 		
-		PreferenceManager preferenceManager = getPreferenceManager();
-		preferenceManager.setSharedPreferencesName(getString(R.string.preferences_file_name));
+		PreferenceManager preferenceManager = this.getPreferenceManager();
+		preferenceManager.setSharedPreferencesName(this.getString(R.string.preferences_file_name));
 		preferenceManager.setSharedPreferencesMode(MODE_PRIVATE);
 		//PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		
 		this.addPreferencesFromResource(R.xml.preferences);
-		
-		//SimpleRecognizer.initLisence(//TODO: TO ENABLE
-		//		Preferences.this,
-		//		(LinearLayout) this.findViewById(R.id.linearLayoutAdView)
-		//	);
-		
-		final ActionBar actionBar = this.getSupportActionBar();
-		if (actionBar != null) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-				actionBar.setHomeButtonEnabled(true);
-				actionBar.setDisplayHomeAsUpEnabled(true);
-				
-				//actionBar.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.background_header));
-				//actionBar.setDisplayUseLogoEnabled(true);
-				//actionBar.setDisplayShowHomeEnabled(true);
-				//actionBar.setDisplayShowTitleEnabled(true);
-			}
-		} else {
-			SimpleRecognizer.logIfDebug(Log.ERROR, LOG_TAG, "// TODO: getSupportActionBar() is NULL");
-		}
-	}
-	
-	private void usePreferencesValues() {
-		mPrefsAdapter.getValues();
-		
-		if (mPrefsAdapter.getIsKeepScreenOn()) {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		} else {
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		}
-		
-		if (mPrefsAdapter.getIsFullScreen()) {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-		} else {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "usePreferencesValues() called");
 	}
 	
 	public void onClickButtonPurchase(View view) {
 		//StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitAll().build());
 		
-		//new SimpleRecognizer().AsyncLicensePurchase(this).execute();//TODO: TO ENABLE
+		//if (AppEngine.isNetworkAvailable(this)) {
+			AdMob.purchaseLisenceAsync(this);
+		//} else {
+		//	SimpleRecognizer.makeToast(this, R.string.error_no_network, Toast.LENGTH_SHORT).show();
+		//}
 	}
 	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		sRequestedOrientation = this.getResources().getConfiguration().orientation;
+		
+		usePreferencesValues(this);
+	}
 	/*
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -207,5 +173,58 @@ public class Preferences extends SherlockPreferenceActivity {
 		}
 	}
 	*/
+	public static PrefsAdapter usePreferencesValues(Activity activity) {
+		return usePreferencesValues(activity, true);
+	}
+	
+	public static PrefsAdapter usePreferencesValues(Activity activity, boolean isWithOrientation) {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "usePreferencesValues(...) called");
+		
+		PrefsAdapter prefsAdapter = PrefsAdapter.getInstance((Context) activity, true);
+		
+		if (prefsAdapter.getIsKeepScreenOn()) {
+			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		} else {
+			activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		}
+		
+		if (prefsAdapter.getIsFullScreen()) {
+			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		} else {
+			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+			activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		
+		if (isWithOrientation) {
+			if (sRequestedOrientation == Configuration.ORIENTATION_UNDEFINED) {
+				sRequestedOrientation = ((Context) activity).getResources().getConfiguration().orientation;
+			}
+			
+			if (prefsAdapter.getIsOrientation()) {
+				activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+			} else {
+				switch (sRequestedOrientation) {
+					case (Configuration.ORIENTATION_PORTRAIT): {
+						activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+						
+						break;
+					}
+					case (Configuration.ORIENTATION_LANDSCAPE): {
+						activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+						
+						break;
+					}
+					default: {
+						activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+						
+						break;
+					}
+				}
+			}
+		}
+		
+		return prefsAdapter;
+	}
 	
 }

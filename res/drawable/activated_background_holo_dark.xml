@@ -9,12 +9,15 @@
 		  android:exitFadeDuration="@android:integer/config_mediumAnimTime"
 		  android:dither="true">
 	
-	<item android:state_activated="true"
-		  android:drawable="@drawable/list_activated_holo" />
-	
+	<!-- CHECKED -->
 	<item android:state_checked="true"
 		  android:drawable="@drawable/list_activated_holo" />
 	
+	<!-- ACTIVATED -->
+	<item android:state_activated="true"
+		  android:drawable="@drawable/list_activated_holo" />
+	
+	<!-- THE REST -->
 	<item android:drawable="@color/transparent" />
 	
 </selector>

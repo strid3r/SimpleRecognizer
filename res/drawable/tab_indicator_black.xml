@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 strider
+	 
+	 Simple Recognizer
+	 Drawable Tab Indicator Black XML
+	 By © strider 2013.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<item android:left="0.0dp"
+		  android:right="0.0dp">
+		
+		<shape android:shape="rectangle"
+			   android:dither="true">
+			
+			<gradient android:angle="270.0"
+					  android:startColor="@color/blackSolid"
+					  android:endColor="@color/blackStroke" />
+			
+			<stroke android:width="2.0dp"
+					android:color="@color/gray_light" />
+			
+			<corners android:topLeftRadius="0.0dp"
+					 android:topRightRadius="0.0dp"
+					 android:bottomLeftRadius="0.0dp"
+					 android:bottomRightRadius="0.0dp" />
+			
+		</shape>
+		
+	</item>
+	
+</layer-list>

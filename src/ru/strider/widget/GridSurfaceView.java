@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Widget
  * SurfaceView GridSurfaceView Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.widget;
@@ -11,63 +11,118 @@ package ru.strider.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.SurfaceView;
 
 import ru.strider.simplerecognizer.R;
+import ru.strider.widget.util.Font;
 
 /**
- * Widget SurfaceView GridSurfaceView Class.
+ * SurfaceView GridSurfaceView Class.
  * 
  * @author strider
  */
 public class GridSurfaceView extends SurfaceView {
 	
-	//private static final String LOG_TAG = "GridSurfaceView";
+	//private static final String LOG_TAG = GridSurfaceView.class.getSimpleName();
 	
 	private static final int MAX_SIZE_STEPS = 5;
 	
-	private Context mContext = null;
+	private static final float FPS_OFFSET_DP = 10.0f;
 	
-	private Paint mPaint = null;
+	private Paint mPaintGrid = null;
+	
+	private Paint mPaintFps = null;
+	
+	private float mOffsetFps = 0.0f; 
+	
+	private long mLastTick = 0L;
+	private int mFrameCount = 0;
+	private int mFps = 0;
 	
 	public GridSurfaceView(Context context) {
 		super(context);
 		
-		doInit(context);
+		doInit(null);
 	}
 	
 	public GridSurfaceView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		doInit(context);
+		doInit(attrs);
 	}
 	
 	public GridSurfaceView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		
-		doInit(context);
+		doInit(attrs);
 	}
 	
-	private void doInit(Context context) {
-		mContext = context;
-		
+	private void doInit(AttributeSet attrs) { // TODO: NEED GAME LOOP FOR PROPER FPS CALCULATION
 		this.setWillNotDraw(false);
 		
-		mPaint = new Paint();
-		mPaint.setStyle(Paint.Style.STROKE);
-		//mPaint.setStrokeWidth(2.0f);
-		mPaint.setColor(mContext.getResources().getColor(R.color.black));
+		mPaintGrid = new Paint();
+		mPaintGrid.setStyle(Paint.Style.STROKE);
+		//mPaintGrid.setStrokeWidth(2.0f);
+		mPaintGrid.setColor(this.getResources().getColor(R.color.black));
+		
+		mPaintFps = new Paint();
+		mPaintFps.setTextSize(32.0f);
+		//mPaintFps.setStyle(Paint.Style.STROKE); // FIXME: TEST TEXT STYLE
+		//mPaintFps.setStrokeWidth(2.0f);
+		mPaintFps.setColor(this.getResources().getColor(R.color.blue_dodger));
+		
+		if (attrs != null) {
+			Typeface typeface = Font.getTypeface(this.getContext(), attrs);
+			
+			if (typeface != null) {
+				mPaintFps.setTypeface(typeface);
+			}
+		}
+		
+		mOffsetFps = TypedValue.applyDimension(
+				TypedValue.COMPLEX_UNIT_DIP,
+				FPS_OFFSET_DP,
+				this.getResources().getDisplayMetrics()
+			);
+	}
+	
+	private void updateFps() {
+		final long currentTick = SystemClock.elapsedRealtime();
+		
+		mFrameCount++;
+		
+		if ((currentTick - mLastTick) > 1000L) {
+			mFps = mFrameCount;
+			
+			mLastTick = currentTick;
+			
+			mFrameCount = 0;
+		}
 	}
 	
 	private boolean isEven(int number) {
 		return (((number % 2) == 0) ? true : false);
 	}
 	
+	public int getFps() {
+		return mFps;
+	}
+	
+	public void setTypeface(Typeface typeface) {
+		mPaintFps.setTypeface(typeface);
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
+		updateFps();
+		
+		// Grid
 		final int width = this.getWidth();
 		final int height = this.getHeight();
 		
@@ -113,12 +168,15 @@ public class GridSurfaceView extends SurfaceView {
 		}
 		
 		for (float i = startWidth; i < width; i += step) {
-			canvas.drawLine(i, 0.0f, i, (float) height, mPaint);
+			canvas.drawLine(i, 0.0f, i, (float) height, mPaintGrid);
 		}
 		
 		for (float j = startHeight; j < height; j += step) {
-			canvas.drawLine(0.0f, j, (float) width, j, mPaint);
+			canvas.drawLine(0.0f, j, (float) width, j, mPaintGrid);
 		}
+		
+		// FPS
+		canvas.drawText(Integer.toString(mFps), mOffsetFps, (height - mOffsetFps), mPaintFps);
 	}
 	
 }

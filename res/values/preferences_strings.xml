@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Strings Preferences XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="preferences_name">
-		Application Preferences
+		Preferences
 	</string>
 	
 	<string name="preferences_file_name">
 		Preferences
-	</string>
-	
-	<!-- MENU -->
-	<string name="preferences_menu_save">
-		Save
 	</string>
 	
 	<!-- CATEGORY -->
@@ -67,6 +62,10 @@
 		IS_FULL_SCREEN
 	</string>
 	
+	<string name="prefs_key_display_is_orientation">
+		IS_ORIENTATION
+	</string>
+	
 	<string name="prefs_key_licensing_purchase">
 		PURCHASE
 	</string>
@@ -84,21 +83,33 @@
 		Full Screen
 	</string>
 	
+	<string name="prefs_title_display_is_orientation">
+		Orientation
+	</string>
+	
 	<string name="prefs_title_licensing_purchase">
 		Remove Ads &amp; support dev.
 	</string>
 	
 	<!-- SUMMATY -->
 	<string name="prefs_summary_localization_language">
-		Current Localization Language\n(reqires an Application restart)
+		Current Localization Language
+		\n(reqires an Application restart)
 	</string>
 	
 	<string name="prefs_summary_display_is_keep_screen_on">
-		Prevent screen from turning off\nwhile Application is in use
+		Prevent screen from turning off
+		\nwhile Application is in use
 	</string>
 	
 	<string name="prefs_summary_display_is_full_screen">
-		Enable full-screen mode,\nhiding the notification bar
+		Enable full-screen mode,
+		\nhiding the notification bar
+	</string>
+	
+	<string name="prefs_summary_display_is_orientation">
+		Switch orientation automatically
+		\nwhen rotating device
 	</string>
 	
 	<!-- DEFAULT VALUE -->

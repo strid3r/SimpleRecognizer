@@ -8,4 +8,4 @@
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
 		android:dither="true"
 		android:tileMode="repeat"
-		android:src="@drawable/background_dark" />
+		android:src="@drawable/bkgd_tile_black" />

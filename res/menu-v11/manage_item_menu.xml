@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 strider
+	 
+	 Simple Recognizer
+	 V11 Menu Manage Item XML
+	 By © strider 2013.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<!-- OVERFLOW -->
+	<item android:id="@+id/mainActionOverflow"
+		  android:title="@string/menu_action_overflow"
+		  android:icon="@drawable/ic_action_overflow"
+		  android:showAsAction="always"
+		  android:orderInCategory="0">
+		
+		<!-- SUBMENU -->
+		<menu>
+			
+			<!-- CONTENT -->
+			<group android:id="@+id/manageItemMenuContent">
+				
+				<item android:id="@+id/manageItemMenuImport"
+					  android:title="@string/manage_item_menu_import"
+					  android:icon="@drawable/ic_action_save"
+					  android:showAsAction="never"
+					  android:orderInCategory="1" />
+				
+				<item android:id="@+id/manageItemMenuAddItem"
+					  android:title="@string/manage_item_menu_add_item"
+					  android:icon="@drawable/ic_action_add"
+					  android:showAsAction="never"
+					  android:orderInCategory="2" />
+				
+			</group>
+			
+			<!-- CONTROLS -->
+			<group android:id="@+id/mainMenuControls">
+				
+				<item android:id="@+id/manageItemMenuDeleteCourse"
+					  android:title="@string/manage_item_menu_delete_course"
+					  android:icon="@drawable/ic_action_delete"
+					  android:showAsAction="never"
+					  android:orderInCategory="3" />
+				
+			</group>
+			
+		</menu>
+		
+	</item>
+	
+</menu>

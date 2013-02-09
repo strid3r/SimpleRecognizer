@@ -1,80 +1,71 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
- * ListActivity Manage PHash Class
- * By © strider 2012.
+ * BaseListActivity ManagePHash Class
+ * By © strider 2012-2013.
  */
 
 package ru.strider.simplerecognizer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.google.ads.AdView;
 
-import ru.strider.simplerecognizer.adapter.ListArrayAdapter;
-import ru.strider.simplerecognizer.adapter.SpinnerArrayAdapter;
+import ru.strider.adapter.BaseArrayAdapter;
+import ru.strider.app.BaseListActivity;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.model.Item;
 import ru.strider.simplerecognizer.model.PHash;
-import ru.strider.simplerecognizer.util.BuildConfig;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.ImagePHash;
-import ru.strider.simplerecognizer.util.PrefsAdapter;
+import ru.strider.util.BuildConfig;
+import ru.strider.util.Text;
 
 /**
- * ListActivity Manage PHash Class.
+ * BaseListActivity ManagePHash Class.
  * 
  * @author strider
  */
-public class ManagePHash extends SherlockListActivity {
+public class ManagePHash extends BaseListActivity {
 	
-	private static final String LOG_TAG = "ManagePHash";
-	
-	private PrefsAdapter mPrefsAdapter = null;
-	private ConfigAdapter mConfigAdapter = null;
+	private static final String LOG_TAG = ManagePHash.class.getSimpleName();
 	
 	private Course mCourse = null;
-	
 	private Item mItem = null;
 	
-	private List<PHash> mListPHash = null;
-	private List<String> mListTitle = null;
+	private ConfigAdapter mConfigAdapter = null;
 	
-	private ListArrayAdapter mAdapter = null;
+	private Menu mMainMenu = null;
+	
+	private BaseArrayAdapter<PHash> mAdapter = null;
 	private ListView mView = null;
 	
 	private AsyncPHashImport mAsyncPHashImport = null;
@@ -86,55 +77,60 @@ public class ManagePHash extends SherlockListActivity {
 		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		doInit();
-		
-		if (savedInstanceState == null) {
-			SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "SIS is NULL");
-		} else {
-			SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "SIS is ~NULL");
-		}
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		
-		usePreferencesValues();
+		useConfigValues();
 		
-		//useConfigValues();
-		
-		//
-		
-		//
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onResume() called");
+		SimpleRecognizer.mediaReceiver.startWatchingExternalStorage(this);
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
 		
-		//
-		
-		//
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onPause() called");
+		SimpleRecognizer.mediaReceiver.stopWatchingExternalStorage(this);
 	}
 	
 	@Override
 	protected void onDestroy() {
-		AdView adView = (AdView) this.findViewById(R.id.adView);
+		mCourse = null;
+		mItem = null;
 		
-		if (adView != null) {
-			adView.destroy();
+		mConfigAdapter = null;
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			mMainMenu = null;
 		}
+		
+		mAdapter = null;
+		mView = null;
+		
+		mAsyncPHashImport = null;
 		
 		super.onDestroy();
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = this.getSupportMenuInflater();
 		inflater.inflate(R.menu.manage_phash_menu, menu);
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			mMainMenu = menu;
+		}
+		
+		return true;
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
+		
+		menu.findItem(R.id.managePHashMenuDeleteItem).setEnabled(isCreator).setVisible(isCreator);
 		
 		return true;
 	}
@@ -142,46 +138,34 @@ public class ManagePHash extends SherlockListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case (android.R.id.home): {
-				this.finish();
-				
-				//Intent intent = new Intent(this, Main.class);
-				//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				//startActivity(intent);
+			case (R.id.mainActionOverflow): {
+				performActionMenu(false);
 				
 				return true;
 			}
 			case (R.id.managePHashMenuImport): {
-				mAsyncPHashImport = new AsyncPHashImport(this);
+				mAsyncPHashImport = new AsyncPHashImport();
 				
-				Intent iPickFile = new Intent(ManagePHash.this, PHashImport.class);
-				this.startActivityForResult(iPickFile, PHashImport.PICK_FILE_REQUEST);
+				Intent iPickFile = new Intent(this, FileManager.class);
+				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_ALL);
+				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
 				
 				return true;
 			}
 			case (R.id.managePHashMenuAddPHash): {
-				showAddPHash();
+				buildAddPHash(null).show();
 				
 				return true;
 			}
 			case (R.id.managePHashMenuDeleteItem): {
-				DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
-				dbAdapter.createDataBase(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				
 				dbAdapter.write();
 				
-				dbAdapter.deleteItem(mConfigAdapter.getItemId());
+				dbAdapter.deleteItem(mItem.getId());
 				
 				dbAdapter.close();
 				
-				//
-				Intent iMainCamera = new Intent(ManagePHash.this, MainCamera.class);
-				iMainCamera.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				this.startActivity(iMainCamera);
-				//
-				
-				return true;
-			}
-			case (R.id.managePHashMenuSave): {
 				this.finish();
 				
 				return true;
@@ -192,39 +176,62 @@ public class ManagePHash extends SherlockListActivity {
 		}
 	}
 	
+	private void performActionMenu(boolean isOnMenuPressed) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			this.openOptionsMenu();
+		} else {
+			if (isOnMenuPressed) {
+				this.supportInvalidateOptionsMenu();
+				
+				mMainMenu.performIdentifierAction(R.id.mainActionOverflow, 0);
+			} else {
+				onPrepareOptionsMenu(mMainMenu);
+			}
+		}
+	}
+	
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
+	public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, view, menuInfo);
 		
 		//menu.setHeaderIcon(iconRes);
 		menu.setHeaderTitle(R.string.manage_phash_context_menu_header_title);
 		
-		android.view.MenuInflater inflater = getMenuInflater();
+		android.view.MenuInflater inflater = this.getMenuInflater();
 		inflater.inflate(R.menu.manage_phash_context_menu, menu);
+		
+		if (mConfigAdapter.getIsCreator()) {
+			boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
+			
+			menu.findItem(R.id.managePHashContextMenuEdit).setEnabled(isCreator).setVisible(isCreator);
+			menu.findItem(R.id.managePHashContextMenuDelete).setEnabled(isCreator).setVisible(isCreator);
+		}
 	}
 	
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		
+		final PHash pHash = mAdapter.getItem(info.position);
+		
 		switch (item.getItemId()) {
 			case (R.id.managePHashContextMenuShowComment): {
-				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-				
-				PHash pHash = getPHash(mAdapter.getItem(info.position).toString());
-				
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				View view = inflater.inflate(R.layout.alert_dialog_manage_phash_show_comment, null);
+				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_show_comment, null);
 				
 				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 				textViewTitle.setText(pHash.getHexValue());
+				textViewTitle.setSelected(true);
 				
-				EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
-				editTextComment.setText(Html.fromHtml(pHash.getComment()));
+				EditText editTextComment = (EditText) viewContent.findViewById(R.id.editTextComment);
+				editTextComment.setText(Html.fromHtml(pHash.getComment().replace(Text.LF, Text.BR)));
 				editTextComment.setEnabled(false);
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCustomTitle(viewTitle);
-				builder.setView(view);
+				builder.setView(viewContent);
+				
 				builder.setNeutralButton(R.string.dialog_button_close, null);
 				
 				AlertDialog alert = builder.create();
@@ -233,72 +240,72 @@ public class ManagePHash extends SherlockListActivity {
 				return true;
 			}
 			case (R.id.managePHashContextMenuEdit): {
-				DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
-				dbAdapter.createDataBase(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				
 				dbAdapter.open();
 				
-				final List<Item> listItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
+				List<Item> listItem = dbAdapter.getListItem(mCourse.getId());
 				
 				dbAdapter.close();
 				
-				List<String> listTitle = new ArrayList<String>();
-				for (Item courseItem : listItem) {
-					listTitle.add(courseItem.getTitle());
+				final BaseArrayAdapter<Item> adapter = new BaseArrayAdapter<Item>(
+						this,
+						R.layout.spinner_item_activated
+					);
+				adapter.setDropDownViewResource(R.layout.list_item_single_choice_activated);
+				
+				int itemPosition = AdapterView.INVALID_POSITION;
+				
+				if (listItem != null) {
+					itemPosition = listItem.indexOf(mItem);
+					
+					adapter.addData(listItem);
 				}
-				
-				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-				
-				final PHash pHash = getPHash(mAdapter.getItem(info.position).toString());
 				
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
 				
 				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 				textViewTitle.setText(R.string.manage_phash_context_menu_edit);
+				textViewTitle.setSelected(true);
 				
-				final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
-				
-				SpinnerArrayAdapter adapter = new SpinnerArrayAdapter(this, listTitle);
-				
+				final Spinner spinnerItem = (Spinner) viewContent.findViewById(R.id.spinnerItem);
 				spinnerItem.setAdapter(adapter);
+				spinnerItem.setSelection(itemPosition);
 				
-				spinnerItem.setSelection(listTitle.indexOf(mItem.getTitle()));
-				
-				final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
+				final EditText editTextHexValue = (EditText) viewContent.findViewById(R.id.editTextHexValue);
 				editTextHexValue.setText(pHash.getHexValue());
 				
-				final EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
+				final EditText editTextComment = (EditText) viewContent.findViewById(R.id.editTextComment);
 				editTextComment.setText(pHash.getComment());
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setCustomTitle(viewTitle);
-				builder.setView(view);
+				builder.setView(viewContent);
 				
 				builder.setNegativeButton(R.string.dialog_button_cancel, null);
 				
 				builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						pHash.setHexValue(editTextHexValue.getText().toString());
-						pHash.setComment(editTextComment.getText().toString());
-						pHash.setItemId(listItem.get(spinnerItem.getSelectedItemPosition()).getId());
 						
-						DataBaseAdapter dbAdapter = new DataBaseAdapter(ManagePHash.this);
-						dbAdapter.createDataBase(ManagePHash.this);
-						dbAdapter.write();
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							pHash.setHexValue(editTextHexValue.getText().toString().trim());
+							pHash.setComment(editTextComment.getText().toString().trim());
+							pHash.setItemId(adapter.getItem(spinnerItem.getSelectedItemPosition()).getId());
+							
+							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManagePHash.this);
+							
+							dbAdapter.write();
+							
+							dbAdapter.updatePHash(pHash);
+							
+							dbAdapter.close();
+							
+							initView();
+						}
 						
-						dbAdapter.updatePHash(pHash);
-						
-						dbAdapter.close();
-						
-						//
-						reloadView();
-						//
-					}
-					
-				});
+					});
 				
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -306,19 +313,15 @@ public class ManagePHash extends SherlockListActivity {
 				return true;
 			}
 			case (R.id.managePHashContextMenuDelete): {
-				AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
 				
-				DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
-				dbAdapter.createDataBase(this);
 				dbAdapter.write();
 				
-				dbAdapter.deletePHash(getPHash(mAdapter.getItem(info.position).toString()).getId());
+				dbAdapter.deletePHash(pHash.getId());
 				
 				dbAdapter.close();
 				
-				//
-				reloadView();
-				//
+				initView();
 				
 				return true;
 			}
@@ -329,209 +332,150 @@ public class ManagePHash extends SherlockListActivity {
 	}
 	
 	private void doInit() {
-		mPrefsAdapter = new PrefsAdapter(this);
-		mConfigAdapter = new ConfigAdapter(this);
+		mConfigAdapter = ConfigAdapter.getInstance(this);
 		
-		mListTitle = new ArrayList<String>();
+		Intent intent = this.getIntent();
 		
-		initData();
+		mCourse = intent.getParcelableExtra(Course.KEY);
+		mItem = intent.getParcelableExtra(Item.KEY);
 		
-		this.setTitle(mCourse.getCategory() + SimpleRecognizer.SEPARATOR + mCourse.getTitle() + SimpleRecognizer.SEPARATOR + mItem.getTitle());
+		this.setTitle(mCourse.getCategory()
+				+ Text.SEPARATOR + mCourse.getTitle()
+				+ Text.SEPARATOR + mItem.getTitle());
 		
 		this.setContentView(R.layout.manage_phash);
 		
 		this.setSupportProgressBarIndeterminateVisibility(false);
 		
-		mAdapter = new ListArrayAdapter(this, mListTitle);
+		mAdapter = new BaseArrayAdapter<PHash>(this, R.layout.list_item_activated);
 		mView = this.getListView();
 		
+		mView.setEmptyView(this.findViewById(R.id.textViewEmpty));
 		mView.setAdapter(mAdapter);
 		//this.setListAdapter(mAdapter);
 		this.registerForContextMenu(mView);
 		
 		mView.setTextFilterEnabled(true);
 		//mView.setItemsCanFocus(false);
-		mView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		//mView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		
-		//SimpleRecognizer.initLisence(//TODO: TO ENABLE
-		//		SelectCourse.this,
-		//		(LinearLayout) this.findViewById(R.id.linearLayoutAdView)
-		//	);
-		
-		final ActionBar actionBar = this.getSupportActionBar();
-		if (actionBar != null) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-				actionBar.setHomeButtonEnabled(true);
-			}
-			
-			actionBar.setDisplayHomeAsUpEnabled(true);
-			//actionBar.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.background_header));
-			//actionBar.setDisplayUseLogoEnabled(true);
-			//actionBar.setDisplayShowHomeEnabled(true);
-			//actionBar.setDisplayShowTitleEnabled(true);
-		} else {
-			SimpleRecognizer.logIfDebug(Log.ERROR, LOG_TAG, "// TODO: getSupportActionBar() is NULL");
-		}
+		initData();
 	}
 	
 	private void initData() {
-		DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
-		dbAdapter.createDataBase(this);
+		mAdapter.clear();
+		
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		
 		dbAdapter.open();
 		
-		mCourse = dbAdapter.getCourse(mConfigAdapter.getCourseId());
-		
-		mItem = dbAdapter.getItem(mConfigAdapter.getItemId());
-		
-		mListPHash = dbAdapter.getListPHash(mConfigAdapter.getItemId());
+		List<PHash> listPHash = dbAdapter.getListPHash(mItem.getId());
 		
 		dbAdapter.close();
 		
-		if (mListPHash == null) {
-			mListPHash = new ArrayList<PHash>();
+		if (listPHash != null) {
+			mAdapter.addData(listPHash);
 		}
-		
-		mListTitle.clear();
-		for (PHash pHash : mListPHash) {
-			mListTitle.add(pHash.getHexValue());
-		}
-	}
-	
-	private void reloadView() {
-		initData();
 		
 		mAdapter.notifyDataSetChanged();
 	}
 	
-	private void showAddPHash() {
-		showAddPHash(null);
+	private void initView() {
+		initData();
+		
+		useConfigValues();
 	}
 	
-	private void showAddPHash(String pHashHex) {
-		DataBaseAdapter dbAdapter = new DataBaseAdapter(this);
-		dbAdapter.createDataBase(this);
+	private AlertDialog buildAddPHash(String pHashHex) {
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		
 		dbAdapter.open();
 		
-		final List<Item> listItem = dbAdapter.getListItem(mConfigAdapter.getCourseId());
+		List<Item> listItem = dbAdapter.getListItem(mCourse.getId());
 		
 		dbAdapter.close();
 		
-		List<String> listTitle = new ArrayList<String>();
-		for (Item courseItem : listItem) {
-			listTitle.add(courseItem.getTitle());
+		final BaseArrayAdapter<Item> adapter = new BaseArrayAdapter<Item>(
+				this,
+				R.layout.spinner_item_activated
+			);
+		adapter.setDropDownViewResource(R.layout.list_item_single_choice_activated);
+		
+		int itemPosition = AdapterView.INVALID_POSITION;
+		
+		if (listItem != null) {
+			itemPosition = listItem.indexOf(mItem);
+			
+			adapter.addData(listItem);
 		}
 		
 		LayoutInflater inflater = LayoutInflater.from(this);
 		View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-		View view = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
+		View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
 		
 		TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 		textViewTitle.setText(R.string.manage_phash_menu_add_phash);
+		textViewTitle.setSelected(true);
 		
-		final Spinner spinnerItem = (Spinner) view.findViewById(R.id.spinnerItem);
-		
-		SpinnerArrayAdapter adapter = new SpinnerArrayAdapter(this, listTitle);
-		
+		final Spinner spinnerItem = (Spinner) viewContent.findViewById(R.id.spinnerItem);
 		spinnerItem.setAdapter(adapter);
+		spinnerItem.setSelection(itemPosition);
 		
-		spinnerItem.setSelection(listTitle.indexOf(mItem.getTitle()));
+		final EditText editTextHexValue = (EditText) viewContent.findViewById(R.id.editTextHexValue);
 		
-		final EditText editTextHexValue = (EditText) view.findViewById(R.id.editTextHexValue);
-		if (pHashHex != null) {
+		if (!TextUtils.isEmpty(pHashHex)) {
 			editTextHexValue.setText(pHashHex);
 		}
 		
-		final EditText editTextComment = (EditText) view.findViewById(R.id.editTextComment);
+		final EditText editTextComment = (EditText) viewContent.findViewById(R.id.editTextComment);
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setCustomTitle(viewTitle);
-		builder.setView(view);
+		builder.setView(viewContent);
 		
 		builder.setNegativeButton(R.string.dialog_button_cancel, null);
 		
 		builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				DataBaseAdapter dbAdapter = new DataBaseAdapter(ManagePHash.this);
-				dbAdapter.createDataBase(ManagePHash.this);
-				dbAdapter.write();
 				
-				dbAdapter.addPHash(new PHash(
-						editTextHexValue.getText().toString(),
-						editTextComment.getText().toString(),
-						listItem.get(spinnerItem.getSelectedItemPosition()).getId()
-					));
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManagePHash.this);
+					
+					dbAdapter.write();
+					
+					dbAdapter.addPHash(new PHash(
+							editTextHexValue.getText().toString().trim(),
+							editTextComment.getText().toString().trim(),
+							adapter.getItem(spinnerItem.getSelectedItemPosition()).getId()
+						));
+					
+					dbAdapter.close();
+					
+					initView();
+				}
 				
-				dbAdapter.close();
-				
-				//
-				reloadView();
-				//
-			}
-			
-		});
+			});
 		
 		AlertDialog alert = builder.create();
-		alert.show();
+		
+		return alert;
 	}
 	
-	private void usePreferencesValues() {
-		mPrefsAdapter.getValues();
-		
-		if (mPrefsAdapter.getIsKeepScreenOn()) {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		} else {
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		}
-		
-		if (mPrefsAdapter.getIsFullScreen()) {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-		} else {
-			this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-			this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "usePreferencesValues() called");
-	}
-	/*
 	private void useConfigValues() {
-		//mConfigAdapter.getValues();
-		
-		//
-		
-		//
-		
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
-	}
-	*/
-	private PHash getPHash(String hexValue) {
-		for (PHash pHash : mListPHash) {
-			if (pHash.getHexValue().equals(hexValue)) {
-				return pHash;
-			}
-		}
 		
-		return null;
+		mConfigAdapter.getValues();
 	}
 	
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		l.setItemChecked(position, true);
-		
+	protected void onListItemClick(ListView listView, View view, int position, long id) {
 		//
 	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
-			case (KeyEvent.KEYCODE_VOLUME_UP): {
-				//
-				return true;
-			}
-			case (KeyEvent.KEYCODE_VOLUME_DOWN): {
-				//
+			case (KeyEvent.KEYCODE_MENU): {
 				return true;
 			}
 			default: {
@@ -543,12 +487,9 @@ public class ManagePHash extends SherlockListActivity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		switch (keyCode) {
-			case (KeyEvent.KEYCODE_VOLUME_UP): {
-				//
-				return true;
-			}
-			case (KeyEvent.KEYCODE_VOLUME_DOWN): {
-				//
+			case (KeyEvent.KEYCODE_MENU): {
+				performActionMenu(true);
+				
 				return true;
 			}
 			default: {
@@ -559,12 +500,12 @@ public class ManagePHash extends SherlockListActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == PHashImport.PICK_FILE_REQUEST) {
+		if (requestCode == FileManager.REQUEST_FILE) {
 			if ((resultCode == RESULT_OK) && (data != null)) {
-				String imagePath = data.getStringExtra(PHashImport.KEY_PICK_FILE);
+				String file = data.getStringExtra(FileManager.KEY_FILE);
 				
-				if ((imagePath != null) && (mAsyncPHashImport != null)) {
-					mAsyncPHashImport.execute(imagePath);
+				if ((!TextUtils.isEmpty(file)) && (mAsyncPHashImport != null)) {
+					mAsyncPHashImport.execute(file);
 				}
 			}
 			
@@ -579,101 +520,58 @@ public class ManagePHash extends SherlockListActivity {
 	 */
 	private class AsyncPHashImport extends AsyncTask<String, Void, List<String>> {
 		
-		private static final String LOG_TAG = "AsyncPHashImport";
+		//private static final String LOG_TAG = "AsyncPHashImport";
 		
 		private long mInitTime = 0L;
-		private long mWorkTime = 0L;
 		
-		private Context mContext = null;
+		//private Context mContext = null;
 		
-		private Activity mActivity = null;
-		
-		private ImagePHash mImagePHash = null;
-		
-		public AsyncPHashImport(Activity activity) {
-			mContext = (Context) activity;
-			
-			mActivity = activity;
+		public AsyncPHashImport() {
+			//mContext = ManagePHash.this.getApplicationContext();
 		}
 		
 		@Override
 		protected void onPreExecute() {
+			mInitTime = SystemClock.elapsedRealtime();
+			
 			ManagePHash.this.setSupportProgressBarIndeterminateVisibility(true);
 		}
 		
 		@Override
 		protected List<String> doInBackground(String... params) {
-			mInitTime = SystemClock.elapsedRealtime();
-			
-			//
-			
 			List<String> listPHashHex = new ArrayList<String>();
 			
-			mImagePHash = new ImagePHash(
-					//ImagePHash.DCT_SIZE_FAST,
-					//ImagePHash.DCT_LOW_SIZE
-				);
-			
-			for (String imagePath : params) {
-				boolean isExternalStorageAvailable = false;
-				
-				String state = Environment.getExternalStorageState();
-				
-				if (!Environment.isExternalStorageRemovable() || state.equals(Environment.MEDIA_MOUNTED)
-						|| state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-					isExternalStorageAvailable = true;
+			for (String path : params) {
+				if (SimpleRecognizer.mediaReceiver.isExternalStorageAvailable()) {
+					String pHashHex = ImagePHash.getPHash(path);
 					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_AVAILABLE");
-				} else {
-					isExternalStorageAvailable = false;
-					
-					SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "MEDIA_N/A");
-				}
-				
-				if (isExternalStorageAvailable) {
-					String pHashHex = null;
-					
-					try {
-						pHashHex = mImagePHash.getPHash(imagePath);
-					} catch (OutOfMemoryError e) {
-						//FIXME: Temp Handler For Not Intended Behavior
-						mActivity.runOnUiThread(new Runnable() {
-							
-							@Override
-							public void run() {
-								Toast.makeText(mContext, "[ DEBUG ] OutOfMemoryError", Toast.LENGTH_SHORT).show();
-							}
-							
-						});
+					if (pHashHex != null) {
+						listPHashHex.add(pHashHex);
 					}
-					
-					listPHashHex.add(pHashHex);
 				} else {
-					//TODO: "Failed, External Storage Not Available."
+					// TODO: "Failed, external storage not available."
 				}
 			}
-			
-			//
-			
-			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
 			
 			return listPHashHex;
 		}
 		
 		@Override
 		protected void onPostExecute(List<String> result) {
-			ManagePHash.this.setSupportProgressBarIndeterminateVisibility(false);
-			
-			//
-			StringBuilder sb = new StringBuilder();
-			
-			if (BuildConfig.DEBUG) {
-				sb.append("Work Time: ").append(mWorkTime).append(" ms.").append(SimpleRecognizer.BR_LINE);
-			}
-			//
-			
-			for (String pHashHex : result) {
-				showAddPHash(pHashHex);
+			if (ManagePHash.this.isAlive()) {
+				ManagePHash.this.setSupportProgressBarIndeterminateVisibility(false);
+				
+				StringBuilder sb = new StringBuilder();
+				
+				if (BuildConfig.DEBUG) {
+					sb.append("Work Time: ");
+					sb.append(SystemClock.elapsedRealtime() - mInitTime);
+					sb.append(" ms.").append(Text.LF);
+				}
+				
+				for (String pHashHex : result) {
+					buildAddPHash(pHashHex).show();
+				}
 			}
 		}
 		

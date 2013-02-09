@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012-2013 strider
+	 
+	 Simple Recognizer
+	 RU Strings File Manager XML
+	 By © strider 2012-2013.
+-->
+<resources>
+	
+	<!-- MAIN -->
+	<string name="file_manager_name">
+		Файловый Менеджер
+	</string>
+	
+	<!-- CONTROLS -->
+	<string name="file_manager_control_cancel">
+		Отмена
+	</string>
+	
+	<string name="file_manager_control_accept">
+		Принять
+	</string>
+	
+</resources>

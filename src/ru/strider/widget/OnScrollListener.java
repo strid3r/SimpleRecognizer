@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Widget
  * ScrollView OnScrollListener Interface
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.widget;
 
 /**
- * Widget ScrollView OnScrollListener Interface.
+ * ScrollView OnScrollListener Interface.
  * 
  * @author strider
  */

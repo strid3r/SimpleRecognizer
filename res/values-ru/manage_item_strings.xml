@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 RU Strings Manage Item XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="manage_item_name">
 		Управление Объектами
 	</string>
@@ -23,10 +23,6 @@
 	
 	<string name="manage_item_menu_delete_course">
 		Удалить Объект
-	</string>
-	
-	<string name="manage_item_menu_save">
-		Сохранить
 	</string>
 	
 	<!-- CONTEXT MENU -->

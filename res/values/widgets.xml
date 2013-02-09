@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Values Widgets XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
@@ -11,19 +11,23 @@
 	<style name="Widget.Main.ActionBar"
 		   parent="@style/Widget.Sherlock.ActionBar">
 		
+		<item name="displayOptions">
+			useLogo|showHome|showTitle
+		</item>
+		
 		<item name="titleTextStyle">
 			@style/TextAppearance.Main.Widget.ActionBar.Title
 		</item>
 		
-		<item name="android:titleTextStyle">
-			@style/TextAppearance.Main.Widget.ActionBar.Title
+		<item name="background">
+			@drawable/background_header
+		</item>
+		
+		<item name="backgroundStacked">
+			@null
 		</item>
 		
 		<item name="indeterminateProgressStyle">
-			@style/Widget.Main.ProgressBar.Indeterminate
-		</item>
-		
-		<item name="android:indeterminateProgressStyle">
 			@style/Widget.Main.ProgressBar.Indeterminate
 		</item>
 		
@@ -39,6 +43,22 @@
 		
 		<item name="android:textColor">
 			@color/main
+		</item>
+		
+		<item name="android:shadowColor">
+			@color/black
+		</item>
+		
+		<item name="android:shadowDx">
+			1
+		</item>
+		
+		<item name="android:shadowDy">
+			1
+		</item>
+		
+		<item name="android:shadowRadius">
+			2
 		</item>
 		
 	</style>

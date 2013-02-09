@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Widget
  * CheckedTextView MainCheckedTextView Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.widget;
@@ -12,10 +12,10 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.CheckedTextView;
 
-import ru.strider.simplerecognizer.SimpleRecognizer;
+import ru.strider.widget.util.Font;
 
 /**
- * Widget CheckedTextView MainCheckedTextView Class.
+ * CheckedTextView MainCheckedTextView Class.
  * 
  * @author strider
  */
@@ -23,26 +23,18 @@ public class MainCheckedTextView extends CheckedTextView {
 	
 	public MainCheckedTextView(Context context) {
 		super(context);
-		
-		doInit(context);
 	}
 	
 	public MainCheckedTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		doInit(context);
+		Font.initTypeface(this, attrs);
 	}
 	
 	public MainCheckedTextView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		
-		doInit(context);
-	}
-	
-	private void doInit(Context context) {
-		if (!isInEditMode()) {
-			this.setTypeface(SimpleRecognizer.getTypefaceMain(context));
-		}
+		Font.initTypeface(this, attrs);
 	}
 	
 }

@@ -9,36 +9,34 @@
 package ru.strider.simplerecognizer;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Process;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.LinearLayout;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.File;
 import java.util.Locale;
 
-import org.json.JSONException;
-
 import cloud4apps.Utils;
-import cloud4apps.Licensing.LicenseInfo;
-import cloud4apps.Licensing.LicenseServices;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
+import com.actionbarsherlock.app.ActionBar;
 
-import ru.strider.simplerecognizer.util.BuildConfig;
+import ru.strider.app.MediaReceiver;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
+import ru.strider.util.BuildConfig;
+import ru.strider.widget.util.Font;
 
 /**
  * Application Simple Recognizer Class.
@@ -47,116 +45,150 @@ import ru.strider.simplerecognizer.util.PrefsAdapter;
  */
 public class SimpleRecognizer extends Application {
 	
-	private static final String LOG_TAG = "SimpleRecognizer";
+	private static final String LOG_TAG = SimpleRecognizer.class.getSimpleName();
 	
-	public static final String SEPARATOR = " :: ";
-	public static final String BR_LINE = "\n";
-	
-	public static final String APP_KEY = "N/A";//TODO
-	public static final String VERSION_KEY_NO_ADS = "N/A";//TODO
-	
-	private static final String FONT_AGENCYB = "Fonts/AGENCYB.TTF";
+	public static final String APP_KEY = "N/A";//FIXME: ADD KEY FOR DEPLOYMENT
 	
 	private static final String LOG_DEBUG = "[ DEBUG ] ";
 	
-	private static final String AD_FREE_PACKAGE = "com.bigtincan.android.adfree";
-	
-	private static final String HOSTS_PATH = "/etc/hosts";
-	
-	private static final long KB = 1024L;
-	private static final long MB = KB * KB;	
-	
-	private static final String ADMOB_PUBLISHER_ID = "a14f8f618f8b291";
-	
-	private static final String EMULATOR_INTEL_ATOM_X86 = "6501C509CD383EC804D00651B5FB19DB";
-	private static final String DEVICE_SAMSUNG_GALAXY_S = "CC37D88448286ACC82EC41CB988E5E97";
-	private static final String DEVICE_HTC_DESIRE = "BBA022EC80EAA9F63042D98D032734E1";
-	
-	private static final LinearLayout.LayoutParams LAYOUT_PARAMS = new LinearLayout.LayoutParams(
-			LinearLayout.LayoutParams.MATCH_PARENT,
-			LinearLayout.LayoutParams.WRAP_CONTENT
-		);
-	
-	private PrefsAdapter mPrefsAdapter = null;
+	public static MediaReceiver mediaReceiver = null;
 	
 	private Locale mLocale = null;
 	
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
+		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Configuration Changed");
+		
 		super.onConfigurationChanged(newConfig);
 		
 		if (mLocale != null) {
-			Resources res = this.getBaseContext().getResources();
-			
 			Locale.setDefault(mLocale);
 			
 			newConfig.locale = mLocale;
 			
+			Resources res = this.getResources();
+			
 			res.updateConfiguration(newConfig, res.getDisplayMetrics());
 		}
-		
-		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Configuration Changed");
 	}
 	
 	@Override
 	public void onCreate() {
+		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Launched");
+		
 		super.onCreate();
 		
 		//PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		
-		doInit();
+		int versionCode = PrefsAdapter.getVersionCode(this);
 		
-		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Launched");
+		try {
+			PackageInfo info = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+			
+			if (versionCode != info.versionCode) {
+				//if (versionCode < 7) {
+				//	ConfigAdapter.clearValues(this);
+				//} else if (versionCode < 8) {
+				//	//
+				//}
+				
+				PrefsAdapter.setVersionCode(this, info.versionCode);
+			}
+		} catch (NameNotFoundException e) {
+			Log.e(LOG_TAG, "onCreate() >> " + e.toString());
+		}
+		
+		mediaReceiver = new MediaReceiver();
+		
+		Resources res = this.getResources();
+		
+		Configuration config = res.getConfiguration();
+		
+		String languageCode = PrefsAdapter.getInstance(this, true).getLanguageCode();
+		
+		if ((!languageCode.equals(res.getString(R.string.locale_language_code_default)))
+				&& (!config.locale.getLanguage().equals(languageCode))) {
+			mLocale = new Locale(languageCode);
+			
+			Locale.setDefault(mLocale);
+			
+			config.locale = mLocale;
+			
+			res.updateConfiguration(config, res.getDisplayMetrics());
+		}
 	}
 	
 	@Override
 	public void onLowMemory() {
-		super.onLowMemory();
-		
 		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: On Low Memory");
+		
+		super.onLowMemory();
 	}
 	
 	@Override
 	public void onTerminate() {
-		super.onTerminate();
-		
 		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Terminated");
+		
+		super.onTerminate();
 	}
 	
-	private void doInit() {
-		mPrefsAdapter = new PrefsAdapter(this);
-		
-		usePreferencesValues();
-	}
-	
-	private void usePreferencesValues() {
-		mPrefsAdapter.getValues();
-		
-		Resources res = this.getBaseContext().getResources();
-		
-		Configuration config = res.getConfiguration();
-		
-		String languageCode = mPrefsAdapter.getLanguageCode();
-		
-		if (!languageCode.equals(res.getString(R.string.locale_language_code_default))
-				&& !config.locale.getLanguage().equals(languageCode)) {
-			Locale locale = new Locale(languageCode);
-			
-			Locale.setDefault(locale);
-			
-			config.locale = locale;
-			
-			res.updateConfiguration(config, res.getDisplayMetrics());
+	public static ActionBar initActionBar(Activity activity, ActionBar actionBar) {
+		if (actionBar == null) {
+			return null;
 		}
 		
-		logIfDebug(Log.INFO, LOG_TAG, "usePreferencesValues() called");
+		Resources res = ((Context) activity).getResources();
+		
+		TextView title = null;
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			actionBar.setHomeButtonEnabled(true);
+			
+			title = (TextView) activity.findViewById(
+					Resources.getSystem().getIdentifier("action_bar_title", "id", "android")
+				);
+		} else {
+			actionBar.setHomeButtonEnabled(true); // FIXME: Only for custom Title Font
+			
+			title = (TextView) activity.findViewById(
+					com.actionbarsherlock.R.id.abs__action_bar_title
+				);
+			
+			BitmapDrawable header = (BitmapDrawable) res.getDrawable(R.drawable.bkgd_tile_black);
+			header.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+			
+			actionBar.setBackgroundDrawable(header);
+		}
+		
+		if (title != null) {
+			title.setTypeface(getTypefaceMain(activity.getResources()));
+			title.setTextSize(
+					TypedValue.COMPLEX_UNIT_SP,
+					Math.round(title.getTextSize() / res.getDisplayMetrics().scaledDensity + 4.0f)
+				);
+		} else {
+			Log.w(LOG_TAG, "Failed to obtain ActionBar Title reference.");
+		}
+		
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		
+		return actionBar;
 	}
 	
-	public static final Typeface getTypefaceMain(Context context) {
-		return Typeface.createFromAsset(context.getAssets(), FONT_AGENCYB);
+	public static Typeface getTypefaceMain(Resources res) {
+		String font = null;
+		
+		if (res.getConfiguration().locale.getLanguage()
+				.equals(res.getString(R.string.locale_language_code_ru))) {
+			font = Font.AGENCY_FB_REGULAR_CYRILLIC;
+		} else {
+			font = Font.AGENCY_FB_BOLD;
+		}
+		
+		return Font.getTypeface(res, font);
 	}
 	
-	public static final void logIfDebug(int priority, String tag, String msg) {
+	public static void logIfDebug(int priority, String tag, String msg) {
 		if (BuildConfig.DEBUG) {
 			msg = LOG_DEBUG + msg;
 			
@@ -187,198 +219,34 @@ public class SimpleRecognizer extends Application {
 					break;
 				}
 				default: {
-					//
+					Log.d(tag, msg);
+					
 					break;
 				}
 			}
 		}
 	}
 	
-	public static final void initLisence(Activity activity, LinearLayout linearLayout) {
-		initLisence(activity, linearLayout, false, false);
+	public static Toast makeToast(Context context, int resId, int duration) throws Resources.NotFoundException {
+		return makeToast(context, context.getResources().getText(resId), duration);
 	}
 	
-	public static final void initLisence(Activity activity, LinearLayout linearLayout, boolean isLog) {
-		initLisence(activity, linearLayout, isLog, false);
+	public static Toast makeToast(Context context, CharSequence text, int duration) {
+		LayoutInflater inflater = LayoutInflater.from(context);
+		View view = inflater.inflate(R.layout.toast, null);
+		
+		TextView textView = (TextView) view.findViewById(R.id.textViewToast);
+		textView.setText(text);
+		
+		Toast toast = new Toast(context.getApplicationContext()); 
+		toast.setView(view);
+		toast.setDuration(duration);
+		
+		return toast;
 	}
 	
-	public static final void initLisence(Activity activity, LinearLayout linearLayout, boolean isLog, boolean isCheckAdFreePackage) {
-		new AsyncInitLicense(activity, linearLayout, isLog, isCheckAdFreePackage).execute();
-	}
-	
-	private static final void checkAdFreePackage(final Context context) {
-		try {
-			ApplicationInfo info = context.getPackageManager().getApplicationInfo(AD_FREE_PACKAGE, 0);
-			
-			File hostsFile = new File(HOSTS_PATH);
-			
-			if (hostsFile.exists() && (hostsFile.length() > (MB / 2))) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(context.getString(R.string.dialog_ad_free_found)).append(BR_LINE);
-				sb.append(info.packageName).append(BR_LINE);
-				sb.append("( ").append(HOSTS_PATH).append(SEPARATOR).append(hostsFile.length() / KB).append(" KB )");
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle(R.string.app_name);
-				builder.setMessage(sb.toString());
-				builder.setCancelable(false);
-				
-				builder.setNegativeButton(R.string.dialog_button_buy_license, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						new AsyncLicensePurchase(context).execute();
-					}
-					
-				});
-				
-				builder.setPositiveButton(R.string.dialog_button_exit, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Process.killProcess(Process.myPid());
-					}
-					
-				});
-				
-				AlertDialog dialog = builder.create();
-				dialog.show();
-			} else {
-				logIfDebug(Log.WARN, LOG_TAG, "AdFree Package :: Found >> " + HOSTS_PATH + " :: (Size < ThresholdValue) || NULL");
-			}
-		} catch (PackageManager.NameNotFoundException e) {
-			logIfDebug(Log.WARN, LOG_TAG, "AdFree Package :: Not Found");
-		}
-	}
-	
-	public static final boolean checkCourseCreator(Context context, String creator) {
+	public static boolean checkCourseCreator(Context context, String creator) {
 		return TextUtils.equals(Utils.GetEmail(context), creator);
-	}
-	
-	/**
-	 * AsyncTask AsyncLicensePurchase<Void, Void, Void> Class.
-	 * 
-	 * @author strider
-	 */
-	public static class AsyncLicensePurchase extends AsyncTask<Void, Void, Void> {
-		
-		private static final String LOG_TAG = "AsyncLicensePurchase";
-		
-		private Context mContext = null;
-		
-		public AsyncLicensePurchase(Context context) {
-			mContext = context;
-		}
-		
-		@Override
-		protected Void doInBackground(Void... params) {
-			try {
-				LicenseServices.Purchase(
-						mContext,
-						SimpleRecognizer.APP_KEY,
-						Utils.GetClientId(mContext),
-						Utils.GetEmail(mContext)
-					);
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "doInBackground() >> " + e.getMessage());
-			}
-			
-			return null;
-		}
-		
-	}
-	
-	/**
-	 * AsyncTask AsyncInitLicense<Void, Void, LicenseInfo> Class.
-	 * 
-	 * @author strider
-	 */
-	private static class AsyncInitLicense extends AsyncTask<Void, Void, LicenseInfo> {
-		
-		private static final String LOG_TAG = "AsyncInitLicense";
-		
-		private Context mContext = null;
-		
-		private Activity mActivity = null; 
-		
-		private LinearLayout mLinearLayout = null;
-		
-		private boolean mIsLog = false;
-		
-		private boolean mIsCheckAdFreePackage = false;
-		
-		public AsyncInitLicense(Activity activity, LinearLayout linearLayout, boolean isLog, boolean isCheckAdFreePackage) {
-			mContext = (Context) activity;
-			
-			mActivity = activity;
-			
-			mLinearLayout = linearLayout;
-			
-			mIsLog = isLog;
-			
-			mIsCheckAdFreePackage = isCheckAdFreePackage;
-		}
-		
-		@Override
-		protected LicenseInfo doInBackground(Void... params) {
-			LicenseInfo lic = null;
-			
-			try {
-				lic = LicenseInfo.GetActiveLicense(
-						mContext,
-						APP_KEY,
-						Utils.GetClientId(mContext)
-					);
-			} catch (JSONException e) {
-				Log.e(LOG_TAG, "ErrorGettingActiveLicense");
-				Log.w(LOG_TAG, e.getMessage());
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "doInBackground() >> " + e.getMessage());
-			}
-			
-			return lic;
-		}
-		
-		@Override
-		protected void onPostExecute(LicenseInfo lic) {
-			AdView adView = (AdView) mLinearLayout.findViewById(R.id.adView);
-			
-			if (TextUtils.equals(lic.VersionKey, VERSION_KEY_NO_ADS) && lic.IsActive) {
-				if (mIsLog) {
-					SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "License :: No Ads");
-				}
-				
-				if (adView != null) {
-					mLinearLayout.removeView(adView);
-				}
-			} else {
-				if (mIsLog) {
-					SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "License :: Free");
-				}
-				
-				if (mIsCheckAdFreePackage) {
-					checkAdFreePackage(mContext);
-				}
-				
-				if (adView == null) {
-					adView = new AdView(mActivity, AdSize.SMART_BANNER, ADMOB_PUBLISHER_ID);
-					
-					adView.setId(R.id.adView);
-					
-					mLinearLayout.addView(adView, LAYOUT_PARAMS);
-				}
-				
-				AdRequest adRequest = new AdRequest();
-				
-				adRequest.addTestDevice(AdRequest.TEST_EMULATOR);
-				adRequest.addTestDevice(EMULATOR_INTEL_ATOM_X86);
-				adRequest.addTestDevice(DEVICE_SAMSUNG_GALAXY_S);
-				adRequest.addTestDevice(DEVICE_HTC_DESIRE);
-				
-				adView.loadAd(adRequest);
-			}
-		}
-		
 	}
 	
 }

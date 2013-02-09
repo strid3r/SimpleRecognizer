@@ -1,13 +1,14 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Widget
  * ImageView RealImageView Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -16,7 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 /**
- * Widget ImageView RealImageView Class.
+ * ImageView RealImageView Class.
  * 
  * @author strider
  */
@@ -43,27 +44,24 @@ public class RealImageView extends ImageView {
 	public RealImageView(Context context) {
 		super(context);
 		
-		doInit(context, null);
+		doInit(null);
 	}
 	
 	public RealImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		doInit(context, attrs);
+		doInit(attrs);
 	}
 	
 	public RealImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		
-		doInit(context, attrs);
+		doInit(attrs);
 	}
 	
-	private void doInit(Context context, AttributeSet attrs) {
+	private void doInit(AttributeSet attrs) {
 		if (attrs != null) {
-			TypedArray array = context.obtainStyledAttributes(
-					attrs,
-					LAYOUT_ATTRS
-				);
+			TypedArray array = this.getContext().obtainStyledAttributes(attrs, LAYOUT_ATTRS);
 			
 			int layoutWidth = array.getLayoutDimension(LAYOUT_WIDTH_ID, "layout_width");
 			int layoutHeight = array.getLayoutDimension(LAYOUT_HEIGHT_ID, "layout_height");
@@ -77,6 +75,7 @@ public class RealImageView extends ImageView {
 		}
 	}
 	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		//super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -119,7 +118,7 @@ public class RealImageView extends ImageView {
 		
 		int pLeft = this.getPaddingLeft();
 		int pTop = this.getPaddingTop();
-        int pRight = this.getPaddingRight();
+		int pRight = this.getPaddingRight();
 		int pBottom = this.getPaddingBottom();
 		
 		int widthSize = 0;

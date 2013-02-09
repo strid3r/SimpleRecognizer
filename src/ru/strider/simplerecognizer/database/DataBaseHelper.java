@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
  * SQLiteOpenHelper DataBaseHelper Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.simplerecognizer.database;
@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -27,6 +28,7 @@ import java.io.OutputStream;
 
 import ru.strider.simplerecognizer.R;
 import ru.strider.simplerecognizer.SimpleRecognizer;
+import ru.strider.util.Text;
 
 /**
  * SQLiteOpenHelper DataBaseHelper Class.
@@ -35,7 +37,7 @@ import ru.strider.simplerecognizer.SimpleRecognizer;
  */
 public class DataBaseHelper extends SQLiteOpenHelper {
 	
-	private static final String LOG_TAG = "DataBaseHelper";
+	private static final String LOG_TAG = DataBaseHelper.class.getSimpleName();
 	
 	private static final String ASSETS_DB_PATH = "Databases" + File.separator;
 	private static final String PACKAGE_DB_PATH = "databases" + File.separator;
@@ -52,7 +54,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	private int mDataBaseSize = -1;
 	
 	/**
-	 * Takes and keeps a reference of the passed context in order to access to the application assets and resources.
+	 * Takes and keeps a reference of the passed context in order
+	 * to access to the application assets and resources.
 	 * 
 	 * @param context
 	 */
@@ -76,34 +79,36 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			mDataBaseSize = is.available();
 		} catch (IOException e) {
 			Log.e(LOG_TAG, "Error Loading DataBase From Assets >> Assets/" + ASSETS_DB_PATH + DB_NAME_SRC);
-			Log.w(LOG_TAG, e.getMessage());
+			Log.w(LOG_TAG, e.toString());
 		} finally {
 			if (is != null) {
 				try {
 					is.close();
-					is = null;
 				} catch (IOException e) {
 					//
 				}
 			}
 		}
-    }
+	}
 	
 	/**
 	 * Creates an empty database on the system and rewrites it with own database.
 	 * 
 	 * @throws IOException
 	 */
-	public void createDataBase(Activity activityUI) throws IOException {
+	public void createDataBase(final Activity activity) throws IOException {
 		SQLiteDatabase db = null;
 		
 		boolean isExists = checkDataBase();
 		if (isExists) {
 			try {
 				db = this.getWritableDatabase();
-				db.close();
 			} catch (SQLException sqle) {
 				//
+			} finally {
+				if (db != null) {
+					db.close();
+				}
 			}
 		}
 		
@@ -117,69 +122,82 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		db = this.getReadableDatabase();
 		
 		if (!isExists) {
-			db.close();
+			if (db != null) {
+				db.close();
+			}
 			
 			try {
 				copyDataBase();
 				
-				Log.i(LOG_TAG, "DataBase Copied");
+				Log.i(LOG_TAG, "Database copied");
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "DataBase Not Copied");
-				Log.w(LOG_TAG, "ErrorCopyingDataBase >> " + e.getMessage());
+				Log.e(LOG_TAG, "Database not copied");
+				Log.w(LOG_TAG, "Error copying Database >> " + e.toString());
 				//throw new Error("ErrorCopyingDataBase");
 			}
 			
 			isExists = checkDataBase();
 			if (!isExists || (isExists && !checkDataBaseSize())) {
-				activityUI.runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-						StringBuilder sb = new StringBuilder();
-						sb.append(mContext.getString(R.string.database_create_error_tip_1)).append(SimpleRecognizer.BR_LINE);
-						sb.append(mContext.getString(R.string.database_create_error_tip_1_help)).append(SimpleRecognizer.BR_LINE).append(SimpleRecognizer.BR_LINE);
-						sb.append(mContext.getString(R.string.database_create_error_tip_2));
+				activity.runOnUiThread(new Runnable() {
 						
-						AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-						builder.setTitle(mContext.getString(R.string.database_create_error_title));
-						builder.setMessage(sb.toString());
-						builder.setCancelable(false);
-						builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+						@Override
+						public void run() {
+							Resources res = mContext.getResources();
 							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								Process.killProcess(Process.myPid());
-							}
+							StringBuilder sb = new StringBuilder();
+							sb.append(res.getString(R.string.database_create_error_tip_1))
+									.append(Text.LF);
+							sb.append(res.getString(R.string.database_create_error_tip_1_help))
+									.append(Text.LF).append(Text.LF);
+							sb.append(res.getString(R.string.database_create_error_tip_2));
 							
-						});
+							AlertDialog.Builder builder = new AlertDialog.Builder((Context) activity);
+							builder.setTitle(R.string.database_create_error_title);
+							builder.setMessage(sb.toString());
+							builder.setCancelable(false);
+							builder.setPositiveButton(R.string.dialog_button_close, new DialogInterface.OnClickListener() {
+								
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									Log.i(LOG_TAG, "Exiting Application...");
+									
+									activity.finish();
+									
+									Process.killProcess(Process.myPid());
+								}
+								
+							});
+							
+							AlertDialog alert = builder.create();
+							alert.setCanceledOnTouchOutside(false);
+							alert.show();
+						}
 						
-						AlertDialog dialog = builder.create();
-						dialog.show();
-					}
-					
-				});
+					});
 				
-				try {
-					synchronized (this) {
-						this.wait();
+				synchronized (activity) {
+					while (true) {
+						try {
+							activity.wait();
+						} catch (InterruptedException e) {
+							Log.w(LOG_TAG, "InterruptedException >> " + e.toString());
+						}
 					}
-				} catch (InterruptedException e) {
-					//
 				}
 			}
 		} else {
-			int dbVersion = db.getVersion();
+			SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "Database already exists"
+					+ " >> dbVersion = " + Integer.toString(db.getVersion()));
 			
 			db.close();
-			
-			SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "DataBase Already Exists >> dbVersion = " + Integer.toString(dbVersion));
 		}
 	}
 	
 	/**
-	 * Check if the database already exist to avoid re-copying the file each time application opened.
+	 * Check if the database already exist to avoid re-copying the file
+	 * each time application opened.
 	 * 
-	 * @return true if it exists, false if it doesn't
+	 * @return true if it exists, false otherwise.
 	 */
 	private boolean checkDataBase() {
 		boolean isExists = false;
@@ -202,15 +220,16 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			}
 		}
 		
-		SimpleRecognizer.logIfDebug(Log.VERBOSE, "dbFile", dbFile + SimpleRecognizer.SEPARATOR + isExists);
+		SimpleRecognizer.logIfDebug(Log.VERBOSE, "dbFile", dbFile + Text.SEPARATOR + isExists);
 		
 		return isExists;
 	}
 	
 	/**
-	 * Check if the database file size equals to assets file to avoid opening corrupted file.
+	 * Check if the database file size equals to assets file to avoid
+	 * opening corrupted file.
 	 * 
-	 * @return true if it equals, false if it doesn't
+	 * @return true if it equals, false otherwise.
 	 */
 	private boolean checkDataBaseSize() {
 		boolean isEquals = false;
@@ -218,7 +237,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		File dbFile = new File(DB_PATH + DB_NAME);
 		
 		if (dbFile.exists() && (dbFile.length() != mDataBaseSize)) {
-			Log.w("dbFile", dbFile + SimpleRecognizer.SEPARATOR + "Bad File Size");
+			Log.w("dbFile", dbFile + Text.SEPARATOR + "Bad File Size");
 		} else {
 			isEquals = true;
 		}
@@ -227,8 +246,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	}
 	
 	/**
-	 * Copies database from local assets-folder to the just created empty database in the system folder,
-	 * from where it can be accessed and handled. This is done by transferring stream of bytes.
+	 * Copies database from local assets-folder to the just created empty
+	 * database in the system folder, from where it can be accessed and
+	 * handled. This is done by transferring stream of bytes.
 	 */
 	private void copyDataBase() throws IOException {
 		AssetManager assetManager = mContext.getAssets();
@@ -252,10 +272,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		os.flush();
 		
 		os.close();
-		os = null;
-		
 		is.close();
-		is = null;
 	}
 	
 	/**
@@ -277,6 +294,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	public synchronized void close() {
 		if (mDataBase != null) {
 			mDataBase.close();
+			
+			mDataBase = null;
 		}
 		
 		super.close();
@@ -284,6 +303,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onCreate() called");
 		/*
 		String CREATE_TABLE_COURSE = "CREATE TABLE Course ("
 				+ "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -291,8 +311,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				+ "category TEXT,"
 				+ "creator TEXT"
 			+ ");";
-        db.execSQL(CREATE_TABLE_COURSE);
-        
+		db.execSQL(CREATE_TABLE_COURSE);
+		
 		String CREATE_TABLE_ITEM = "CREATE TABLE Item ("
 				+ "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "title TEXT NOT NULL,"
@@ -338,29 +358,43 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		
 		String INSERT_PHASH = "INSERT INTO PHash(hex_value, comment, item_id)"
 				+ "VALUES ('FFFFFFFFFFFF', 'This is temp pHash value.<br /><br />For more info blahblahblah...', 1);";
-		db.execSQL(INSERT_PHASH);
-        */
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onCreate() called");
+		db.execSQL(INSERT_PHASH);*/
 	}
 	
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onUpgrade() called");
+		
 		if (newVersion > oldVersion) {
-			try {
-				boolean isDeleted = deleteDataBase();
-				
-				if (isDeleted) {
-					Log.i(LOG_TAG, "On Upgrade DataBase Deleted >> oldVersion = " + Integer.toString(oldVersion) + ", newVersion = " + Integer.toString(newVersion));
-				} else {
-					Log.w(LOG_TAG, "On Upgrade DataBase Not Deleted >> oldVersion = " + Integer.toString(oldVersion) + ", newVersion = " + Integer.toString(newVersion));
+			if (oldVersion == 1) {
+				// 1 —› X
+				try {
+					boolean isDeleted = deleteDataBase();
+					
+					if (isDeleted) {
+						Log.i(LOG_TAG, "On upgrade Database deleted >> oldVersion = " + Integer.toString(oldVersion)
+								+ ", newVersion = " + Integer.toString(newVersion));
+					} else {
+						Log.w(LOG_TAG, "On upgrade Database not deleted >> oldVersion = " + Integer.toString(oldVersion)
+								+ ", newVersion = " + Integer.toString(newVersion));
+					}
+				} catch (SQLException sqle) {
+					Log.e(LOG_TAG, "Delete Database on upgrade >> oldVersion = " + Integer.toString(oldVersion)
+							+ ", newVersion = " + Integer.toString(newVersion) + " >> " + sqle.toString());
+					throw sqle;
 				}
-			} catch (SQLException sqle) {
-				Log.e(LOG_TAG, "Delete DataBase On Upgrade >> oldVersion = " + Integer.toString(oldVersion) + ", newVersion = " + Integer.toString(newVersion) + " >> " + sqle.getMessage());
-				throw sqle;
+			} else {
+				if (oldVersion == 2) {
+					//
+				}
+				
+				if (oldVersion <= 3) {
+					//
+				}
+				
+				// etc.
 			}
 		}
-		
 		/*
 		db.execSQL("DROP TABLE IF EXISTS PHash;");
 		db.execSQL("DROP TABLE IF EXISTS Item;");
@@ -368,10 +402,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TRIGGER IF EXISTS fk_PHashItem_item_id;");
 		db.execSQL("DROP TRIGGER IF EXISTS fk_ItemCourse_course_id;");
 		
-		onCreate(db);
-		*/
-		
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onUpgrade() called");
+		onCreate(db);*/
 	}
 	
 }

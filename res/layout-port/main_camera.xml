@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
-	 Layout Portrait Main Camera XML
-	 By © strider 2012.
+	 Portrait Layout Main Camera XML
+	 By © strider 2012-2013.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			  android:id="@+id/linearLayoutMainCamera"
@@ -15,17 +15,16 @@
 	<!-- CAMERA -->
 	<FrameLayout android:id="@+id/frameLayoutCameraPreview"
 				 android:layout_width="match_parent"
-				 android:layout_height="match_parent"
+				 android:layout_height="0.0dp"
 				 android:layout_weight="1.0">
 		
 		<!-- PREVIEW -->
-		<ru.strider.simplerecognizer.CameraPreview android:id="@+id/cameraPreview"
-												   android:layout_width="match_parent"
-				 								   android:layout_height="match_parent" />
+		<ru.strider.widget.CameraPreview android:id="@+id/cameraPreview"
+										 android:layout_width="match_parent"
+				 						 android:layout_height="match_parent" />
 		
 		<!-- ADMOB -->
 		<LinearLayout android:id="@+id/linearLayoutAdView"
-					  android:layout_width="wrap_content"
 					  android:layout_gravity="center_horizontal|top"
 					  style="@style/Main.AdView" />
 		
@@ -48,6 +47,7 @@
 							 android:layout_gravity="center"
 							 android:adjustViewBounds="true"
 							 android:src="@drawable/ic_camera_shutter"
+							 android:contentDescription="@string/main_description_button_shutter"
 							 android:background="@drawable/button_shutter_selector" />
 				
 				<ProgressBar android:id="@+id/progressBarShutter"

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 strider
+	 
+	 Simple Recognizer
+	 V14 Values Widgets XML
+	 By © strider 2013.
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<!-- MAIN ACTION BAR -->
+	<style name="Widget.Main.ActionBar"
+		   parent="@style/Widget.Sherlock.ActionBar">
+		
+		<item name="android:displayOptions">
+			useLogo|showHome|showTitle
+		</item>
+		
+		<item name="android:titleTextStyle">
+			@style/TextAppearance.Main.Widget.ActionBar.Title
+		</item>
+		
+		<item name="android:background">
+			@drawable/background_header
+		</item>
+		
+		<item name="android:backgroundStacked">
+			@null
+		</item>
+		
+		<item name="android:indeterminateProgressStyle">
+			@style/Widget.Main.ProgressBar.Indeterminate
+		</item>
+		
+	</style>
+	
+</resources>

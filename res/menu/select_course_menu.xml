@@ -1,38 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Menu Select Course XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	
+	<!-- CONTENT -->
 	<group android:id="@+id/selectCourseMenuContent">
 		
 		<item android:id="@+id/selectCourseMenuSwitchMode"
-		      android:title="@string/select_course_menu_switch_mode_creator"
-		      android:icon="@drawable/ic_menu_login"
-		      android:showAsAction="ifRoom|withText"
-		      android:orderInCategory="0" />
+			  android:title="@string/select_course_menu_switch_mode_creator"
+			  android:icon="@drawable/ic_action_accounts"
+			  android:showAsAction="always|withText"
+			  android:orderInCategory="0" />
 		
 	</group>
 	
-    <group android:id="@+id/selectCourseMenuControls">
+	<!-- OVERFLOW -->
+	<item android:id="@+id/mainActionOverflow"
+		  android:title="@string/menu_action_overflow"
+		  android:icon="@drawable/ic_action_overflow"
+		  android:showAsAction="always"
+		  android:orderInCategory="1" />
+	
+	<!-- CONTROLS -->
+	<group android:id="@+id/selectCourseMenuControls">
 		
 		<item android:id="@+id/selectCourseMenuImport"
-		      android:title="@string/select_course_menu_import"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="1" />
+			  android:title="@string/select_course_menu_import"
+			  android:icon="@drawable/ic_menu_save"
+			  android:showAsAction="never"
+			  android:orderInCategory="2" />
 		
 		<item android:id="@+id/selectCourseMenuAddCourse"
-		      android:title="@string/select_course_menu_add_course"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="2" />
-		
-		<item android:id="@+id/selectCourseMenuSave"
-		      android:title="@string/select_course_menu_save"
-		      android:icon="@drawable/ic_menu_save"
-		      android:orderInCategory="3" />
+			  android:title="@string/select_course_menu_add_course"
+			  android:icon="@drawable/ic_menu_add"
+			  android:showAsAction="never"
+			  android:orderInCategory="3" />
 		
 	</group>
 	

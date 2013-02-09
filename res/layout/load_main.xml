@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Layout Load Main XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 			  android:id="@+id/linearLayoutLoadMain"
@@ -15,7 +15,7 @@
 	<!-- LOGO TEXT -->
 	<ru.strider.widget.MainTextView android:id="@+id/textViewLoadMainLogo"
 									android:text="@string/app_name"
-									style="@style/Main.ButtonMain.TextViewAbout" />
+									style="@style/Main.Button.TextView.About" />
 	
 	<!-- CENTER -->
 	<LinearLayout android:id="@+id/linearLayoutLoadMainCenter"
@@ -26,7 +26,7 @@
 				  android:orientation="horizontal"
 				  android:weightSum="1.0">
 		
-		<!-- LOGO IMAGE -->
+		<!-- LOGO IMAGE --><!-- TODO: CREATE LOGO -->
 		<ru.strider.widget.RealImageView android:id="@+id/imageViewLoadMainLogo"
 										 android:layout_width="0.0dp"
 										 android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
 		<ru.strider.widget.MainTextView android:id="@+id/textViewLoadMainFooter"
 										android:text="@string/app_footer"
 										android:textSize="24sp"
-										style="@style/Main.ButtonMain.TextViewAbout.Info" />
+										style="@style/Main.Button.TextView.Info" />
 		
 	</LinearLayout>
 	

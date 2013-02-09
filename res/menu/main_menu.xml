@@ -1,47 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Menu Main XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	
+	<!-- OVERFLOW -->
+	<item android:id="@+id/mainActionOverflow"
+		  android:title="@string/menu_action_overflow"
+		  android:icon="@drawable/ic_action_overflow"
+		  android:showAsAction="always"
+		  android:orderInCategory="0" />
+	
+	<!-- CONTENT -->
 	<group android:id="@+id/mainMenuContent">
 		
 		<item android:id="@+id/mainMenuSwitchMode"
-		      android:title="@string/main_menu_switch_mode_creator"
-		      android:icon="@drawable/ic_menu_login"
-		      android:orderInCategory="5" />
+			  android:title="@string/main_menu_switch_mode_creator"
+			  android:icon="@drawable/ic_menu_accounts"
+			  android:showAsAction="never"
+			  android:orderInCategory="1" />
 		
 		<item android:id="@+id/mainMenuCourse"
-		      android:title="@string/main_menu_course"
-		      android:icon="@drawable/ic_menu_gallery"
-		      android:orderInCategory="6" />
+			  android:title="@string/main_menu_course"
+			  android:icon="@drawable/ic_menu_course"
+			  android:showAsAction="never"
+			  android:orderInCategory="2" />
 		
 		<item android:id="@+id/mainMenuSwitchCamera"
-		      android:title="@string/main_menu_switch_camera"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="7" />
+			  android:title="@string/main_menu_switch_camera"
+			  android:icon="@drawable/ic_menu_switch_camera"
+			  android:showAsAction="never"
+			  android:orderInCategory="3" />
 		
 	</group>
 	
+	<!-- CONTROLS -->
 	<group android:id="@+id/mainMenuControls">
 		
 		<item android:id="@+id/mainMenuPreferences"
 			  android:title="@string/main_menu_preferences"
-			  android:icon="@drawable/ic_menu_preferences"
-			  android:orderInCategory="8" />
+			  android:icon="@drawable/ic_menu_settings"
+			  android:showAsAction="never"
+			  android:orderInCategory="4" />
 		
 		<item android:id="@+id/mainMenuAbout"
 			  android:title="@string/main_menu_about"
-			  android:icon="@drawable/ic_menu_info"
-			  android:orderInCategory="9" />
+			  android:icon="@drawable/ic_menu_about"
+			  android:showAsAction="never"
+			  android:orderInCategory="5" />
 		
 		<item android:id="@+id/mainMenuExit"
 			  android:title="@string/main_menu_exit"
 			  android:icon="@drawable/ic_menu_exit"
-			  android:orderInCategory="10" />
+			  android:showAsAction="never"
+			  android:orderInCategory="6" />
 		
 	</group>
 	

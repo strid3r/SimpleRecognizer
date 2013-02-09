@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Widget
  * HorizontalScrollView ObservableHorizontalScrollView Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.widget;
@@ -13,7 +13,7 @@ import android.util.AttributeSet;
 import android.widget.HorizontalScrollView;
 
 /**
- * Widget HorizontalScrollView ObservableHorizontalScrollView Class.
+ * HorizontalScrollView ObservableHorizontalScrollView Class.
  * 
  * @author strider
  */

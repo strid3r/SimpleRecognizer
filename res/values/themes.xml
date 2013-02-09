@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Values Themes XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 	
 	<!-- MAIN -->
 	<style name="Theme.Main"
@@ -19,8 +19,13 @@
 			@style/Widget.Main.ActionBar
 		</item>
 		
-		<item name="android:actionBarStyle">
-			@style/Widget.Main.ActionBar
+	</style>
+	
+	<!-- MAIN ACTION BAR OVERLAY -->
+	<style name="Theme.Main.ActionBarOverlay">
+		
+		<item name="windowActionBarOverlay">
+			true
 		</item>
 		
 	</style>

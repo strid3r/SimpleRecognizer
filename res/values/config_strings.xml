@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Strings Config XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="config_name">
-		Application Config
+		Config
 	</string>
 	
 	<string name="config_file_name">
@@ -32,8 +32,5 @@
 	<string name="config_key_directory">
 		DIRECTORY
 	</string>
-	
-	<!-- DEFAULT VALUE -->
-	<!-- Place Holder -->
 	
 </resources>

@@ -1,27 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 RU Strings Application XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="app_name">
 		Simple Recognizer
 	</string>
 	
 	<string name="app_footer">
-		Загрузка...
+		Загрузка&#8230;
 	</string>
 	
 	<string name="app_version">
-		Версия:
+		Версия
 	</string>
 	
 	<string name="app_copyright">
-		Copyright © 2012 Дмитрий Станков.
+		Copyright © 2012-2013 Дмитрий Станков.
+	</string>
+	
+	<!-- FONT -->
+	<string name="font_normal">
+		AgencyFB_R_Cyr.ttf
+	</string>
+	
+	<!-- MENU -->
+	<string name="menu_action_overflow">
+		Меню
+	</string>
+	
+	<!-- KEY -->
+	<string name="key_button_back_double_press">
+		‹‹ Нажмите кнопку Назад ещё раз,
+		\nчтобы закрыть Приложение ››
 	</string>
 	
 	<!-- DATABASE -->
@@ -43,7 +59,7 @@
 	
 	<!-- DIALOG -->
 	<string name="dialog_ad_free_found">
-		Чтобы использовать данное Приложение, Вы Должны Отключить/Удалить AdFree Package:
+		Чтобы использовать данное Приложение, Вы должны Отключить/Удалить AdFree Package:
 	</string>
 	
 	<string name="dialog_title_caution">
@@ -88,6 +104,11 @@
 	
 	<string name="dialog_button_close_controls">
 		‹‹ Закрыть ››
+	</string>
+	
+	<!-- ERROR -->
+	<string name="error_no_items">
+		« Нет данных »
 	</string>
 	
 </resources>

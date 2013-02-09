@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 XML Preferences XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 				  android:title="@string/preferences_name">
@@ -48,9 +48,15 @@
 							android:summary="@string/prefs_summary_display_is_full_screen"
 							android:defaultValue="@bool/prefs_default_value_display_is_full_screen" />
 		
+		<!-- ORIENTATION -->
+		<CheckBoxPreference android:key="@string/prefs_key_display_is_orientation"
+							android:title="@string/prefs_title_display_is_orientation"
+							android:summary="@string/prefs_summary_display_is_orientation"
+							android:defaultValue="@bool/prefs_default_value_display_is_orientation" />
+		
 	</PreferenceCategory>
 	
-	<!-- LICENSING -->
+	<!-- LICENSING --><!-- TODO: ENABLE FOR RELEASE -->
 	<!-- <PreferenceCategory android:key="@string/preferences_category_licensing_key"
 						android:title="@string/preferences_category_licensing_title"> -->
 		

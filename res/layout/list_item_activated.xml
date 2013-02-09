@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Layout List Item Activated XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <ru.strider.widget.MainTextView xmlns:android="http://schemas.android.com/apk/res/android"
-								android:id="@android:id/text1"
+								android:id="@+id/textViewItem"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
-								style="@style/ListItem.Activated" />
+								android:paddingLeft="14.0dp"
+								android:paddingTop="20.0dp"
+								android:paddingRight="14.0dp"
+								android:paddingBottom="20.0dp"
+								style="@style/Main.ListItem.Activated" />

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Strings Main XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="main_name">
 		Main Camera
 	</string>
@@ -62,9 +62,9 @@
 		Sorry, but Device has only one camera.
 	</string>
 	
-	<!-- CONTROLS -->
-	<string name="key_button_back_double_press">
-		‹‹ Press Back Key Again To Close App ››
+	<!-- DESCRIPTION -->
+	<string name="main_description_button_shutter">
+		Shutter
 	</string>
 	
 </resources>

@@ -1,36 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Strings Application XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="app_name">
 		Simple Recognizer
 	</string>
 	
 	<string name="app_footer">
-		Loading...
+		Loading&#8230;
 	</string>
 	
 	<string name="app_version">
-		Version:
+		Version
 	</string>
 	
 	<string name="app_copyright">
-		Copyright © 2012 Dmitry Stankov.
+		Copyright © 2012-2013 Dmitry Stankov.
+	</string>
+	
+	<!-- FONT -->
+	<string name="font_normal">
+		AgencyFB_R.ttf
+	</string>
+	
+	<string name="font_bold">
+		AgencyFB_B.ttf
+	</string>
+	
+	<!-- MENU -->
+	<string name="menu_action_overflow">
+		Menu
+	</string>
+	
+	<!-- KEY -->
+	<string name="key_button_back_double_press">
+		‹‹ Press Back key again to close App ››
 	</string>
 	
 	<!-- DATABASE -->
 	<string name="database_create_error_title">
-		Unable to create DataBase file
+		Unable to create Database file
 	</string>
 	
 	<string name="database_create_error_tip_1">
-		1. Please try to Clear App Data and launch it again:
+		1. Please try to clear App Data and launch it again:
 	</string>
 	
 	<string name="database_create_error_tip_1_help">
@@ -38,12 +57,12 @@
 	</string>
 	
 	<string name="database_create_error_tip_2">
-		2. Also check the available free space on Internal Memory.
+		2. Also check the available Internal Memory free space.
 	</string>
 	
 	<!-- DIALOG -->
 	<string name="dialog_ad_free_found">
-		To use this Application, You Must Disable/Uninstall AdFree Package:
+		To use this Application, You must Disable/Uninstall AdFree package:
 	</string>
 	
 	<string name="dialog_title_caution">
@@ -88,6 +107,11 @@
 	
 	<string name="dialog_button_close_controls">
 		‹‹ Close ››
+	</string>
+	
+	<!-- ERROR -->
+	<string name="error_no_items">
+		« No items »
 	</string>
 	
 </resources>

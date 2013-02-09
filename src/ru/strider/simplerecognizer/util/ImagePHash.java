@@ -9,17 +9,15 @@
 package ru.strider.simplerecognizer.util;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Paint;
 import android.os.SystemClock;
 import android.util.Log;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
+
+import ru.strider.util.BuildConfig;
+import ru.strider.widget.util.Image;
 
 /**
  * Util ImagePHash Class.
@@ -28,7 +26,7 @@ import java.io.InputStream;
  */
 public class ImagePHash {
 	
-	private static final String LOG_TAG = "ImagePHash";
+	private static final String LOG_TAG = ImagePHash.class.getSimpleName();
 	
 	public static final int DCT_SIZE = 32;
 	public static final int DCT_SIZE_FAST = 16;
@@ -37,53 +35,48 @@ public class ImagePHash {
 	
 	public static final int HAMMING_DISTANCE_THRESHOLD = 15;
 	
-	private static final float SATURATION_GRAYSCALE = 0.0f;
+	private static double[] sCoeff = null;
 	
-	private static final float CANVAS_BITMAP_POS = 0.0f;
+	private static int sSize = DCT_SIZE;
+	private static int sLowSize = DCT_LOW_SIZE;
 	
-	private int mSize = DCT_SIZE;
-	private int mLowSize = DCT_LOW_SIZE;
-	
-	private double[] mCoeff = null;
-	
-	private long mInitTime = 0L;
-	private long mWorkTime = 0L;
-	
-	public ImagePHash() {
+	static {
 		initCoefficients();
 	}
 	
-	public ImagePHash(int size, int smallSize) {
-		mSize = size;
-		mLowSize = smallSize;
+	public static synchronized void setDCTSize(int size, int lowSize) {
+		sSize = size;
+		sLowSize = lowSize;
 		
 		initCoefficients();
 	}
 	
-	private void initCoefficients() {
-		mCoeff = new double[mSize];
+	private static void initCoefficients() {
+		sCoeff = new double[sSize];
 		
-		for (int i = 1; i < mSize; i++) {
-			mCoeff[i] = 1.0;
+		for (int i = 1; i < sSize; i++) {
+			sCoeff[i] = 1.0;
 		}
 		
-		mCoeff[0] = 1.0 / Math.sqrt(2.0);
+		sCoeff[0] = 1.0 / Math.sqrt(2.0);
 	}
 	
-	private double[][] applyDCT(double[][] in) {
-		double[][] DCT = new double[mSize][mSize];
+	private static double[][] applyDCT(double[][] in) {
+		double[][] DCT = new double[sSize][sSize];
 		
-		for (int u = 0; u < mSize; u++) {
-			for (int v = 0; v < mSize; v++) {
+		for (int u = 0; u < sSize; u++) {
+			for (int v = 0; v < sSize; v++) {
 				double sum = 0.0;
 				
-				for (int i = 0; i < mSize; i++) {
-					for (int j = 0; j < mSize; j++) {
-						sum += in[i][j] * Math.cos((2 * i + 1) / (2.0 * mSize) * u * Math.PI) * Math.cos((2 * j + 1) / (2.0 * mSize) * v * Math.PI);
+				for (int i = 0; i < sSize; i++) {
+					for (int j = 0; j < sSize; j++) {
+						sum += in[i][j]
+								* Math.cos((2 * i + 1) / (2.0 * sSize) * u * Math.PI)
+								* Math.cos((2 * j + 1) / (2.0 * sSize) * v * Math.PI);
 					}
 				}
 				
-				sum *= mCoeff[u]* mCoeff[v] / 4.0;
+				sum *= sCoeff[u] * sCoeff[v] / 4.0;
 				
 				DCT[u][v] = sum;
 			}
@@ -99,23 +92,8 @@ public class ImagePHash {
 	 * @return Hex String pHash of the image from File by pathName,
 	 *         or null if the image data could not be decoded.
 	 */
-	public String getPHash(String pathName) {
-		String pHash = null;
-		
-		if (pathName != null) {
-			final BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			BitmapFactory.decodeFile(pathName, options);
-			
-			options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
-			options.inJustDecodeBounds = false;
-			
-			Bitmap bitmap = BitmapFactory.decodeFile(pathName, options);
-			
-			pHash = getPHash(bitmap);
-		}
-		
-		return pHash;
+	public static String getPHash(String pathName) {
+		return getPHash(Image.decodeSampledBitmap(pathName, sSize, sSize));
 	}
 	
 	/**
@@ -125,30 +103,8 @@ public class ImagePHash {
 	 * @return Hex String pHash of the image from InputStream,
 	 *         or null if the image data could not be decoded.
 	 */
-	public String getPHash(InputStream is) {
-		String pHash = null;
-		
-		if (is != null) {
-			final BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			BitmapFactory.decodeStream(is, null, options);
-			
-			options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
-			options.inJustDecodeBounds = false;
-			
-			Bitmap bitmap = BitmapFactory.decodeStream(is, null, options);
-			
-			try {
-				is.close();
-				is = null;
-			} catch (IOException e) {
-				//
-			}
-			
-			pHash = getPHash(bitmap);
-		}
-		
-		return pHash;
+	public static String getPHash(InputStream is) {
+		return getPHash(Image.decodeSampledBitmap(is, sSize, sSize));
 	}
 	
 	/**
@@ -158,21 +114,8 @@ public class ImagePHash {
 	 * @return Hex String pHash of the image from byte[] array,
 	 *         or null if the image data could not be decoded.
 	 */
-	public String getPHash(byte[] data) {
-		String pHash = null;
-		
-		if (data != null) {
-			final BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			BitmapFactory.decodeByteArray(data, 0, data.length, options);
-			
-			options.inSampleSize = calculateInSampleSize(options, mSize, mSize);
-			options.inJustDecodeBounds = false;
-			
-			pHash = getPHash(BitmapFactory.decodeByteArray(data, 0, data.length, options));
-		}
-		
-		return pHash;
+	public static String getPHash(byte[] data) {
+		return getPHash(Image.decodeSampledBitmap(data, sSize, sSize));
 	}
 	
 	/**
@@ -182,96 +125,106 @@ public class ImagePHash {
 	 * @return Hex String pHash of the image from Bitmap,
 	 *         or null if bitmap image is null.
 	 */
-	public String getPHash(Bitmap bitmapImage) {
-		if (bitmapImage == null) {
+	public static String getPHash(Bitmap image) {
+		if (image == null) {
 			return null;
 		}
 		
 		/* 1. Reduce size. 
 		 * 
-		 * Like Average Hash, pHash starts with a small image. 
-		 * However, the image is larger than 8x8; 32x32 is a good size. 
-		 * This is really done to simplify the DCT computation and not 
+		 * Like Average Hash, pHash starts with a small image.
+		 * However, the image is larger than 8x8; 32x32 is a good size.
+		 * This is really done to simplify the DCT computation and not
 		 * because it is needed to reduce the high frequencies.
 		 */
-		bitmapImage = Bitmap.createScaledBitmap(bitmapImage, mSize, mSize, true);
+		Bitmap scaledBitmap = Bitmap.createScaledBitmap(image, sSize, sSize, true);
+		
+		if (scaledBitmap != image) {
+			image.recycle();
+		}
+		
+		image = scaledBitmap;
 		
 		/* 2. Reduce color. 
 		 * 
-		 * The image is reduced to a grayscale just to further simplify 
+		 * The image is reduced to a grayscale just to further simplify
 		 * the number of computations.
 		 */
-		bitmapImage = convertToGrayscale(bitmapImage);
+		Bitmap grayscale = Image.convertToGrayscale(image);
 		
-		double[][] blue = new double[mSize][mSize];
+		image.recycle();
 		
-		for (int i = 0; i < bitmapImage.getWidth(); i++) {
-			for (int j = 0; j < bitmapImage.getHeight(); j++) {
-				blue[i][j] = Color.blue(bitmapImage.getPixel(i, j));
+		image = grayscale;
+		
+		double[][] blue = new double[sSize][sSize];
+		
+		for (int i = 0; i < image.getWidth(); i++) {
+			for (int j = 0; j < image.getHeight(); j++) {
+				blue[i][j] = Color.blue(image.getPixel(i, j));
 			}
 		}
 		
-		bitmapImage.recycle();
-		bitmapImage = null;
+		image.recycle();
 		
 		/* 3. Compute the DCT. 
 		 * 
-		 * The DCT separates the image into a collection of frequencies 
-		 * and scalars. While JPEG uses an 8x8 DCT, this algorithm uses 
+		 * The DCT separates the image into a collection of frequencies
+		 * and scalars. While JPEG uses an 8x8 DCT, this algorithm uses
 		 * a 32x32 DCT.
 		 */
+		long initTime = 0L;
+		
 		if(BuildConfig.DEBUG) {
-			mInitTime = SystemClock.elapsedRealtime();
+			initTime = SystemClock.elapsedRealtime();
 		}
 		
 		double[][] dctValue = applyDCT(blue);
 		
 		if(BuildConfig.DEBUG) {
-			mWorkTime = SystemClock.elapsedRealtime() - mInitTime;
-			
-			Log.d(LOG_TAG, "Time DCT: " + Long.toString(mWorkTime) + " ms.");
+			Log.d(LOG_TAG, "Time DCT: "
+					+ Long.toString(SystemClock.elapsedRealtime() - initTime) + " ms.");
 		}
 		
 		/* 4. Reduce the DCT. 
 		 * 
-		 * This is the magic step. While the DCT is 32x32, just keep the 
-		 * top-left 8x8. Those represent the lowest frequencies in the 
+		 * This is the magic step. While the DCT is 32x32, just keep the
+		 * top-left 8x8. Those represent the lowest frequencies in the
 		 * picture.
 		 * 
-		 * 5. Compute the average value. 
+		 * 5. Compute the average value.
 		 * 
-		 * Like the Average Hash, compute the mean DCT value (using only 
-		 * the 8x8 DCT low-frequency values and excluding the first term 
-		 * since the DC coefficient can be significantly different from 
+		 * Like the Average Hash, compute the mean DCT value (using only
+		 * the 8x8 DCT low-frequency values and excluding the first term
+		 * since the DC coefficient can be significantly different from
 		 * the other values and will throw off the average).
 		 */
 		double dctTotal = 0;
 		
-		for (int i = 0; i < mLowSize; i++) {
-			for (int j = 0; j < mLowSize; j++) {
+		for (int i = 0; i < sLowSize; i++) {
+			for (int j = 0; j < sLowSize; j++) {
 				dctTotal += dctValue[i][j];
 			}
 		}
 		
 		dctTotal -= dctValue[0][0];
 		
-		double dctAverage = dctTotal / (double) ((mLowSize * mLowSize) - 1);
+		double dctAverage = dctTotal / (double) ((sLowSize * sLowSize) - 1);
 		
-		/* 6. Further reduce the DCT. 
+		/* 6. Further reduce the DCT.
 		 * 
-		 * This is the magic step. Set the 64 hash bits to 0 or 1 
-		 * depending on whether each of the 64 DCT values is above or 
-		 * below the average value. The result doesn't tell us the 
-		 * actual low frequencies; it just tells us the very-rough 
-		 * relative scale of the frequencies to the mean. The result 
-		 * will not vary as long as the overall structure of the image 
-		 * remains the same; this can survive gamma and color histogram 
+		 * This is the magic step. Set the 64 hash bits to 0 or 1
+		 * depending on whether each of the 64 DCT values is above or
+		 * below the average value. The result doesn't tell us the
+		 * actual low frequencies; it just tells us the very-rough
+		 * relative scale of the frequencies to the mean. The result
+		 * will not vary as long as the overall structure of the image
+		 * remains the same; this can survive gamma and color histogram
 		 * adjustments without a problem.
 		 */
 		StringBuilder pHash = new StringBuilder();
 		
-		for (int i = 0; i < mLowSize; i++) {
-			for (int j = 0; j < mLowSize; j++) {
+		for (int i = 0; i < sLowSize; i++) {
+			for (int j = 0; j < sLowSize; j++) {
 				if ((i != 0) && (j != 0)) {
 					pHash.append((dctValue[i][j] > dctAverage) ? 1 : 0);
 				}
@@ -280,72 +233,7 @@ public class ImagePHash {
 		
 		long pHashValue = Long.parseLong(pHash.toString(), 2);
 		
-		return Long.toHexString(pHashValue).toUpperCase();
-	}
-	
-	/**
-	 * Calculate an inSampleSize for use in a {@link BitmapFactory.Options} object when decoding
-	 * bitmaps using the decode* methods from {@link BitmapFactory}. This implementation calculates
-	 * the closest inSampleSize that will result in the final decoded bitmap having a width and
-	 * height equal to or larger than the requested width and height. This implementation does not
-	 * ensure a power of 2 is returned for inSampleSize which can be faster when decoding but
-	 * results in a larger bitmap which isn't as useful for caching purposes.
-	 * 
-	 * @param options An options object with out* params already populated (run through a decode*
-	 *            method with inJustDecodeBounds==true
-	 * @param reqWidth The requested width of the resulting bitmap
-	 * @param reqHeight The requested height of the resulting bitmap
-	 * 
-	 * @return The value to be used for inSampleSize
-	 */
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-		int inSampleSize = 1;
-		
-		final int width = options.outWidth;
-		final int height = options.outHeight;
-		
-		if ((width > reqWidth) || (height > reqHeight)) {
-			if (width > height) {
-				inSampleSize = Math.round((float) height / (float) reqHeight);
-			} else {
-				inSampleSize = Math.round((float) width / (float) reqWidth);
-			}
-			
-			final float totalPixels = width * height;
-			
-			final float totalReqPixelsCap = reqWidth * reqHeight * 2;
-			
-			while ((totalPixels / (inSampleSize * inSampleSize)) > totalReqPixelsCap) {
-				inSampleSize++;
-			}
-		}
-		
-		return inSampleSize;
-	}
-	
-	/**
-	 * Converts bitmap to grayscale.
-	 * 
-	 * @return Bitmap Grayscale.
-	 */
-	public static Bitmap convertToGrayscale(Bitmap bitmap) {
-		ColorMatrix matrix = new ColorMatrix();
-		matrix.setSaturation(SATURATION_GRAYSCALE);
-		
-		ColorMatrixColorFilter colorFilter = new ColorMatrixColorFilter(matrix);
-		
-		Paint paint = new Paint();
-		paint.setColorFilter(colorFilter);
-		
-		Bitmap bitmapGrayscale = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
-		
-		Canvas canvas = new Canvas(bitmapGrayscale);
-		canvas.drawBitmap(bitmap, CANVAS_BITMAP_POS, CANVAS_BITMAP_POS, paint);
-		
-		bitmap.recycle();
-		bitmap = null;
-		
-		return bitmapGrayscale;
+		return Long.toHexString(pHashValue).toUpperCase(Locale.ENGLISH);
 	}
 	
 	/**

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Layout Alert Dialog Select Course Edit XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
 			android:id="@+id/scrollViewAlertDialogSelectCourseEdit"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
+			android:layout_margin="4.0dp"
 			android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
 			android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
 			android:scrollbarSize="8.0dp">
@@ -25,7 +26,7 @@
 										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextTitle"
-				  style="@style/Main.AlertDialog.EditView" />
+				  style="@style/Main.AlertDialog.EditView.Title" />
 		
 		<!-- CATEGORY -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewCategoryTitle"
@@ -33,7 +34,7 @@
 										style="@style/Main.AlertDialog.TextView.Title.Sub" />
 		
 		<EditText android:id="@+id/editTextCategory"
-				  style="@style/Main.AlertDialog.EditView" />
+				  style="@style/Main.AlertDialog.EditView.Title" />
 		
 		<!-- VERSION -->
 		<ru.strider.widget.MainTextView android:id="@+id/textViewVersionTitle"

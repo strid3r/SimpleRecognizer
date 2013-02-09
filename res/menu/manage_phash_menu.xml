@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Menu Manage PHash XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	
-    <group android:id="@+id/managePHashMenuControls">
+	<!-- OVERFLOW -->
+	<item android:id="@+id/mainActionOverflow"
+		  android:title="@string/menu_action_overflow"
+		  android:icon="@drawable/ic_action_overflow"
+		  android:showAsAction="always"
+		  android:orderInCategory="0" />
+	
+	<!-- CONTENT -->
+	<group android:id="@+id/managePHashMenuContent">
 		
 		<item android:id="@+id/managePHashMenuImport"
-		      android:title="@string/manage_phash_menu_import"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="0" />
+			  android:title="@string/manage_phash_menu_import"
+			  android:icon="@drawable/ic_menu_save"
+			  android:showAsAction="never"
+			  android:orderInCategory="1" />
 		
 		<item android:id="@+id/managePHashMenuAddPHash"
-		      android:title="@string/manage_phash_menu_add_phash"
-		      android:icon="@drawable/ic_menu_camera"
-		      android:orderInCategory="1" />
+			  android:title="@string/manage_phash_menu_add_phash"
+			  android:icon="@drawable/ic_menu_add"
+			  android:showAsAction="never"
+			  android:orderInCategory="2" />
+		
+	</group>
+	
+	<!-- CONTROLS -->
+	<group android:id="@+id/managePHashMenuControls">
 		
 		<item android:id="@+id/managePHashMenuDeleteItem"
-		      android:title="@string/manage_phash_menu_delete_item"
-		      android:icon="@drawable/ic_menu_gallery"
-		      android:orderInCategory="2" />
-		
-		<item android:id="@+id/managePHashMenuSave"
-		      android:title="@string/manage_phash_menu_save"
-		      android:icon="@drawable/ic_menu_save"
-		      android:orderInCategory="3" />
+			  android:title="@string/manage_phash_menu_delete_item"
+			  android:icon="@drawable/ic_menu_delete"
+			  android:showAsAction="never"
+			  android:orderInCategory="3" />
 		
 	</group>
 	

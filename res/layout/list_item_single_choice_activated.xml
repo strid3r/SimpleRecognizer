@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012-2013 strider
+	 
+	 Simple Recognizer
+	 Layout List Item Single Choice Activated XML
+	 By © strider 2012-2013.
+-->
+<ru.strider.widget.MainCheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+									   android:id="@+id/checkedTextViewItem"
+									   android:layout_width="match_parent"
+									   android:layout_height="wrap_content"
+									   android:paddingLeft="14.0dp"
+									   android:paddingTop="20.0dp"
+									   android:paddingRight="14.0dp"
+									   android:paddingBottom="20.0dp"
+									   style="@style/Main.ListItem.SingleChoice.Activated" />

@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 Values Styles XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-	<!-- LIST ITEM -->
-	<style name="ListItem">
+	<!-- MAIN -->
+	<style name="Main" />
+	
+	<!-- MAIN ADMOB -->
+	<style name="Main.AdView">
 		
-		<item name="android:padding">
-			8.0dp
+		<item name="android:layout_width">
+			match_parent
 		</item>
+		
+		<item name="android:layout_height">
+			wrap_content
+		</item>
+		
+		<item name="android:layout_weight">
+			0.0
+		</item>
+		
+	</style>
+	
+	<!-- MAIN LIST ITEM -->
+	<style name="Main.ListItem">
 		
 		<item name="android:includeFontPadding">
 			false
@@ -46,6 +62,10 @@
 			center_vertical
 		</item>
 		
+		<item name="typeface">
+			@string/font_bold
+		</item>
+		
 		<item name="android:textSize">
 			24sp
 		</item>
@@ -76,42 +96,8 @@
 		
 	</style>
 	
-	
-	<!-- LIST ITEM SINGLE CHOICE -->
-	<style name="ListItem.SingleChoice"
-		   parent="@style/ListItem">
-		
-		<item name="android:checkMark">
-			?android:attr/listChoiceIndicatorSingle
-		</item>
-		
-	</style>
-	
-	<!-- LIST ITEM ACTIVATED -->
-	<style name="ListItem.Activated"
-		   parent="@style/ListItem">
-		
-		<item name="android:background">
-			@drawable/activated_background
-		</item>
-		
-	</style>
-	
-	<!-- LIST ITEM ACTIVATED SINGLE CHOICE -->
-	<style name="ListItem.Activated.SingleChoice"
-		   parent="@style/ListItem.Activated">
-		
-		<item name="android:checkMark">
-			?android:attr/listChoiceIndicatorSingle
-		</item>
-		
-	</style>
-	
-	<!-- MAIN -->
-	<style name="Main" />
-	
-	<!-- ADMOB -->
-	<style name="Main.AdView">
+	<!-- MAIN LIST ITEM EMPTY -->
+	<style name="Main.ListItem.Empty">
 		
 		<item name="android:layout_width">
 			match_parent
@@ -121,13 +107,68 @@
 			wrap_content
 		</item>
 		
-		<item name="android:layout_weight">
-			0.0
+		<item name="android:gravity">
+			center
+		</item>
+		
+		<item name="android:textSize">
+			22sp
+		</item>
+		
+		<item name="android:background">
+			@drawable/textview_about_black
+		</item>
+		
+		<item name="android:paddingLeft">
+			14.0dp
+		</item>
+		
+		<item name="android:paddingTop">
+			20.0dp
+		</item>
+		
+		<item name="android:paddingRight">
+			14.0dp
+		</item>
+		
+		<item name="android:paddingBottom">
+			20.0dp
 		</item>
 		
 	</style>
 	
-	<!-- ALERT DIALOG -->
+	<!-- MAIN LIST ITEM ACTIVATED -->
+	<style name="Main.ListItem.Activated">
+		
+		<item name="android:background">
+			@drawable/activated_background
+		</item>
+		
+	</style>
+	
+	<!-- MAIN LIST ITEM SINGLE CHOICE -->
+	<style name="Main.ListItem.SingleChoice">
+		
+		<item name="android:checkMark">
+			?android:attr/listChoiceIndicatorSingle
+		</item>
+		
+	</style>
+	
+	<!-- MAIN LIST ITEM SINGLE CHOICE ACTIVATED -->
+	<style name="Main.ListItem.SingleChoice.Activated"
+		   parent="@style/Main.ListItem.Activated">
+		
+		<item name="android:checkMark">
+			?android:attr/listChoiceIndicatorSingle
+		</item>
+		
+	</style>
+	
+	<!-- MIAN ACTION BAR -->
+	<style name="Main.ActionBar" />
+	
+	<!-- MAIN ALERT DIALOG -->
 	<style name="Main.AlertDialog">
 		
 		<item name="android:layout_width">
@@ -139,36 +180,107 @@
 		</item>
 		
 		<item name="android:layout_marginLeft">
-			16.0dp
+			10.0dp
 		</item>
 		
 		<item name="android:layout_marginTop">
-			4.0dp
+			2.0dp
 		</item>
 		
 		<item name="android:layout_marginRight">
-			16.0dp
+			10.0dp
 		</item>
 		
 		<item name="android:layout_marginBottom">
+			2.0dp
+		</item>
+		
+	</style>
+	
+	<!-- MAIN ALERT DIALOG TEXTVIEW -->
+	<style name="Main.AlertDialog.TextView">
+		
+		<!-- <item name="android:gravity">
+			fill_horizontal
+		</item> -->
+		
+		<item name="typeface">
+			@string/font_normal
+		</item>
+		
+		<item name="android:textSize">
+			18sp
+		</item>
+		
+		<item name="android:textStyle">
+			normal
+		</item>
+		
+		<item name="android:textColor">
+			@color/silver
+		</item>
+		
+		<item name="android:shadowColor">
+			@color/black
+		</item>
+		
+		<item name="android:shadowDx">
+			1
+		</item>
+		
+		<item name="android:shadowDy">
+			1
+		</item>
+		
+		<item name="android:shadowRadius">
+			2
+		</item>
+		
+	</style>
+	
+	<!-- MAIN ALERT DIALOG TEXTVIEW TOAST -->
+	<style name="Main.AlertDialog.TextView.Toast">
+		
+		<item name="android:includeFontPadding">
+			false
+		</item>
+		
+		<item name="android:gravity">
+			center
+		</item>
+		
+		<item name="typeface">
+			@string/font_bold
+		</item>
+		
+		<item name="android:textStyle">
+			bold
+		</item>
+		
+		<item name="android:textColor">
+			@color/white
+		</item>
+		
+		<item name="android:paddingLeft">
 			4.0dp
 		</item>
 		
-	</style>
-	
-	<!-- ALERT DIALOG EDIT TEXTVIEW -->
-	<style name="Main.AlertDialog.TextView"
-		   parent="@style/Main.AlertDialog">
+		<item name="android:paddingTop">
+			8.0dp
+		</item>
 		
-		<item name="android:gravity">
-			fill_horizontal
+		<item name="android:paddingRight">
+			4.0dp
+		</item>
+		
+		<item name="android:paddingBottom">
+			8.0dp
 		</item>
 		
 	</style>
 	
-	<!-- ALERT DIALOG EDIT TEXTVIEW TITLE -->
-	<style name="Main.AlertDialog.TextView.Title"
-		   parent="@style/Main.AlertDialog.TextView">
+	<!-- MAIN ALERT DIALOG TEXTVIEW TITLE -->
+	<style name="Main.AlertDialog.TextView.Title">
 		
 		<item name="android:includeFontPadding">
 			false
@@ -198,8 +310,16 @@
 			true
 		</item>
 		
+		<item name="android:focusable">
+			true
+		</item>
+		
 		<item name="android:gravity">
 			center
+		</item>
+		
+		<item name="typeface">
+			@string/font_bold
 		</item>
 		
 		<item name="android:textSize">
@@ -214,27 +334,10 @@
 			@color/white
 		</item>
 		
-		<item name="android:shadowColor">
-			@color/black
-		</item>
-		
-		<item name="android:shadowDx">
-			1
-		</item>
-		
-		<item name="android:shadowDy">
-			1
-		</item>
-		
-		<item name="android:shadowRadius">
-			2
-		</item>
-		
 	</style>
 	
-	<!-- ALERT DIALOG EDIT TEXTVIEW TITLE SUB -->
-	<style name="Main.AlertDialog.TextView.Title.Sub"
-		   parent="@style/Main.AlertDialog.TextView.Title">
+	<!-- MAIN ALERT DIALOG TEXTVIEW TITLE SUB -->
+	<style name="Main.AlertDialog.TextView.Title.Sub">
 		
 		<item name="android:gravity">
 			left
@@ -250,18 +353,51 @@
 		
 	</style>
 	
-	<!-- ALERT DIALOG EDIT EDITVIEW -->
-	<style name="Main.AlertDialog.EditView"
-		   parent="@style/Main.AlertDialog">
+	<!-- MAIN ALERT DIALOG EDITVIEW -->
+	<style name="Main.AlertDialog.EditView">
 		
-		<item name="android:gravity">
+		<!-- <item name="android:gravity">
 			fill_horizontal
+		</item> -->
+		
+	</style>
+	
+	<!-- MAIN ALERT DIALOG EDITVIEW TITLE -->
+	<style name="Main.AlertDialog.EditView.Title">
+		
+		<item name="android:lines">
+			1
+		</item>
+		
+		<item name="android:maxLines">
+			1
+		</item>
+		
+		<item name="android:singleLine">
+			true
 		</item>
 		
 	</style>
 	
-	<!-- BUTTON MAIN -->
-	<style name="Main.ButtonMain">
+	<!-- MAIN ALERT DIALOG EDITVIEW TEXT -->
+	<style name="Main.AlertDialog.EditView.Text">
+		
+		<item name="android:gravity">
+			top
+		</item>
+		
+		<item name="android:minLines">
+			4
+		</item>
+		
+		<item name="android:inputType">
+			textMultiLine
+		</item>
+		
+	</style>
+	
+	<!-- MAIN BUTTON -->
+	<style name="Main.Button">
 		
 		<item name="android:layout_width">
 			match_parent
@@ -271,24 +407,20 @@
 			wrap_content
 		</item>
 		
-		<item name="android:layout_margin">
+		<item name="android:layout_marginLeft">
 			2.0dp
 		</item>
 		
-		<item name="android:paddingLeft">
-			4.0dp
+		<item name="android:layout_marginTop">
+			2.0dp
 		</item>
 		
-		<item name="android:paddingTop">
-			8.0dp
+		<item name="android:layout_marginRight">
+			2.0dp
 		</item>
 		
-		<item name="android:paddingRight">
-			4.0dp
-		</item>
-		
-		<item name="android:paddingBottom">
-			8.0dp
+		<item name="android:layout_marginBottom">
+			2.0dp
 		</item>
 		
 		<item name="android:includeFontPadding">
@@ -327,9 +459,13 @@
 			center
 		</item>
 		
+		<item name="typeface">
+			@string/font_bold
+		</item>
+		
 		<item name="android:textSize">
 			24sp
-		</item><!--26sp-->
+		</item>
 		
 		<item name="android:textStyle">
 			bold
@@ -355,14 +491,35 @@
 			2
 		</item>
 		
+		<item name="android:paddingLeft">
+			4.0dp
+		</item>
+		
+		<item name="android:paddingTop">
+			8.0dp
+		</item>
+		
+		<item name="android:paddingRight">
+			4.0dp
+		</item>
+		
+		<item name="android:paddingBottom">
+			8.0dp
+		</item>
+		
 	</style>
 	
-	<!-- TEXTVIEW ABOUT -->
-	<style name="Main.ButtonMain.TextViewAbout">
+	<!-- MAIN BUTTON TEXTVIEW -->
+	<style name="Main.Button.TextView">
 		
 		<item name="android:layout_weight">
 			0.0
 		</item>
+		
+	</style>
+	
+	<!-- MAIN BUTTON TEXTVIEW ABOUT -->
+	<style name="Main.Button.TextView.About">
 		
 		<item name="android:textSize">
 			26sp
@@ -374,8 +531,8 @@
 		
 	</style>
 	
-	<!-- TEXTVIEW ABOUT INFO -->
-	<style name="Main.ButtonMain.TextViewAbout.Info">
+	<!-- MAIN BUTTON TEXTVIEW INFO -->
+	<style name="Main.Button.TextView.Info">
 		
 		<item name="android:textSize">
 			20sp

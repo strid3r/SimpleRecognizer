@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 strider
+	 
+	 Simple Recognizer
+	 V14 Values Themes XML
+	 By © strider 2013.
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	
+	<!-- MAIN -->
+	<style name="Theme.Main"
+		   parent="@style/Theme.Sherlock">
+		
+		<item name="android:windowBackground">
+			@drawable/background_main
+		</item>
+		
+		<item name="android:actionBarStyle">
+			@style/Widget.Main.ActionBar
+		</item>
+		
+	</style>
+	
+	<!-- MAIN ACTION BAR OVERLAY -->
+	<style name="Theme.Main.ActionBarOverlay">
+		
+		<item name="android:windowActionBarOverlay">
+			true
+		</item>
+		
+	</style>
+	
+</resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 RU Strings Manage PHash XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="manage_phash_name">
 		Управление Перцептивным Хэшем
 	</string>
@@ -25,17 +25,9 @@
 		Удалить Объект
 	</string>
 	
-	<string name="manage_phash_menu_save">
-		Сохранить
-	</string>
-	
 	<!-- CONTEXT MENU -->
 	<string name="manage_phash_context_menu_header_title">
 		Меню Подтверждения
-	</string>
-	
-	<string name="manage_phash_context_menu_apply_selection">
-		Применить Выбор
 	</string>
 	
 	<string name="manage_phash_context_menu_show_comment">
@@ -43,11 +35,11 @@
 	</string>
 	
 	<string name="manage_phash_context_menu_edit">
-		Изменить PHash
+		Изменить перцептивный хэш
 	</string>
 	
 	<string name="manage_phash_context_menu_delete">
-		Удалить PHash
+		Удалить перцептивный хэш
 	</string>
 	
 	<!-- DIALOG -->

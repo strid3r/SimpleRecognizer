@@ -1,27 +1,49 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
  * Model Course Class
- * By © strider 2012. 
+ * By © strider 2012-2013. 
  */
 
 package ru.strider.simplerecognizer.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
+
 import java.util.List;
+
+import ru.strider.util.Text;
 
 /**
  * Model Course Class.
  * 
  * @author strider
  */
-public class Course {
+public class Course implements Parcelable {
 	
-	//private static final String LOG_TAG = "Course";
+	//private static final String LOG_TAG = Course.class.getSimpleName();
+	
+	public static final String KEY = Course.class.getSimpleName();
 	
 	public static final int INIT_VERSION = 1;
 	
-	private int mId = 0;
+	public static final Creator<Course> CREATOR = new Creator<Course>() {
+			
+			@Override
+			public Course createFromParcel(Parcel source) {
+				return (new Course(source));
+			}
+			
+			@Override
+			public Course[] newArray(int size) {
+				return (new Course[size]);
+			}
+			
+		};
+	
+	private long mId = 0L;
 	
 	private String mTitle = null;
 	private String mCategory = null;
@@ -37,37 +59,20 @@ public class Course {
 	}
 	
 	public Course(String title, String category, int version, String creator) {
-		mTitle = title;
-		mCategory = category;
-		
-		mVersion = version;
-		
-		mCreator = creator;
+		this(0L, title, category, version, creator, null);
 	}
 	
-	public Course(String title, String category, int version, String creator, List<Item> listItem) {
-		mTitle = title;
-		mCategory = category;
-		
-		mVersion = version;
-		
-		mCreator = creator;
-		
-		mListItem = listItem;
+	public Course(String title, String category, int version, String creator,
+			List<Item> listItem) {
+		this(0L, title, category, version, creator, listItem);
 	}
 	
-	public Course(int id, String title, String category, int version, String creator) {
-		mId = id;
-		
-		mTitle = title;
-		mCategory = category;
-		
-		mVersion = version;
-		
-		mCreator = creator;
+	public Course(long id, String title, String category, int version, String creator) {
+		this(id, title, category, version, creator, null);
 	}
 	
-	public Course(int id, String title, String category, int version, String creator, List<Item> listItem) {
+	public Course(long id, String title, String category, int version, String creator,
+			List<Item> listItem) {
 		mId = id;
 		
 		mTitle = title;
@@ -80,11 +85,24 @@ public class Course {
 		mListItem = listItem;
 	}
 	
-	public int getId() {
+	public Course(Parcel in) {
+		mId = in.readLong();
+		
+		mTitle = in.readString();
+		mCategory = in.readString();
+		
+		mVersion = in.readInt();
+		
+		mCreator = in.readString();
+		
+		in.readList(mListItem, Item.class.getClassLoader());
+	}
+	
+	public long getId() {
 		return mId;
 	}
 	
-	public void setId(int id) {
+	public void setId(long id) {
 		mId = id;
 	}
 	
@@ -126,6 +144,74 @@ public class Course {
 	
 	public void setListItem(List<Item> listItem) {
 		mListItem = listItem;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (!(obj instanceof Course)) {
+			return false;
+		}
+		
+		Course course = (Course) obj;
+		
+		return ((mId == course.mId) && (mVersion == course.mVersion));
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		
+		int result = 17;
+		
+		result = prime * result + Long.valueOf(mId).hashCode();
+		
+		result = prime * result + Integer.valueOf(mVersion).hashCode();
+		
+		return result;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append((!TextUtils.isEmpty(mCategory)) ? mCategory : Text.NOT_AVAILABLE_EXTRA);
+		
+		sb.append(Text.SEPARATOR);
+		
+		sb.append((!TextUtils.isEmpty(mTitle)) ? mTitle : Text.NOT_AVAILABLE_EXTRA);
+		
+		sb.append(Text.SEPARATOR);
+		
+		sb.append(mVersion);
+		
+		if (!TextUtils.isEmpty(mCreator)) {
+			sb.append(Text.SEPARATOR_BY).append(mCreator);
+		}
+		
+		return sb.toString();
+	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeLong(mId);
+		
+		dest.writeString(mTitle);
+		dest.writeString(mCategory);
+		
+		dest.writeInt(mVersion);
+		
+		dest.writeString(mCreator);
+		
+		dest.writeList(mListItem);
 	}
 	
 }

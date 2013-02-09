@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 RU Strings Select Course XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="select_course_name_viewer">
 		Выбор Курса
 	</string>
@@ -33,17 +33,9 @@
 		Добавить Курс
 	</string>
 	
-	<string name="select_course_menu_save">
-		Сохранить
-	</string>
-	
 	<!-- CONTEXT MENU -->
 	<string name="select_course_context_menu_header_title">
 		Меню Подтверждения
-	</string>
-	
-	<string name="select_course_context_menu_apply_selection">
-		Применить Выбор
 	</string>
 	
 	<string name="select_course_context_menu_export">
@@ -64,7 +56,8 @@
 	
 	<!-- DIALOG -->
 	<string name="select_course_dialog_not_creator_message">
-		Вы не можете управлять этим курсом,\nпотому что Вы не его создатель.
+		Вы не можете управлять этим курсом,
+		\nпотому что Вы не его создатель.
 	</string>
 	
 	<string name="select_course_dialog_title_title">

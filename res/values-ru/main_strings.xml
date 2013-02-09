@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2012 strider
+<!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
 	 RU Strings Main XML
-	 By © strider 2012.
+	 By © strider 2012-2013.
 -->
 <resources>
 	
-    <!-- MAIN -->
+	<!-- MAIN -->
 	<string name="main_name">
 		Главная Камера
 	</string>
@@ -62,9 +62,9 @@
 		Извините, но данное Устройство имеет только одну Камеру.
 	</string>
 	
-	<!-- CONTROLS -->
-	<string name="key_button_back_double_press">
-		‹‹ Нажмите Кнопку Назад ещё раз, чтобы закрыть Приложение ››
+	<!-- DESCRIPTION -->
+	<string name="main_description_button_shutter">
+		Затвор
 	</string>
 	
 </resources>

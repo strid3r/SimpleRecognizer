@@ -1,31 +1,53 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
  * Model Item Class
- * By © strider 2012. 
+ * By © strider 2012-2013. 
  */
 
 package ru.strider.simplerecognizer.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
+
 import java.util.List;
+
+import ru.strider.util.Text;
 
 /**
  * Model Item Class.
  * 
  * @author strider
  */
-public class Item {
+public class Item implements Parcelable {
 	
-	//private static final String LOG_TAG = "Item";
+	//private static final String LOG_TAG = Item.class.getSimpleName();
 	
-	private int mId = 0;
+	public static final String KEY = Item.class.getSimpleName();
+	
+	public static final Creator<Item> CREATOR = new Creator<Item>() {
+			
+			@Override
+			public Item createFromParcel(Parcel source) {
+				return (new Item(source));
+			}
+			
+			@Override
+			public Item[] newArray(int size) {
+				return (new Item[size]);
+			}
+			
+		};
+	
+	private long mId = 0L;
 	
 	private String mTitle = null;
 	private String mContent = null;
 	private String mVideoUri = null;
 	
-	private int mCourseId = 0;
+	private long mCourseId = 0L;
 	
 	private List<PHash> mListPHash = null;
 	
@@ -33,35 +55,21 @@ public class Item {
 		//
 	}
 	
-	public Item(String title, String content, String videoUri, int courseId) {
-		mTitle = title;
-		mContent = content;
-		mVideoUri = videoUri;
-		
-		mCourseId = courseId;
+	public Item(String title, String content, String videoUri, long courseId) {
+		this(0L, title, content, videoUri, courseId, null);
 	}
 	
-	public Item(String title, String content, String videoUri, int courseId, List<PHash> listPHash) {
-		mTitle = title;
-		mContent = content;
-		mVideoUri = videoUri;
-		
-		mCourseId = courseId;
-		
-		mListPHash = listPHash;
+	public Item(String title, String content, String videoUri, long courseId,
+			List<PHash> listPHash) {
+		this(0L, title, content, videoUri, courseId, listPHash);
 	}
 	
-	public Item(int id, String title, String content, String videoUri, int courseId) {
-		mId = id;
-		
-		mTitle = title;
-		mContent = content;
-		mVideoUri = videoUri;
-		
-		mCourseId = courseId;
+	public Item(long id, String title, String content, String videoUri, long courseId) {
+		this(id, title, content, videoUri, courseId, null);
 	}
 	
-	public Item(int id, String title, String content, String videoUri, int courseId, List<PHash> listPHash) {
+	public Item(long id, String title, String content, String videoUri, long courseId,
+			List<PHash> listPHash) {
 		mId = id;
 		
 		mTitle = title;
@@ -73,11 +81,23 @@ public class Item {
 		mListPHash = listPHash;
 	}
 	
-	public int getId() {
+	public Item(Parcel in) {
+		mId = in.readLong();
+		
+		mTitle = in.readString();
+		mContent = in.readString();
+		mVideoUri = in.readString();
+		
+		mCourseId = in.readLong();
+		
+		in.readList(mListPHash, PHash.class.getClassLoader());
+	}
+	
+	public long getId() {
 		return mId;
 	}
 	
-	public void setId(int id) {
+	public void setId(long id) {
 		mId = id;
 	}
 	
@@ -105,11 +125,11 @@ public class Item {
 		mVideoUri = videoUri;
 	}
 	
-	public int getCourseId() {
+	public long getCourseId() {
 		return mCourseId;
 	}
 	
-	public void setCourseId(int courseId) {
+	public void setCourseId(long courseId) {
 		mCourseId = courseId;
 	}
 	
@@ -133,17 +153,80 @@ public class Item {
 		}
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		
+		if (!(obj instanceof Item)) {
+			return false;
+		}
+		
+		Item item = (Item) obj;
+		
+		return ((mId == item.mId) && (mCourseId == item.mCourseId));
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		
+		int result = 17;
+		
+		result = prime * result + Long.valueOf(mId).hashCode();
+		
+		result = prime * result + Long.valueOf(mCourseId).hashCode();
+		
+		return result;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		if (!TextUtils.isEmpty(mTitle)) {
+			sb.append(mTitle);
+		} else {
+			sb.append(Text.NOT_AVAILABLE_EXTRA);
+			
+			sb.append(Text.SEPARATOR);
+			
+			sb.append(mCourseId);
+		}
+		
+		return sb.toString();
+	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+	
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeLong(mId);
+		
+		dest.writeString(mTitle);
+		dest.writeString(mContent);
+		dest.writeString(mVideoUri);
+		
+		dest.writeLong(mCourseId);
+		
+		dest.writeList(mListPHash);
+	}
+	
 	/**
 	 * Finds PHash object with Min Hamming Distance Value
 	 * in given List<PHash> listPHash.
 	 * 
 	 * @return PHash object with Min Hamming Distance in given listPHash,
-	 *         or null if listPHash is either null or empty
+	 *         or null if listPHash is either null or empty.
 	 */
 	public static PHash findPHashMin(List<PHash> listPHash) {
 		PHash pHashMin = null;
 		
-		if ((listPHash != null) && !listPHash.isEmpty()) {
+		if ((listPHash != null) && (!listPHash.isEmpty())) {
 			pHashMin = listPHash.get(0);
 			
 			for (PHash pHash : listPHash) {
