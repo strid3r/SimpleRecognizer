@@ -11,6 +11,7 @@ package ru.strider.widget;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -37,15 +38,15 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	
 	private static final String LOG_TAG = CameraPreview.class.getSimpleName();
 	
-	private GridSurfaceView mSurfaceView = null;
+	private GridSurfaceView mGridSurfaceView = null;
 	private SurfaceHolder mSurfaceHolder = null;
+	
+	private boolean mIsSurfaceAlive = false;
 	
 	private Camera mCamera = null;
 	
 	private Size mPreviewSize = null;
 	private List<Size> mListPreviewSize = null;
-	
-	private boolean mIsSurfaceAlive = false;
 	
 	public CameraPreview(Context context) {
 		super(context);
@@ -65,17 +66,20 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		doInit();
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void doInit() {
-		mSurfaceView = new GridSurfaceView(this.getContext());
-		mSurfaceView.setTypeface(Font.getTypeface(this.getResources(), Font.AGENCY_FB_BOLD));
+		mGridSurfaceView = new GridSurfaceView(this.getContext());
+		mGridSurfaceView.setTypeface(Font.getTypeface(this.getResources(), Font.AGENCY_FB_BOLD));
 		
-		this.addView(mSurfaceView);
+		this.addView(mGridSurfaceView);
 		
-		mSurfaceHolder = mSurfaceView.getHolder();
+		mSurfaceHolder = mGridSurfaceView.getHolder();
 		mSurfaceHolder.addCallback(this);
 		
 		// Deprecated setting, but required on Android versions prior to 3.0.
-		mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		}
 	}
 	
 	public void setCamera(Camera camera) {
@@ -106,16 +110,30 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 	
 	public void switchCamera() {
-		try {
-			mCamera.setPreviewDisplay(mSurfaceHolder);
-			
-			mCamera.startPreview();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "setPreviewDisplay(...) >> " + e.toString());
+		if (mCamera != null) {
+			try {
+				initPreview();
+				
+				mCamera.startPreview();
+			} catch (IOException e) {
+				Log.e(LOG_TAG, "setPreviewDisplay(...) >> " + e.toString());
+			}
 		}
 	}
 	
-	public void setPreviewSize() {
+	private void initPreview() throws IOException {
+		mCamera.setPreviewDisplay(mSurfaceHolder);
+		mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+				
+				@Override
+				public void onPreviewFrame(byte[] data, Camera camera) {
+					mGridSurfaceView.invalidate();
+				}
+				
+			});
+	}
+	
+	private void setPreviewSize() {
 		this.requestLayout();
 		
 		if (mPreviewSize != null) {
@@ -141,15 +159,15 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		
 		if (mCamera != null) {
 			try {
-				mCamera.setPreviewDisplay(holder);
+				initPreview();
 				
 				//mCamera.startPreview();
 			} catch (IOException e) {
 				Log.e(LOG_TAG, "setPreviewDisplay(...) >> " + e.toString());
 			}
+			
+			setPreviewSize();
 		}
-		
-		setPreviewSize();
 	}
 	
 	@Override
@@ -160,20 +178,22 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 			return;
 		}
 		
-		try {
-			mCamera.stopPreview();
-		} catch (Exception e) {
-			//
-		}
-		
-		setPreviewSize();
-		
-		try {
-			mCamera.setPreviewDisplay(mSurfaceHolder);
+		if (mCamera != null) {
+			try {
+				mCamera.stopPreview();
+			} catch (Exception e) {
+				//
+			}
 			
-			mCamera.startPreview();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "setPreviewDisplay(...)" + e.toString());
+			setPreviewSize();
+			
+			try {
+				initPreview();
+				
+				mCamera.startPreview();
+			} catch (IOException e) {
+				Log.e(LOG_TAG, "setPreviewDisplay(...)" + e.toString());
+			}
 		}
 	}
 	

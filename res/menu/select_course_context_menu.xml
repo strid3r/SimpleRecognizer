@@ -7,7 +7,7 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	
-	<group android:id="@+id/selectCourseContextMenuControls">
+	<group android:id="@+id/selectCourseContextMenuContent">
 		
 		<item android:id="@+id/selectCourseContextMenuExport"
 			  android:title="@string/select_course_context_menu_export"
@@ -16,6 +16,10 @@
 		<item android:id="@+id/selectCourseContextMenuShowInfo"
 			  android:title="@string/select_course_context_menu_show_info"
 			  android:orderInCategory="1" />
+		
+	</group>
+	
+	<group android:id="@+id/selectCourseContextMenuControls">
 		
 		<item android:id="@+id/selectCourseContextMenuEdit"
 			  android:title="@string/select_course_context_menu_edit"

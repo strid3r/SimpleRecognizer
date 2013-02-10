@@ -1,4 +1,4 @@
 SimpleRecognizer
 ================
 
-Android Simple Recognizer, ver. 0.9.0
+Android Simple Recognizer, ver. 0.9.1

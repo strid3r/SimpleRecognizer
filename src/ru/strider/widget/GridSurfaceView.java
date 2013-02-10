@@ -31,6 +31,7 @@ public class GridSurfaceView extends SurfaceView {
 	
 	private static final int MAX_SIZE_STEPS = 5;
 	
+	private static final long FPS_INTERVAL = 1000L;
 	private static final float FPS_OFFSET_DP = 10.0f;
 	
 	private Paint mPaintGrid = null;
@@ -39,7 +40,7 @@ public class GridSurfaceView extends SurfaceView {
 	
 	private float mOffsetFps = 0.0f; 
 	
-	private long mLastTick = 0L;
+	private long mLastTime = 0L;
 	private int mFrameCount = 0;
 	private int mFps = 0;
 	
@@ -61,7 +62,7 @@ public class GridSurfaceView extends SurfaceView {
 		doInit(attrs);
 	}
 	
-	private void doInit(AttributeSet attrs) { // TODO: NEED GAME LOOP FOR PROPER FPS CALCULATION
+	private void doInit(AttributeSet attrs) {
 		this.setWillNotDraw(false);
 		
 		mPaintGrid = new Paint();
@@ -90,24 +91,6 @@ public class GridSurfaceView extends SurfaceView {
 			);
 	}
 	
-	private void updateFps() {
-		final long currentTick = SystemClock.elapsedRealtime();
-		
-		mFrameCount++;
-		
-		if ((currentTick - mLastTick) > 1000L) {
-			mFps = mFrameCount;
-			
-			mLastTick = currentTick;
-			
-			mFrameCount = 0;
-		}
-	}
-	
-	private boolean isEven(int number) {
-		return (((number % 2) == 0) ? true : false);
-	}
-	
 	public int getFps() {
 		return mFps;
 	}
@@ -116,13 +99,34 @@ public class GridSurfaceView extends SurfaceView {
 		mPaintFps.setTypeface(typeface);
 	}
 	
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
+	private void updateFps() {
+		final long currentTime = SystemClock.elapsedRealtime();
 		
-		updateFps();
+		mFrameCount++;
 		
-		// Grid
+		if ((currentTime - mLastTime) > FPS_INTERVAL) {
+			mFps = mFrameCount;
+			
+			mLastTime = currentTime;
+			
+			mFrameCount = 0;
+		}
+	}
+	
+	private void drawFps(Canvas canvas) {
+		canvas.drawText(
+				Integer.toString(mFps),
+				mOffsetFps,
+				(this.getHeight() - mOffsetFps),
+				mPaintFps
+			);
+	}
+	
+	private boolean isEven(int number) {
+		return ((number % 2) == 0);
+	}
+	
+	private void drawGrid(Canvas canvas) {
 		final int width = this.getWidth();
 		final int height = this.getHeight();
 		
@@ -174,9 +178,19 @@ public class GridSurfaceView extends SurfaceView {
 		for (float j = startHeight; j < height; j += step) {
 			canvas.drawLine(0.0f, j, (float) width, j, mPaintGrid);
 		}
+	}
+	
+	@Override
+	protected void onDraw(Canvas canvas) {
+		updateFps();
+		
+		super.onDraw(canvas);
+		
+		// Grid
+		drawGrid(canvas);
 		
 		// FPS
-		canvas.drawText(Integer.toString(mFps), mOffsetFps, (height - mOffsetFps), mPaintFps);
+		drawFps(canvas);
 	}
 	
 }

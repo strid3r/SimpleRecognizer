@@ -68,13 +68,15 @@ public class ManageItem extends BaseListActivity {
 	private BaseArrayAdapter<Item> mAdapter = null;
 	private ListView mView = null;
 	
+	private boolean mIsLock = false;
+	
 	private AsyncItemImport mAsyncItemImport = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
 		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
+		super.onCreate(savedInstanceState);
 		
 		doInit();
 	}
@@ -126,6 +128,14 @@ public class ManageItem extends BaseListActivity {
 	}
 	
 	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.setGroupEnabled(R.id.manageItemMenuContent, (!mIsLock));
+		menu.setGroupEnabled(R.id.manageItemMenuControls, (!mIsLock));
+		
+		return true;
+	}
+	
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case (R.id.mainActionOverflow): {
@@ -137,6 +147,7 @@ public class ManageItem extends BaseListActivity {
 				mAsyncItemImport = new AsyncItemImport();
 				
 				Intent iPickFile = new Intent(this, FileManager.class);
+				iPickFile.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_FILE);
 				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_ALL);
 				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
 				
@@ -190,11 +201,20 @@ public class ManageItem extends BaseListActivity {
 		android.view.MenuInflater inflater = this.getMenuInflater();
 		inflater.inflate(R.menu.manage_item_context_menu, menu);
 		
+		menu.setGroupEnabled(
+				R.id.manageItemContextMenuControls,
+				((!mIsLock) && mConfigAdapter.getIsCreator())
+			);
+		
 		if (mConfigAdapter.getIsCreator()) {
 			boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
 			
-			menu.findItem(R.id.manageItemContextMenuEdit).setEnabled(isCreator).setVisible(isCreator);
-			menu.findItem(R.id.manageItemContextMenuDelete).setEnabled(isCreator).setVisible(isCreator);
+			menu.findItem(R.id.manageItemContextMenuEdit)
+					.setEnabled((!mIsLock) && isCreator)
+					.setVisible(isCreator);
+			menu.findItem(R.id.manageItemContextMenuDelete)
+					.setEnabled((!mIsLock) && isCreator)
+					.setVisible(isCreator);
 		}
 	}
 	
@@ -363,64 +383,20 @@ public class ManageItem extends BaseListActivity {
 		useConfigValues();
 	}
 	
-	private AlertDialog buildAddItem(String content) {
-		LayoutInflater inflater = LayoutInflater.from(this);
-		View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-		View viewContent = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
-		
-		TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-		textViewTitle.setText(R.string.manage_item_menu_add_item);
-		textViewTitle.setSelected(true);
-		
-		final EditText editTextTitle = (EditText) viewContent.findViewById(R.id.editTextTitle);
-		
-		final EditText editTextContent = (EditText) viewContent.findViewById(R.id.editTextContent);
-		
-		if (!TextUtils.isEmpty(content)) {
-			editTextContent.setText(content);
-		}
-		
-		final EditText editTextVideoUri = (EditText) viewContent.findViewById(R.id.editTextVideoUri);
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setCustomTitle(viewTitle);
-		builder.setView(viewContent);
-		
-		builder.setNegativeButton(R.string.dialog_button_cancel, null);
-		
-		builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManageItem.this);
-					
-					dbAdapter.write();
-					
-					dbAdapter.addItem(new Item(
-							editTextTitle.getText().toString().trim(),
-							editTextContent.getText().toString().trim(),
-							editTextVideoUri.getText().toString().trim(),
-							mCourse.getId()
-						));
-					
-					dbAdapter.close();
-					
-					initView();
-				}
-				
-			});
-		
-		AlertDialog alert = builder.create();
-		
-		return alert;
-	}
-	
 	private void useConfigValues() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
 		
 		mConfigAdapter.getValues();
 		
 		mView.setItemChecked(getItemPosition(), true);
+	}
+	
+	private void lockUI(boolean isLock) {
+		mIsLock = isLock;
+		
+		this.supportInvalidateOptionsMenu();
+		
+		this.setSupportProgressBarIndeterminateVisibility(isLock);
 	}
 	
 	private int getItemPosition() {
@@ -490,6 +466,58 @@ public class ManageItem extends BaseListActivity {
 		}
 	}
 	
+	private AlertDialog buildAddItem(String content) {
+		LayoutInflater inflater = LayoutInflater.from(this);
+		View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+		View viewContent = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
+		
+		TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
+		textViewTitle.setText(R.string.manage_item_menu_add_item);
+		textViewTitle.setSelected(true);
+		
+		final EditText editTextTitle = (EditText) viewContent.findViewById(R.id.editTextTitle);
+		
+		final EditText editTextContent = (EditText) viewContent.findViewById(R.id.editTextContent);
+		
+		if (!TextUtils.isEmpty(content)) {
+			editTextContent.setText(content);
+		}
+		
+		final EditText editTextVideoUri = (EditText) viewContent.findViewById(R.id.editTextVideoUri);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setCustomTitle(viewTitle);
+		builder.setView(viewContent);
+		
+		builder.setNegativeButton(R.string.dialog_button_cancel, null);
+		
+		builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManageItem.this);
+					
+					dbAdapter.write();
+					
+					dbAdapter.addItem(new Item(
+							editTextTitle.getText().toString().trim(),
+							editTextContent.getText().toString().trim(),
+							editTextVideoUri.getText().toString().trim(),
+							mCourse.getId()
+						));
+					
+					dbAdapter.close();
+					
+					initView();
+				}
+				
+			});
+		
+		AlertDialog alert = builder.create();
+		
+		return alert;
+	}
+	
 	/**
 	 * AsyncTask AsyncItemImport<String, Void, List<String>> Class.
 	 * 
@@ -511,7 +539,7 @@ public class ManageItem extends BaseListActivity {
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
 			
-			ManageItem.this.setSupportProgressBarIndeterminateVisibility(true);
+			lockUI(true);
 		}
 		
 		@Override
@@ -603,8 +631,6 @@ public class ManageItem extends BaseListActivity {
 		@Override
 		protected void onPostExecute(List<String> result) {
 			if (ManageItem.this.isAlive()) {
-				ManageItem.this.setSupportProgressBarIndeterminateVisibility(false);
-				
 				StringBuilder sb = new StringBuilder();
 				
 				if (BuildConfig.DEBUG) {
@@ -616,6 +642,8 @@ public class ManageItem extends BaseListActivity {
 				for (String content : result) {
 					buildAddItem(content).show();
 				}
+				
+				lockUI(false);
 			}
 		}
 		

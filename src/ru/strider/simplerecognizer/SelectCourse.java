@@ -39,6 +39,7 @@ import cloud4apps.Utils;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 
 import ru.strider.app.BaseExpandableListActivity;
 import ru.strider.simplerecognizer.adapter.CourseAdapter;
@@ -66,11 +67,15 @@ public class SelectCourse extends BaseExpandableListActivity {
 	
 	private Course mCourse = null;
 	
+	private boolean mIsLock = false;
+	
 	private AsyncCourseExport mAsyncCourseExport = null;
 	private AsyncCourseImport mAsyncCourseImport = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
 		super.onCreate(savedInstanceState);
 		
 		doInit();
@@ -127,12 +132,16 @@ public class SelectCourse extends BaseExpandableListActivity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.setGroupEnabled(R.id.selectCourseMenuContent, (!mIsLock));
+		menu.setGroupEnabled(R.id.selectCourseMenuControls, (!mIsLock));
+		
 		menu.findItem(R.id.selectCourseMenuSwitchMode).setTitle(mConfigAdapter.getIsCreator()
 				? R.string.select_course_menu_switch_mode_viewer
 				: R.string.select_course_menu_switch_mode_creator
 			);
 		
-		menu.findItem(R.id.selectCourseMenuAddCourse).setEnabled(mConfigAdapter.getIsCreator());
+		menu.findItem(R.id.selectCourseMenuAddCourse)
+				.setEnabled((!mIsLock) && mConfigAdapter.getIsCreator());
 		
 		return true;
 	}
@@ -161,6 +170,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 				mAsyncCourseImport = new AsyncCourseImport();
 				
 				Intent iPickFile = new Intent(this, FileManager.class);
+				iPickFile.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_FILE);
 				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_COURSE);
 				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
 				
@@ -255,6 +265,12 @@ public class SelectCourse extends BaseExpandableListActivity {
 			android.view.MenuInflater inflater = this.getMenuInflater();
 			inflater.inflate(R.menu.select_course_context_menu, menu);
 			
+			menu.setGroupEnabled(R.id.selectCourseContextMenuContent, (!mIsLock));
+			menu.setGroupEnabled(
+					R.id.selectCourseContextMenuControls,
+					((!mIsLock) && mConfigAdapter.getIsCreator())
+				);
+			
 			if (mConfigAdapter.getIsCreator()) {
 				int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
 				int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
@@ -264,8 +280,12 @@ public class SelectCourse extends BaseExpandableListActivity {
 						((Course) mAdapter.getChild(groupPosition, childPosition)).getCreator()
 					);
 				
-				menu.findItem(R.id.selectCourseContextMenuEdit).setEnabled(isCreator).setVisible(isCreator);
+				menu.findItem(R.id.selectCourseContextMenuEdit)
+						.setEnabled((!mIsLock) && isCreator)
+						.setVisible(isCreator);
 			}
+			
+			menu.findItem(R.id.selectCourseContextMenuDelete).setEnabled(!mIsLock);
 		}
 	}
 	
@@ -505,6 +525,14 @@ public class SelectCourse extends BaseExpandableListActivity {
 		}
 	}
 	
+	private void lockUI(boolean isLock) {
+		mIsLock = isLock;
+		
+		this.supportInvalidateOptionsMenu();
+		
+		this.setSupportProgressBarIndeterminateVisibility(isLock);
+	}
+	
 	private Course initCourseData(Course course, boolean isWithPHash) {
 		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
 		
@@ -683,6 +711,8 @@ public class SelectCourse extends BaseExpandableListActivity {
 		@Override
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
+			
+			lockUI(true);
 		}
 		
 		@Override
@@ -772,6 +802,8 @@ public class SelectCourse extends BaseExpandableListActivity {
 				
 				AlertDialog alert = builder.create();
 				alert.show();
+				
+				lockUI(false);
 			}
 		}
 		
@@ -797,6 +829,8 @@ public class SelectCourse extends BaseExpandableListActivity {
 		@Override
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
+			
+			lockUI(true);
 		}
 		
 		@Override
@@ -896,6 +930,8 @@ public class SelectCourse extends BaseExpandableListActivity {
 				alert.show();
 				
 				initView();
+				
+				lockUI(false);
 			}
 		}
 		

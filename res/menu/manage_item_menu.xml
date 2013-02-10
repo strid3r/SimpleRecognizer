@@ -32,7 +32,7 @@
 	</group>
 	
 	<!-- CONTROLS -->
-	<group android:id="@+id/mainMenuControls">
+	<group android:id="@+id/manageItemMenuControls">
 		
 		<item android:id="@+id/manageItemMenuDeleteCourse"
 			  android:title="@string/manage_item_menu_delete_course"

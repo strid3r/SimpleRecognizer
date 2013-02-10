@@ -61,7 +61,7 @@ public class SimpleRecognizer extends Application {
 		
 		super.onConfigurationChanged(newConfig);
 		
-		if (mLocale != null) {
+		if (mLocale != null) { // FIXME: BAD SOLUTION
 			Locale.setDefault(mLocale);
 			
 			newConfig.locale = mLocale;
@@ -100,7 +100,7 @@ public class SimpleRecognizer extends Application {
 		
 		mediaReceiver = new MediaReceiver();
 		
-		Resources res = this.getResources();
+		Resources res = this.getResources(); // FIXME: BAD SOLUTION
 		
 		Configuration config = res.getConfiguration();
 		

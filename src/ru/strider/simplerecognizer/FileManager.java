@@ -70,7 +70,7 @@ public class FileManager extends BaseListActivity {
 	private BaseArrayAdapter<File> mAdapter = null;
 	private ListView mView = null;
 	
-	private FilenameFilter mFilter = null;
+	private FilenameFilter mFilenameFilter = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +157,7 @@ public class FileManager extends BaseListActivity {
 		mAdapter = null;
 		mView = null;
 		
-		mFilter = null;
+		mFilenameFilter = null;
 		
 		super.onDestroy();
 	}
@@ -228,7 +228,7 @@ public class FileManager extends BaseListActivity {
 			mView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		}
 		
-		mFilter = new FilenameFilter() {
+		mFilenameFilter = new FilenameFilter() {
 				
 				@Override
 				public boolean accept(File dir, String fileName) {
@@ -305,7 +305,7 @@ public class FileManager extends BaseListActivity {
 		List<File> listDir = new ArrayList<File>();
 		List<File> listFile = new ArrayList<File>();
 		
-		for (File file : mDirectory.listFiles(mFilter)) {
+		for (File file : mDirectory.listFiles(mFilenameFilter)) {
 			if (file.isDirectory()) {
 				listDir.add(file);
 			} else {
@@ -389,9 +389,11 @@ public class FileManager extends BaseListActivity {
 				break;
 			}
 			case (REQUEST_FILE): {
-				iFile.putExtra(KEY_FILE, ((mFile != null) ? mFile.getPath() : null));
+				boolean isExists = ((mFile != null) && mFile.exists());
 				
-				this.setResult(((mFile != null) ? RESULT_OK : RESULT_CANCELED), iFile);
+				iFile.putExtra(KEY_FILE, (isExists ? mFile.getPath() : null));
+				
+				this.setResult((isExists ? RESULT_OK : RESULT_CANCELED), iFile);
 				
 				break;
 			}
@@ -407,20 +409,20 @@ public class FileManager extends BaseListActivity {
 	protected void onListItemClick(ListView listView, View view, int position, long id) {
 		File file = mAdapter.getItem(position);
 		
-		if (file.isDirectory()) {
-			if (file.canRead()) {
+		if (file.exists() && file.canRead()) {
+			if (file.isDirectory()) {
 				mDirectory = file;
 				
 				initView();
-			} else {
-				//TODO: Couldn't read alert
+			} else if (file.isFile()) {
+				if (mMode == MODE_FILE) {
+					listView.setItemChecked(position, true);
+					
+					mFile = file;
+				}
 			}
-		} else if (file.isFile()) {
-			if (mMode == MODE_FILE) {
-				listView.setItemChecked(position, true);
-				
-				mFile = file;
-			}
+		} else {
+			//TODO: Couldn't read alert
 		}
 	}
 	

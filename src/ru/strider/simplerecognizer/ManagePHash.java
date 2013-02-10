@@ -68,13 +68,15 @@ public class ManagePHash extends BaseListActivity {
 	private BaseArrayAdapter<PHash> mAdapter = null;
 	private ListView mView = null;
 	
+	private boolean mIsLock = false;
+	
 	private AsyncPHashImport mAsyncPHashImport = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
 		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
+		super.onCreate(savedInstanceState);
 		
 		doInit();
 	}
@@ -128,9 +130,14 @@ public class ManagePHash extends BaseListActivity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.setGroupEnabled(R.id.managePHashMenuContent, (!mIsLock));
+		menu.setGroupEnabled(R.id.managePHashMenuControls, (!mIsLock));
+		
 		boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
 		
-		menu.findItem(R.id.managePHashMenuDeleteItem).setEnabled(isCreator).setVisible(isCreator);
+		menu.findItem(R.id.managePHashMenuDeleteItem)
+				.setEnabled((!mIsLock) && isCreator)
+				.setVisible(isCreator);
 		
 		return true;
 	}
@@ -147,7 +154,8 @@ public class ManagePHash extends BaseListActivity {
 				mAsyncPHashImport = new AsyncPHashImport();
 				
 				Intent iPickFile = new Intent(this, FileManager.class);
-				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_ALL);
+				iPickFile.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_FILE);
+				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_IMAGE);
 				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
 				
 				return true;
@@ -200,11 +208,20 @@ public class ManagePHash extends BaseListActivity {
 		android.view.MenuInflater inflater = this.getMenuInflater();
 		inflater.inflate(R.menu.manage_phash_context_menu, menu);
 		
+		menu.setGroupEnabled(
+				R.id.managePHashContextMenuControls,
+				((!mIsLock) && mConfigAdapter.getIsCreator())
+			);
+		
 		if (mConfigAdapter.getIsCreator()) {
 			boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
 			
-			menu.findItem(R.id.managePHashContextMenuEdit).setEnabled(isCreator).setVisible(isCreator);
-			menu.findItem(R.id.managePHashContextMenuDelete).setEnabled(isCreator).setVisible(isCreator);
+			menu.findItem(R.id.managePHashContextMenuEdit)
+					.setEnabled((!mIsLock) && isCreator)
+					.setVisible(isCreator);
+			menu.findItem(R.id.managePHashContextMenuDelete)
+					.setEnabled((!mIsLock) && isCreator)
+					.setVisible(isCreator);
 		}
 	}
 	
@@ -386,6 +403,66 @@ public class ManagePHash extends BaseListActivity {
 		useConfigValues();
 	}
 	
+	private void useConfigValues() {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
+		
+		mConfigAdapter.getValues();
+	}
+	
+	private void lockUI(boolean isLock) {
+		mIsLock = isLock;
+		
+		this.supportInvalidateOptionsMenu();
+		
+		this.setSupportProgressBarIndeterminateVisibility(isLock);
+	}
+	
+	@Override
+	protected void onListItemClick(ListView listView, View view, int position, long id) {
+		//
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case (KeyEvent.KEYCODE_MENU): {
+				return true;
+			}
+			default: {
+				return super.onKeyDown(keyCode, event);
+			}
+		}
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case (KeyEvent.KEYCODE_MENU): {
+				performActionMenu(true);
+				
+				return true;
+			}
+			default: {
+				return super.onKeyUp(keyCode, event);
+			}
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == FileManager.REQUEST_FILE) {
+			if ((resultCode == RESULT_OK) && (data != null)) {
+				String file = data.getStringExtra(FileManager.KEY_FILE);
+				
+				if ((!TextUtils.isEmpty(file)) && (mAsyncPHashImport != null)) {
+					mAsyncPHashImport.execute(file);
+				}
+			}
+			
+			mAsyncPHashImport = null;
+		}
+	}
+	
 	private AlertDialog buildAddPHash(String pHashHex) {
 		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
 		
@@ -461,58 +538,6 @@ public class ManagePHash extends BaseListActivity {
 		return alert;
 	}
 	
-	private void useConfigValues() {
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
-		
-		mConfigAdapter.getValues();
-	}
-	
-	@Override
-	protected void onListItemClick(ListView listView, View view, int position, long id) {
-		//
-	}
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		switch (keyCode) {
-			case (KeyEvent.KEYCODE_MENU): {
-				return true;
-			}
-			default: {
-				return super.onKeyDown(keyCode, event);
-			}
-		}
-	}
-	
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		switch (keyCode) {
-			case (KeyEvent.KEYCODE_MENU): {
-				performActionMenu(true);
-				
-				return true;
-			}
-			default: {
-				return super.onKeyUp(keyCode, event);
-			}
-		}
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == FileManager.REQUEST_FILE) {
-			if ((resultCode == RESULT_OK) && (data != null)) {
-				String file = data.getStringExtra(FileManager.KEY_FILE);
-				
-				if ((!TextUtils.isEmpty(file)) && (mAsyncPHashImport != null)) {
-					mAsyncPHashImport.execute(file);
-				}
-			}
-			
-			mAsyncPHashImport = null;
-		}
-	}
-	
 	/**
 	 * AsyncTask AsyncPHashImport<String, Void, List<String>> Class.
 	 * 
@@ -534,7 +559,7 @@ public class ManagePHash extends BaseListActivity {
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
 			
-			ManagePHash.this.setSupportProgressBarIndeterminateVisibility(true);
+			lockUI(true);
 		}
 		
 		@Override
@@ -559,8 +584,6 @@ public class ManagePHash extends BaseListActivity {
 		@Override
 		protected void onPostExecute(List<String> result) {
 			if (ManagePHash.this.isAlive()) {
-				ManagePHash.this.setSupportProgressBarIndeterminateVisibility(false);
-				
 				StringBuilder sb = new StringBuilder();
 				
 				if (BuildConfig.DEBUG) {
@@ -572,6 +595,8 @@ public class ManagePHash extends BaseListActivity {
 				for (String pHashHex : result) {
 					buildAddPHash(pHashHex).show();
 				}
+				
+				lockUI(false);
 			}
 		}
 		

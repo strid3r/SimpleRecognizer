@@ -149,11 +149,15 @@ public class PHash implements Parcelable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append((!TextUtils.isEmpty(mHexValue)) ? mHexValue : Text.NOT_AVAILABLE_EXTRA);
-		
-		sb.append(Text.SEPARATOR);
-		
-		sb.append(mItemId);
+		if (!TextUtils.isEmpty(mHexValue)) {
+			sb.append(mHexValue);
+		} else {
+			sb.append(Text.NOT_AVAILABLE_EXTRA);
+			
+			sb.append(Text.SEPARATOR);
+			
+			sb.append(mItemId);
+		}
 		
 		return sb.toString();
 	}

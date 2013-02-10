@@ -29,6 +29,10 @@
 		AgencyFB_R_Cyr.ttf
 	</string>
 	
+	<string name="font_bold">
+		AgencyFB_R_Cyr.ttf
+	</string>
+	
 	<!-- MENU -->
 	<string name="menu_action_overflow">
 		Меню

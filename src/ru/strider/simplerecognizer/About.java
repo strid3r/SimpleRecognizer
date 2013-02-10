@@ -45,7 +45,9 @@ public class About extends BaseActivity {
 		
 		this.setContentView(R.layout.about);
 		
-		TextView textView = (TextView) this.findViewById(R.id.textViewAboutVersion);
+		((TextView) this.findViewById(R.id.textViewAboutName)).setSelected(true);
+		
+		TextView textViewVersion = (TextView) this.findViewById(R.id.textViewAboutVersion);
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -62,10 +64,14 @@ public class About extends BaseActivity {
 				sb.append(BuildConfig.VERSION);
 			}
 			
-			textView.setText(sb.toString());
+			textViewVersion.setText(sb.toString());
 		} catch (NameNotFoundException e) {
 			Log.e(LOG_TAG, e.toString());
 		}
+		
+		textViewVersion.setSelected(true);
+		
+		((TextView) this.findViewById(R.id.textViewAboutCopyright)).setSelected(true);
 	}
 	
 }

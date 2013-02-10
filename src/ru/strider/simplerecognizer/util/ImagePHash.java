@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2012 strider
+ * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
  * Util ImagePHash Class
- * By © strider 2012.
+ * By © strider 2012-2013.
  */
 
 package ru.strider.simplerecognizer.util;
