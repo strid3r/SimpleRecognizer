@@ -98,7 +98,13 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	
 	public void releaseCamera() {
 		if (mCamera != null) {
-			mCamera.stopPreview();
+			try {
+				mCamera.stopPreview();
+			} catch (Exception e) {
+				//
+			}
+			
+			mCamera.setPreviewCallback(null);
 			
 			mCamera.release();
 			
@@ -123,14 +129,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	
 	private void initPreview() throws IOException {
 		mCamera.setPreviewDisplay(mSurfaceHolder);
-		mCamera.setPreviewCallback(new Camera.PreviewCallback() {
-				
-				@Override
-				public void onPreviewFrame(byte[] data, Camera camera) {
-					mGridSurfaceView.invalidate();
-				}
-				
-			});
+		mCamera.setPreviewCallback(mGridSurfaceView);
 	}
 	
 	private void setPreviewSize() {

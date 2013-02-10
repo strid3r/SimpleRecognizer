@@ -443,12 +443,16 @@ public class SelectCourse extends BaseExpandableListActivity {
 	private void doInit() {
 		mConfigAdapter = ConfigAdapter.getInstance(this);
 		
+		
+		
 		this.setTitle(mConfigAdapter.getIsCreator()
 				? R.string.select_course_name_creator
 				: R.string.select_course_name_viewer
 			);
 		
 		this.setContentView(R.layout.select_course);
+		
+		this.setSupportProgressBarIndeterminateVisibility(false);
 		
 		mAdapter = new CourseAdapter(this);
 		//mView = (ExpandableListView) this.findViewById(android.R.id.list);

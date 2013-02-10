@@ -12,6 +12,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.hardware.Camera;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -25,7 +26,7 @@ import ru.strider.widget.util.Font;
  * 
  * @author strider
  */
-public class GridSurfaceView extends SurfaceView {
+public class GridSurfaceView extends SurfaceView implements Camera.PreviewCallback {
 	
 	//private static final String LOG_TAG = GridSurfaceView.class.getSimpleName();
 	
@@ -191,6 +192,11 @@ public class GridSurfaceView extends SurfaceView {
 		
 		// FPS
 		drawFps(canvas);
+	}
+	
+	@Override
+	public void onPreviewFrame(byte[] data, Camera camera) {
+		this.invalidate();
 	}
 	
 }

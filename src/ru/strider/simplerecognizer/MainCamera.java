@@ -552,16 +552,18 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 	public static String getOptimalFocusMode(List<String> listFocusMode) {
 		String optimalFocusMode = null;
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			if (listFocusMode.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
-				optimalFocusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
+		if (listFocusMode != null) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+				if (listFocusMode.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+					optimalFocusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE;
+				}
 			}
-		}
-		
-		if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-				|| (optimalFocusMode == null)) {
-			if (listFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-				optimalFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
+			
+			if ((Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+					|| (optimalFocusMode == null)) {
+				if (listFocusMode.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+					optimalFocusMode = Camera.Parameters.FOCUS_MODE_AUTO;
+				}
 			}
 		}
 		
