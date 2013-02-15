@@ -36,6 +36,7 @@ import java.util.List;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.view.Window;
 
 import ru.strider.adapter.BaseArrayAdapter;
@@ -130,8 +131,15 @@ public class ManagePHash extends BaseListActivity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.setGroupEnabled(R.id.managePHashMenuContent, (!mIsLock));
-		menu.setGroupEnabled(R.id.managePHashMenuControls, (!mIsLock));
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			menu.setGroupEnabled(R.id.managePHashMenuContent, (!mIsLock));
+			menu.setGroupEnabled(R.id.managePHashMenuControls, (!mIsLock));
+		} else {
+			SubMenu action = menu.findItem(R.id.mainActionOverflow).getSubMenu();
+			
+			action.setGroupEnabled(R.id.managePHashMenuContent, (!mIsLock));
+			action.setGroupEnabled(R.id.managePHashMenuControls, (!mIsLock));
+		}
 		
 		boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
 		

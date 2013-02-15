@@ -47,13 +47,13 @@ public class SimpleRecognizer extends Application {
 	
 	private static final String LOG_TAG = SimpleRecognizer.class.getSimpleName();
 	
-	public static final String APP_KEY = "N/A";//FIXME: ADD KEY FOR DEPLOYMENT
+	public static final String APP_KEY = "N/A"; // FIXME: ADD KEY FOR DEPLOYMENT
 	
 	private static final String LOG_DEBUG = "[ DEBUG ] ";
 	
 	public static MediaReceiver mediaReceiver = null;
 	
-	private Locale mLocale = null;
+	public Locale mLocale = null;
 	
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -61,15 +61,17 @@ public class SimpleRecognizer extends Application {
 		
 		super.onConfigurationChanged(newConfig);
 		
-		if (mLocale != null) { // FIXME: BAD SOLUTION
+		// FIXME: VERY BAD APPROACH
+		/*if (mLocale != null) {
 			Locale.setDefault(mLocale);
 			
 			newConfig.locale = mLocale;
 			
 			Resources res = this.getResources();
 			
-			res.updateConfiguration(newConfig, res.getDisplayMetrics());
-		}
+			res.updateConfiguration(newConfig, res.getDisplayMetrics()); // Infinite loop...
+		}*/
+		//
 	}
 	
 	@Override
@@ -100,7 +102,8 @@ public class SimpleRecognizer extends Application {
 		
 		mediaReceiver = new MediaReceiver();
 		
-		Resources res = this.getResources(); // FIXME: BAD SOLUTION
+		// FIXME: VERY BAD APPROACH
+		Resources res = this.getResources();
 		
 		Configuration config = res.getConfiguration();
 		
@@ -116,6 +119,7 @@ public class SimpleRecognizer extends Application {
 			
 			res.updateConfiguration(config, res.getDisplayMetrics());
 		}
+		//
 	}
 	
 	@Override

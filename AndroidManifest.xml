@@ -8,7 +8,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="ru.strider.simplerecognizer"
 		  android:versionCode="1"
-		  android:versionName="0.9.1"
+		  android:versionName="0.9.2"
 		  android:installLocation="auto">
 	
 	<uses-sdk android:minSdkVersion="5"
@@ -79,7 +79,7 @@
 		<!-- ABOUT -->
 		<activity android:name=".About"
 				  android:label="@string/about_name"
-				  android:configChanges="keyboardHidden|orientation"
+				  android:configChanges="orientation|keyboardHidden"
 				  android:screenOrientation="sensorPortrait" />
 		
 	</application>

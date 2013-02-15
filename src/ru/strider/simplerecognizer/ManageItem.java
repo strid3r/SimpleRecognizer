@@ -39,6 +39,7 @@ import java.util.List;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.view.Window;
 
 import ru.strider.adapter.BaseArrayAdapter;
@@ -129,8 +130,15 @@ public class ManageItem extends BaseListActivity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.setGroupEnabled(R.id.manageItemMenuContent, (!mIsLock));
-		menu.setGroupEnabled(R.id.manageItemMenuControls, (!mIsLock));
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			menu.setGroupEnabled(R.id.manageItemMenuContent, (!mIsLock));
+			menu.setGroupEnabled(R.id.manageItemMenuControls, (!mIsLock));
+		} else {
+			SubMenu action = menu.findItem(R.id.mainActionOverflow).getSubMenu();
+			
+			action.setGroupEnabled(R.id.manageItemMenuContent, (!mIsLock));
+			action.setGroupEnabled(R.id.manageItemMenuControls, (!mIsLock));
+		}
 		
 		return true;
 	}
@@ -246,7 +254,7 @@ public class ManageItem extends BaseListActivity {
 				textViewTitle.setSelected(true);
 				
 				EditText editTextContent = (EditText) viewContent.findViewById(R.id.editTextContent);
-				editTextContent.setText(Html.fromHtml(item.getContent()));
+				editTextContent.setText(Html.fromHtml(item.getContent().replace(Text.LF, Text.BR)));
 				editTextContent.setEnabled(false);
 				
 				EditText editTextVideoUri = (EditText) viewContent.findViewById(R.id.editTextVideoUri);

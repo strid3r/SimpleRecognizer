@@ -94,7 +94,7 @@
 	<!-- SUMMATY -->
 	<string name="prefs_summary_localization_language">
 		Язык текущей Локализации
-		\n(требуется перезапуска Приложения)
+		\n(требуется перезапуск Приложения)
 	</string>
 	
 	<string name="prefs_summary_display_is_keep_screen_on">

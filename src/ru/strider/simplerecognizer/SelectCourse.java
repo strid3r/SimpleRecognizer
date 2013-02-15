@@ -39,6 +39,7 @@ import cloud4apps.Utils;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.view.Window;
 
 import ru.strider.app.BaseExpandableListActivity;
@@ -133,7 +134,14 @@ public class SelectCourse extends BaseExpandableListActivity {
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.setGroupEnabled(R.id.selectCourseMenuContent, (!mIsLock));
-		menu.setGroupEnabled(R.id.selectCourseMenuControls, (!mIsLock));
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			menu.setGroupEnabled(R.id.selectCourseMenuControls, (!mIsLock));
+		} else {
+			SubMenu action = menu.findItem(R.id.mainActionOverflow).getSubMenu();
+			
+			action.setGroupEnabled(R.id.selectCourseMenuControls, (!mIsLock));
+		}
 		
 		menu.findItem(R.id.selectCourseMenuSwitchMode).setTitle(mConfigAdapter.getIsCreator()
 				? R.string.select_course_menu_switch_mode_viewer

@@ -35,55 +35,19 @@ public class ImagePHash {
 	
 	public static final int HAMMING_DISTANCE_THRESHOLD = 15;
 	
-	private static double[] sCoeff = null;
-	
-	private static int sSize = DCT_SIZE;
-	private static int sLowSize = DCT_LOW_SIZE;
+	private static int sDctSize = DCT_SIZE;
+	private static int sDctLowSize = DCT_LOW_SIZE;
 	
 	static {
-		initCoefficients();
+		System.loadLibrary(ImagePHash.class.getSimpleName());
 	}
 	
 	public static synchronized void setDCTSize(int size, int lowSize) {
-		sSize = size;
-		sLowSize = lowSize;
-		
-		initCoefficients();
+		sDctSize = size;
+		sDctLowSize = lowSize;
 	}
 	
-	private static void initCoefficients() {
-		sCoeff = new double[sSize];
-		
-		for (int i = 1; i < sSize; i++) {
-			sCoeff[i] = 1.0;
-		}
-		
-		sCoeff[0] = 1.0 / Math.sqrt(2.0);
-	}
-	
-	private static double[][] applyDCT(double[][] in) {
-		double[][] DCT = new double[sSize][sSize];
-		
-		for (int u = 0; u < sSize; u++) {
-			for (int v = 0; v < sSize; v++) {
-				double sum = 0.0;
-				
-				for (int i = 0; i < sSize; i++) {
-					for (int j = 0; j < sSize; j++) {
-						sum += in[i][j]
-								* Math.cos((2 * i + 1) / (2.0 * sSize) * u * Math.PI)
-								* Math.cos((2 * j + 1) / (2.0 * sSize) * v * Math.PI);
-					}
-				}
-				
-				sum *= sCoeff[u] * sCoeff[v] / 4.0;
-				
-				DCT[u][v] = sum;
-			}
-		}
-		
-		return DCT;
-	}
+	private static native double[][] nativeApplyDCT(double[][] in);
 	
 	/**
 	 * Returns Hex String of a "binary string" (like, 001010111011100010),
@@ -93,7 +57,7 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public static String getPHash(String pathName) {
-		return getPHash(Image.decodeSampledBitmap(pathName, sSize, sSize));
+		return getPHash(Image.decodeSampledBitmap(pathName, sDctSize, sDctSize));
 	}
 	
 	/**
@@ -104,7 +68,7 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public static String getPHash(InputStream is) {
-		return getPHash(Image.decodeSampledBitmap(is, sSize, sSize));
+		return getPHash(Image.decodeSampledBitmap(is, sDctSize, sDctSize));
 	}
 	
 	/**
@@ -115,7 +79,7 @@ public class ImagePHash {
 	 *         or null if the image data could not be decoded.
 	 */
 	public static String getPHash(byte[] data) {
-		return getPHash(Image.decodeSampledBitmap(data, sSize, sSize));
+		return getPHash(Image.decodeSampledBitmap(data, sDctSize, sDctSize));
 	}
 	
 	/**
@@ -137,7 +101,7 @@ public class ImagePHash {
 		 * This is really done to simplify the DCT computation and not
 		 * because it is needed to reduce the high frequencies.
 		 */
-		Bitmap scaledBitmap = Bitmap.createScaledBitmap(image, sSize, sSize, true);
+		Bitmap scaledBitmap = Bitmap.createScaledBitmap(image, sDctSize, sDctSize, true);
 		
 		if (scaledBitmap != image) {
 			image.recycle();
@@ -156,7 +120,7 @@ public class ImagePHash {
 		
 		image = grayscale;
 		
-		double[][] blue = new double[sSize][sSize];
+		double[][] blue = new double[sDctSize][sDctSize];
 		
 		for (int i = 0; i < image.getWidth(); i++) {
 			for (int j = 0; j < image.getHeight(); j++) {
@@ -178,7 +142,7 @@ public class ImagePHash {
 			initTime = SystemClock.elapsedRealtime();
 		}
 		
-		double[][] dctValue = applyDCT(blue);
+		double[][] dctValue = nativeApplyDCT(blue);
 		
 		if(BuildConfig.DEBUG) {
 			Log.d(LOG_TAG, "Time DCT: "
@@ -200,15 +164,15 @@ public class ImagePHash {
 		 */
 		double dctTotal = 0;
 		
-		for (int i = 0; i < sLowSize; i++) {
-			for (int j = 0; j < sLowSize; j++) {
+		for (int i = 0; i < sDctLowSize; i++) {
+			for (int j = 0; j < sDctLowSize; j++) {
 				dctTotal += dctValue[i][j];
 			}
 		}
 		
 		dctTotal -= dctValue[0][0];
 		
-		double dctAverage = dctTotal / (double) ((sLowSize * sLowSize) - 1);
+		double dctAverage = dctTotal / (double) ((sDctLowSize * sDctLowSize) - 1);
 		
 		/* 6. Further reduce the DCT.
 		 * 
@@ -223,8 +187,8 @@ public class ImagePHash {
 		 */
 		StringBuilder pHash = new StringBuilder();
 		
-		for (int i = 0; i < sLowSize; i++) {
-			for (int j = 0; j < sLowSize; j++) {
+		for (int i = 0; i < sDctLowSize; i++) {
+			for (int j = 0; j < sDctLowSize; j++) {
 				if ((i != 0) && (j != 0)) {
 					pHash.append((dctValue[i][j] > dctAverage) ? 1 : 0);
 				}

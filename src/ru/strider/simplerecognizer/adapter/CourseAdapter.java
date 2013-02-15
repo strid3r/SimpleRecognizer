@@ -127,6 +127,10 @@ public class CourseAdapter extends BaseExpandableListAdapter
 		return mListGroup.size();
 	}
 	
+	public int indexOfGroup(Object object) {
+		return mListGroup.indexOf(object);
+	}
+	
 	@Override
 	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 		View view = convertView;
@@ -202,6 +206,10 @@ public class CourseAdapter extends BaseExpandableListAdapter
 	@Override
 	public int getChildrenCount(int groupPosition) {
 		return mListChild.get(groupPosition).size();
+	}
+	
+	public int indexOfChild(Object object) {
+		return mListChild.indexOf(object);
 	}
 	
 	@Override

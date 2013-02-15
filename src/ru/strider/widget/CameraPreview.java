@@ -123,6 +123,8 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 				mCamera.startPreview();
 			} catch (IOException e) {
 				Log.e(LOG_TAG, "setPreviewDisplay(...) >> " + e.toString());
+				
+				releaseCamera();
 			}
 		}
 	}
@@ -163,6 +165,8 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 				//mCamera.startPreview();
 			} catch (IOException e) {
 				Log.e(LOG_TAG, "setPreviewDisplay(...) >> " + e.toString());
+				
+				releaseCamera();
 			}
 			
 			setPreviewSize();
@@ -192,6 +196,8 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 				mCamera.startPreview();
 			} catch (IOException e) {
 				Log.e(LOG_TAG, "setPreviewDisplay(...)" + e.toString());
+				
+				releaseCamera();
 			}
 		}
 	}
@@ -202,10 +208,15 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		
 		mIsSurfaceAlive = false;
 		
+		if (mCamera != null) {
+			try {
+				mCamera.stopPreview();
+			} catch (Exception e) {
+				//
+			}
+		}
+		
 		// Take care of releasing the Camera preview in activity.
-		/*if (mCamera != null) {
-			//mCamera.stopPreview();
-		}*/
 	}
 	
 	@Override

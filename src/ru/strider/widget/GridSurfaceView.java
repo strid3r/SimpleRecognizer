@@ -73,8 +73,6 @@ public class GridSurfaceView extends SurfaceView implements Camera.PreviewCallba
 		
 		mPaintFps = new Paint();
 		mPaintFps.setTextSize(32.0f);
-		//mPaintFps.setStyle(Paint.Style.STROKE); // FIXME: TEST TEXT STYLE
-		//mPaintFps.setStrokeWidth(2.0f);
 		mPaintFps.setColor(this.getResources().getColor(R.color.blue_dodger));
 		
 		if (attrs != null) {

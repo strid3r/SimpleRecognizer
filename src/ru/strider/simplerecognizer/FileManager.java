@@ -56,6 +56,8 @@ public class FileManager extends BaseListActivity {
 	public static final int FILE_TYPE_COURSE = 10;
 	public static final int FILE_TYPE_IMAGE = 100;
 	
+	private static final String KEY_SUB_DIR = "subDir";
+	
 	private static final String PARENT_DIR = ".." + File.separator;
 	
 	private int mMode = MODE_INVALID;
@@ -71,6 +73,8 @@ public class FileManager extends BaseListActivity {
 	private ListView mView = null;
 	
 	private FilenameFilter mFilenameFilter = null;
+	
+	private int mSubDir = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +117,8 @@ public class FileManager extends BaseListActivity {
 					mFile = new File(file);
 				}
 			}
+			
+			mSubDir = savedInstanceState.getInt(KEY_SUB_DIR, 0);
 		}
 		
 		doInit();
@@ -136,6 +142,8 @@ public class FileManager extends BaseListActivity {
 				outState.putString(KEY_FILE, mFile.getPath());
 			}
 		}
+		
+		outState.putInt(KEY_SUB_DIR, mSubDir);
 	}
 	
 	@Override
@@ -330,12 +338,24 @@ public class FileManager extends BaseListActivity {
 		useConfigValues();
 	}
 	
+	private void initView(File dir) {
+		mDirectory = dir;
+		
+		initView();
+	}
+	
 	private void useConfigValues() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
 		
 		//mConfigAdapter.getValues();
 		
 		if (mMode == MODE_FILE) {
+			int position = mView.getCheckedItemPosition();
+			
+			if (position != AdapterView.INVALID_POSITION) {
+				mView.setItemChecked(position, false);
+			}
+			
 			if (mFile != null) {
 				mView.setItemChecked(getFilePosition(), true);
 			}
@@ -344,11 +364,13 @@ public class FileManager extends BaseListActivity {
 	
 	private int getFilePosition() {
 		// Parent Directory
-		if (!mFile.getPath().startsWith(mDirectory.getPath())) {
-			for (int i = 0; i < mAdapter.getCount(); i++) {
-				if (mAdapter.getItem(i).equals(mDirectory.getParentFile())) {
-					return i;
-				}
+		int parentPosition = AdapterView.INVALID_POSITION;
+		
+		if (mDirectory.getParentFile() != null) {
+			parentPosition = mAdapter.indexOf(mDirectory.getParentFile());
+			
+			if (!mFile.getPath().startsWith(mDirectory.getPath())) {
+				return parentPosition;
 			}
 		}
 		
@@ -364,7 +386,8 @@ public class FileManager extends BaseListActivity {
 		}
 		
 		// Sub Directory
-		for (int i = 0; i < mAdapter.getCount(); i++) {
+		for (int i = ((parentPosition == AdapterView.INVALID_POSITION)
+				? 0 : 1); i < mAdapter.getCount(); i++) {
 			File file = mAdapter.getItem(i);
 			
 			if (file.isDirectory() && mFile.getPath().startsWith(file.getPath())) {
@@ -411,9 +434,13 @@ public class FileManager extends BaseListActivity {
 		
 		if (file.exists() && file.canRead()) {
 			if (file.isDirectory()) {
-				mDirectory = file;
+				if (!file.equals(mDirectory.getParentFile())) {
+					mSubDir++;
+				} else {
+					mSubDir--;
+				}
 				
-				initView();
+				initView(file);
 			} else if (file.isFile()) {
 				if (mMode == MODE_FILE) {
 					listView.setItemChecked(position, true);
@@ -446,10 +473,10 @@ public class FileManager extends BaseListActivity {
 	public void onBackPressed() {
 		File parentDir = mDirectory.getParentFile();
 		
-		if (parentDir != null) {
-			mDirectory = parentDir;
+		if ((mSubDir > 0) && (parentDir != null)) {
+			mSubDir--;
 			
-			initView();
+			initView(parentDir);
 		} else {
 			super.onBackPressed();
 		}

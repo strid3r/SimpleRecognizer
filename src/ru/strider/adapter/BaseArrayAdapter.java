@@ -13,6 +13,7 @@ import android.content.Context;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import java.util.Collection;
@@ -58,6 +59,16 @@ public class BaseArrayAdapter<T> extends ArrayAdapter<T> {
 				this.add(object);
 			}
 		}
+	}
+	
+	public int indexOf(T object) {
+		for (int i = 0; i < this.getCount(); i++) {
+			if (this.getItem(i).equals(object)) {
+				return i;
+			}
+		}
+		
+		return AdapterView.INVALID_POSITION;
 	}
 	
 	@Override

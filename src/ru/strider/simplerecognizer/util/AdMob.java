@@ -46,7 +46,7 @@ public class AdMob {
 	
 	private static final String LOG_TAG = AdMob.class.getSimpleName();
 	
-	private static final String VERSION_KEY_NO_ADS = "8-4-4-4-12";//FIXME: ADD KEY FOR DEPLOYMENT
+	private static final String VERSION_KEY_NO_ADS = "8-4-4-4-12"; // FIXME: ADD KEY FOR DEPLOYMENT
 	
 	private static final String AD_FREE_PACKAGE = "com.bigtincan.android.adfree";
 	
@@ -57,7 +57,7 @@ public class AdMob {
 	private static final String EMULATOR_INTEL_ATOM_X86_4_0_3 = "6501C509CD383EC804D00651B5FB19DB";
 	private static final String EMULATOR_INTEL_ATOM_X86_4_1 = "C261CBC76429066573F07F9A8F91B5B6";
 	private static final String EMULATOR_INTEL_ATOM_X86_4_2 = "B1072D981E85BAA5510BF710213E0DFC";
-	private static final String DEVICE_SAMSUNG_GALAXY_S = "16DA42D4FB93A1B2C4682497878B3C12";
+	private static final String DEVICE_SAMSUNG_GALAXY_S = "4BB4DFC11C5713B996D16683EA0A0831";
 	private static final String DEVICE_HTC_DESIRE = "BBA022EC80EAA9F63042D98D032734E1";
 	
 	private AdMob() {
