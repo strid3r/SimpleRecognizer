@@ -21,7 +21,7 @@ import ru.strider.util.Text;
  * 
  * @author strider
  */
-public class Item implements Parcelable {
+public class Item implements Comparable<Item>, Parcelable {
 	
 	//private static final String LOG_TAG = Item.class.getSimpleName();
 	
@@ -196,6 +196,20 @@ public class Item implements Parcelable {
 		}
 		
 		return sb.toString();
+	}
+	
+	@Override
+	public int compareTo(Item item) {
+		// CourseId
+		int cmpCourseId = ((mCourseId < item.mCourseId) ? -1
+				: ((mCourseId == item.mCourseId) ? 0 : 1));
+		
+		if (cmpCourseId != 0) {
+			return cmpCourseId;
+		} else {
+			// Title
+			return mTitle.compareTo(item.mTitle);
+		}
 	}
 	
 	@Override

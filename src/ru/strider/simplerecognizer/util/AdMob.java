@@ -8,19 +8,25 @@
 
 package ru.strider.simplerecognizer.util;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
-import android.os.Process;
+import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 import org.json.JSONException;
 
@@ -32,6 +38,7 @@ import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
+import ru.strider.app.BaseDialogFragment;
 import ru.strider.simplerecognizer.R;
 import ru.strider.simplerecognizer.SimpleRecognizer;
 import ru.strider.util.BuildConfig;
@@ -48,7 +55,8 @@ public class AdMob {
 	
 	private static final String VERSION_KEY_NO_ADS = "8-4-4-4-12"; // FIXME: ADD KEY FOR DEPLOYMENT
 	
-	private static final String AD_FREE_PACKAGE = "com.bigtincan.android.adfree";
+	private static final String AD_FREE_PACKAGE_OLD = "com.bigtincan.android.adfree";
+	private static final String AD_FREE_PACKAGE = "com.bigtincan.adfree";
 	
 	private static final String HOSTS_PATH = "/etc/hosts";
 	
@@ -58,12 +66,20 @@ public class AdMob {
 	private static final String EMULATOR_INTEL_ATOM_X86_4_1 = "C261CBC76429066573F07F9A8F91B5B6";
 	private static final String EMULATOR_INTEL_ATOM_X86_4_2 = "B1072D981E85BAA5510BF710213E0DFC";
 	private static final String DEVICE_SAMSUNG_GALAXY_S = "4BB4DFC11C5713B996D16683EA0A0831";
-	private static final String DEVICE_HTC_DESIRE = "BBA022EC80EAA9F63042D98D032734E1";
+	private static final String DEVICE_HTC_DESIRE = "C41B592FE5EE6EEBD69918FDDF75BDA2";
+	
+	public static volatile int pendingLic = 0;
+	
+	private static volatile boolean sIsAsyncLic = true;
+	
+	private static volatile boolean sIsFree = true;
 	
 	private AdMob() {
-		//
+		throw (new AssertionError());
 	}
 	
+	@SuppressWarnings("deprecation")
+	@SuppressLint("InlinedApi")
 	public static void addAdView(Activity activity) {
 		if (!activity.isFinishing()) {
 			LinearLayout linearLayout = (LinearLayout) activity.findViewById(R.id.linearLayoutAdView);
@@ -76,10 +92,13 @@ public class AdMob {
 					
 					adView.setId(R.id.adView);
 					
-					linearLayout.addView(adView, new LinearLayout.LayoutParams(
-							LinearLayout.LayoutParams.MATCH_PARENT,
+					linearLayout.addView(adView, (new LinearLayout.LayoutParams(
+							((Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
+									? LinearLayout.LayoutParams.FILL_PARENT
+									: LinearLayout.LayoutParams.MATCH_PARENT
+								),
 							LinearLayout.LayoutParams.WRAP_CONTENT
-						));
+						)));
 				}
 				
 				adView.loadAd(getAdRequest());
@@ -128,70 +147,157 @@ public class AdMob {
 		return adRequest;
 	}
 	
-	public static void purchaseLisenceAsync(Context context) {
-		(new AsyncLicensePurchase(context)).execute();
+	public static boolean isAsyncLic() {
+		return sIsAsyncLic;
 	}
 	
-	public static void initLisenceAsync(Activity activity) {
-		initLisenceAsync(activity, false);
+	public static boolean isFree() {
+		return sIsFree;
 	}
 	
-	public static void initLisenceAsync(Activity activity, boolean isCheckAdFreePackage) {
-		(new AsyncInitLicense(activity, isCheckAdFreePackage)).execute();
+	public static void initLicense(Activity activity) {
+		if (sIsFree) {
+			addAdView(activity);
+		} else {
+			removeAdView(activity);
+			
+			destroyAdView(activity);
+		}
 	}
 	
-	private static void checkAdFreePackage(final Activity activity) {
-		final Context context = (Context) activity;
+	public static void purchaseLisenceAsync() {
+		(new AsyncLicensePurchase()).execute();
+	}
+	
+	public static void checkLisenceAsync() {
+		(new AsyncCheckLicense()).execute();
+	}
+	
+	public static boolean checkAdFreePackage() {
+		boolean isHazard = false;
+		
+		ApplicationInfo info = null;
 		
 		try {
-			ApplicationInfo info = context.getPackageManager().getApplicationInfo(AD_FREE_PACKAGE, 0);
-			
+			info = SimpleRecognizer.getPackageContext().getPackageManager()
+					.getApplicationInfo(AD_FREE_PACKAGE_OLD, 0);
+		} catch (NameNotFoundException e) {
+			try {
+				info = SimpleRecognizer.getPackageContext().getPackageManager()
+						.getApplicationInfo(AD_FREE_PACKAGE, 0);
+			} catch (NameNotFoundException ex) {
+				SimpleRecognizer.logIfDebug(
+						Log.WARN,
+						LOG_TAG,
+						("AdFree Package" + Text.SEPARATOR + "Not Found")
+					);
+			}
+		}
+		
+		if (info != null) {
 			File hostsFile = new File(HOSTS_PATH);
 			
 			if (hostsFile.exists() && (hostsFile.length() > (1024L * 1024L / 2L))) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(context.getString(R.string.dialog_ad_free_found)).append(Text.LF);
-				sb.append(info.packageName).append(Text.LF);
-				sb.append("( ").append(HOSTS_PATH).append(Text.SEPARATOR)
-						.append(hostsFile.length() / 1024L).append(" KB )");
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle(R.string.app_name);
-				builder.setMessage(sb.toString());
-				builder.setCancelable(false);
-				
-				builder.setNegativeButton(R.string.dialog_button_buy_license, new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							new AsyncLicensePurchase(context).execute();
-						}
-						
-					});
-				
-				builder.setPositiveButton(R.string.dialog_button_exit, new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Log.i(LOG_TAG, "Exiting Application...");
-							
-							activity.finish();
-							
-							Process.killProcess(Process.myPid());
-						}
-						
-					});
-				
-				AlertDialog alert = builder.create();
-				alert.setCanceledOnTouchOutside(false);
-				alert.show();
-			} else {
-				SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "AdFree Package :: Found >> "
-						+ HOSTS_PATH + " :: (Size < ThresholdValue) || NULL");
+				isHazard = true;
 			}
-		} catch (NameNotFoundException e) {
-			SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "AdFree Package :: Not Found");
+			
+			SimpleRecognizer.logIfDebug(
+					Log.WARN,
+					LOG_TAG,
+					("AdFree Package" + Text.SEPARATOR + (isHazard ? "Found" : "Disabled"))
+				);
 		}
+		
+		return isHazard;
+	}
+	
+	/**
+	 * BaseDialogFragment AdMobDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class AdMobDialog extends BaseDialogFragment {
+		
+		//private static final String LOG_TAG = AdMobDialog.class.getSimpleName();
+		
+		public static final String KEY = AdMobDialog.class.getSimpleName();
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		public static AdMobDialog newInstance() {
+			AdMobDialog fragment = new AdMobDialog();
+			
+			Bundle args = new Bundle();
+			
+			fragment.setArguments(args);
+			fragment.setCancelable(false);
+			
+			return fragment;
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_ad_free, null);
+			
+			this.setNegativeButton((Button) mView.findViewById(R.id.buttonAlertDialogBuyLicense));
+			this.setPositiveButton((Button) mView.findViewById(R.id.buttonAlertDialogExit));
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText(R.string.app_name);
+			textViewTitle.setSelected(true);
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+		}
+		
+		@Override
+		public void onNegativeClick(View view) {
+			if (SimpleRecognizer.isNetworkAvailable()) {
+				purchaseLisenceAsync();
+				
+				super.onNegativeClick(view);
+			} else {
+				SimpleRecognizer.makeToast(R.string.error_no_network, Toast.LENGTH_SHORT).show();
+			}
+		}
+		/*//TODO: TEST NEUTRAL BUTTON -> Manage Apps
+		@Override
+		public void onNeutralClick(View view) {
+			super.onNeutralClick(view);
+			
+			Intent intent = new Intent();
+			intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+			Uri uri = Uri.fromParts("package", "com.test.test", null);
+			intent.setData(uri);
+			startActivity(intent);
+		}
+		*/
+		@Override
+		public void onPositiveClick(View view) {
+			super.onPositiveClick(view);
+			
+			SimpleRecognizer.exit(this.getSherlockActivity());
+		}
+		
 	}
 	
 	/**
@@ -203,20 +309,14 @@ public class AdMob {
 		
 		private static final String LOG_TAG = AsyncLicensePurchase.class.getSimpleName();
 		
-		private Context mContext = null;
-		
-		public AsyncLicensePurchase(Context context) {
-			mContext = context.getApplicationContext();
-		}
-		
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
 				LicenseServices.Purchase(
-						mContext,
+						SimpleRecognizer.getPackageContext(),
 						SimpleRecognizer.APP_KEY,
-						Utils.GetClientId(mContext),
-						Utils.GetEmail(mContext)
+						Utils.GetClientId(SimpleRecognizer.getPackageContext()),
+						Utils.GetEmail(SimpleRecognizer.getPackageContext())
 					);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, "doInBackground() >> " + e.toString());
@@ -228,40 +328,28 @@ public class AdMob {
 	}
 	
 	/**
-	 * AsyncTask AsyncInitLicense<Void, Void, LicenseInfo> Class.
+	 * AsyncTask AsyncCheckLicense<Void, Void, Void> Class.
 	 * 
 	 * @author strider
 	 */
-	private static class AsyncInitLicense extends AsyncTask<Void, Void, LicenseInfo> {
+	private static class AsyncCheckLicense extends AsyncTask<Void, Void, Void> {
 		
-		private static final String LOG_TAG = AsyncInitLicense.class.getSimpleName();
-		
-		private WeakReference<Activity> mWeakActivity = null;
-		
-		private boolean mIsCheckAdFreePackage = false;
-		
-		public AsyncInitLicense(Activity activity, boolean isCheckAdFreePackage) {
-			mWeakActivity = new WeakReference<Activity>(activity);
-			
-			mIsCheckAdFreePackage = isCheckAdFreePackage;
-		}
+		private static final String LOG_TAG = AsyncCheckLicense.class.getSimpleName();
 		
 		@Override
-		protected LicenseInfo doInBackground(Void... params) {
-			LicenseInfo lic = null;
+		protected Void doInBackground(Void... params) {
+			pendingLic++;
 			
-			Activity activity = mWeakActivity.get();
-			
-			if (activity != null) {
-				Context context = ((Context) activity).getApplicationContext();
+			synchronized (AsyncCheckLicense.class) {
+				sIsAsyncLic = true;
 				
-				activity = null;
+				LicenseInfo lic = null;
 				
 				try {
 					lic = LicenseInfo.GetActiveLicense(
-							context,
+							SimpleRecognizer.getPackageContext(),
 							SimpleRecognizer.APP_KEY,
-							Utils.GetClientId(context)
+							Utils.GetClientId(SimpleRecognizer.getPackageContext())
 						);
 				} catch (JSONException e) {
 					Log.e(LOG_TAG, "Error getting active License");
@@ -269,34 +357,31 @@ public class AdMob {
 				} catch (Exception e) {
 					Log.e(LOG_TAG, "doInBackground() >> " + e.toString());
 				}
-			}
-			
-			return lic;
-		}
-		
-		@Override
-		protected void onPostExecute(LicenseInfo lic) {
-			Activity activity = mWeakActivity.get();
-			
-			if (activity != null) {
+				
 				if ((lic != null)
 						&& lic.VersionKey.contentEquals(VERSION_KEY_NO_ADS)
 						&& lic.IsActive) {
-					SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "License :: " + lic.VersionName);
+					sIsFree = false;
 					
-					removeAdView(activity);
-					
-					destroyAdView(activity);
+					SimpleRecognizer.logIfDebug(
+							Log.WARN,
+							LOG_TAG,
+							("License" + Text.SEPARATOR + lic.VersionName)
+						);
 				} else {
-					SimpleRecognizer.logIfDebug(Log.WARN, LOG_TAG, "License :: Free");
+					sIsFree = true;
 					
-					addAdView(activity);
-					
-					if (mIsCheckAdFreePackage) {
-						checkAdFreePackage(activity);
-					}
+					SimpleRecognizer.logIfDebug(
+							Log.WARN,
+							LOG_TAG,
+							("License" + Text.SEPARATOR + "Free")
+						);
 				}
+				
+				sIsAsyncLic = false;
 			}
+			
+			return null;
 		}
 		
 	}

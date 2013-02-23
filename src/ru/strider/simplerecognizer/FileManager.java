@@ -8,8 +8,10 @@
 
 package ru.strider.simplerecognizer;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -150,9 +152,7 @@ public class FileManager extends BaseListActivity {
 	protected void onPause() {
 		super.onPause();
 		
-		mConfigAdapter.setDirectory(mDirectory.getPath());
-		
-		mConfigAdapter.setValues();
+		mConfigAdapter.setDirectory(mDirectory.getPath()).setValues();
 	}
 	
 	@Override
@@ -171,7 +171,7 @@ public class FileManager extends BaseListActivity {
 	}
 	
 	private void doInit() {
-		mConfigAdapter = ConfigAdapter.getInstance(this, true);
+		mConfigAdapter = ConfigAdapter.getInstance().getValues();
 		
 		if (mDirectory == null) {
 			File file = new File(mConfigAdapter.getDirectory());
@@ -480,6 +480,39 @@ public class FileManager extends BaseListActivity {
 		} else {
 			super.onBackPressed();
 		}
+	}
+	
+	private static Intent requestPickDirectory() {
+		Intent iFileManager = new Intent(SimpleRecognizer.getPackageContext(), FileManager.class);
+		iFileManager.putExtra(KEY_MODE, MODE_DIRECTORY);
+		iFileManager.putExtra(KEY_REQUEST_CODE, REQUEST_DIRECTORY);
+		
+		return iFileManager;
+	}
+	
+	private static Intent requestPickFile(int fileType) {
+		Intent iFileManager = new Intent(SimpleRecognizer.getPackageContext(), FileManager.class);
+		iFileManager.putExtra(KEY_MODE, MODE_FILE);
+		iFileManager.putExtra(KEY_FILE_TYPE, fileType);
+		iFileManager.putExtra(KEY_REQUEST_CODE, REQUEST_FILE);
+		
+		return iFileManager;
+	}
+	
+	public static void requestPickDirectory(Activity activity) {
+		activity.startActivityForResult(requestPickDirectory(), REQUEST_DIRECTORY);
+	}
+	
+	public static void requestPickDirectory(Fragment fragment) {
+		fragment.startActivityForResult(requestPickDirectory(), REQUEST_DIRECTORY);
+	}
+	
+	public static void requestPickFile(Activity activity, int fileType) {
+		activity.startActivityForResult(requestPickFile(fileType), REQUEST_FILE);
+	}
+	
+	public static void requestPickFile(Fragment fragment, int fileType) {
+		fragment.startActivityForResult(requestPickFile(fileType), REQUEST_FILE);
 	}
 	
 }

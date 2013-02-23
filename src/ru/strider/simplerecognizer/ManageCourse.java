@@ -2,14 +2,13 @@
  * Copyright (C) 2012-2013 strider
  * 
  * Simple Recognizer
- * BaseExpandableListActivity SelectCourse Class
+ * BaseFragmentActivity ManageCourse Class
  * By © strider 2012-2013.
  */
 
 package ru.strider.simplerecognizer;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -42,22 +41,25 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.view.Window;
 
-import ru.strider.app.BaseExpandableListActivity;
+import ru.strider.app.BaseFragmentActivity;
 import ru.strider.simplerecognizer.adapter.CourseAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.util.BuildConfig;
 import ru.strider.util.Text;
+import ru.strider.view.OnLockViewListener;
 
 /**
- * BaseExpandableListActivity SelectCourse Class.
+ * BaseFragmentActivity ManageCourse Class.
  * 
  * @author strider
  */
-public class SelectCourse extends BaseExpandableListActivity {
+public class ManageCourse extends BaseFragmentActivity implements OnLockViewListener,
+		ExpandableListView.OnChildClickListener,
+		ExpandableListView.OnGroupExpandListener, ExpandableListView.OnGroupCollapseListener {
 	
-	private static final String LOG_TAG = SelectCourse.class.getSimpleName();
+	private static final String LOG_TAG = ManageCourse.class.getSimpleName();
 	
 	private ConfigAdapter mConfigAdapter = null;
 	
@@ -80,6 +82,10 @@ public class SelectCourse extends BaseExpandableListActivity {
 		super.onCreate(savedInstanceState);
 		
 		doInit();
+		
+		if (savedInstanceState != null) {
+			mCourse = savedInstanceState.getParcelable(Course.KEY);
+		}
 	}
 	
 	@Override
@@ -88,16 +94,21 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		useConfigValues();
 		
-		SimpleRecognizer.mediaReceiver.startWatchingExternalStorage(this);
+		SimpleRecognizer.getMediaReceiver().startWatchingExternalStorage(this);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		outState.putParcelable(Course.KEY, mCourse);
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
 		
-		mConfigAdapter.setValues();
-		
-		SimpleRecognizer.mediaReceiver.stopWatchingExternalStorage(this);
+		SimpleRecognizer.getMediaReceiver().stopWatchingExternalStorage(this);
 	}
 	
 	@Override
@@ -122,7 +133,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = this.getSupportMenuInflater();
-		inflater.inflate(R.menu.select_course_menu, menu);
+		inflater.inflate(R.menu.manage_course_menu, menu);
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			mMainMenu = menu;
@@ -133,22 +144,22 @@ public class SelectCourse extends BaseExpandableListActivity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.setGroupEnabled(R.id.selectCourseMenuContent, (!mIsLock));
+		menu.setGroupEnabled(R.id.manageCourseMenuContent, (!mIsLock));
 		
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			menu.setGroupEnabled(R.id.selectCourseMenuControls, (!mIsLock));
+			menu.setGroupEnabled(R.id.manageCourseMenuControls, (!mIsLock));
 		} else {
 			SubMenu action = menu.findItem(R.id.mainActionOverflow).getSubMenu();
 			
-			action.setGroupEnabled(R.id.selectCourseMenuControls, (!mIsLock));
+			action.setGroupEnabled(R.id.manageCourseMenuControls, (!mIsLock));
 		}
 		
-		menu.findItem(R.id.selectCourseMenuSwitchMode).setTitle(mConfigAdapter.getIsCreator()
-				? R.string.select_course_menu_switch_mode_viewer
-				: R.string.select_course_menu_switch_mode_creator
+		menu.findItem(R.id.manageCourseMenuSwitchMode).setTitle(mConfigAdapter.getIsCreator()
+				? R.string.manage_course_menu_switch_mode_viewer
+				: R.string.manage_course_menu_switch_mode_creator
 			);
 		
-		menu.findItem(R.id.selectCourseMenuAddCourse)
+		menu.findItem(R.id.manageCourseMenuAddCourse)
 				.setEnabled((!mIsLock) && mConfigAdapter.getIsCreator());
 		
 		return true;
@@ -162,35 +173,32 @@ public class SelectCourse extends BaseExpandableListActivity {
 				
 				return true;
 			}
-			case (R.id.selectCourseMenuSwitchMode): {
+			case (R.id.manageCourseMenuSwitchMode): {
 				mConfigAdapter.setIsCreator(!mConfigAdapter.getIsCreator());
 				
 				this.setTitle(mConfigAdapter.getIsCreator()
-						? R.string.select_course_name_creator
-						: R.string.select_course_name_viewer
+						? R.string.manage_course_name_creator
+						: R.string.manage_course_name_viewer
 					);
 				
 				this.supportInvalidateOptionsMenu();
 				
 				return true;
 			}
-			case (R.id.selectCourseMenuImport): {
+			case (R.id.manageCourseMenuImport): {
 				mAsyncCourseImport = new AsyncCourseImport();
 				
-				Intent iPickFile = new Intent(this, FileManager.class);
-				iPickFile.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_FILE);
-				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_COURSE);
-				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
+				FileManager.requestPickFile(this, FileManager.FILE_TYPE_COURSE);
 				
 				return true;
 			}
-			case (R.id.selectCourseMenuAddCourse): {
+			case (R.id.manageCourseMenuAddCourse): {//TODO: Dialog
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				View viewContent = inflater.inflate(R.layout.alert_dialog_select_course_edit, null);
+				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_course_edit, null);
 				
 				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.select_course_menu_add_course);
+				textViewTitle.setText(R.string.manage_course_menu_add_course);
 				textViewTitle.setSelected(true);
 				
 				final EditText editTextTitle = (EditText) viewContent.findViewById(R.id.editTextTitle);
@@ -215,7 +223,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(SelectCourse.this);
+							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 							
 							dbAdapter.write();
 							
@@ -268,14 +276,14 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
 			//menu.setHeaderIcon(iconRes);
-			menu.setHeaderTitle(R.string.select_course_context_menu_header_title);
+			menu.setHeaderTitle(R.string.manage_course_context_menu_header_title);
 			
 			android.view.MenuInflater inflater = this.getMenuInflater();
-			inflater.inflate(R.menu.select_course_context_menu, menu);
+			inflater.inflate(R.menu.manage_course_context_menu, menu);
 			
-			menu.setGroupEnabled(R.id.selectCourseContextMenuContent, (!mIsLock));
+			menu.setGroupEnabled(R.id.manageCourseContextMenuContent, (!mIsLock));
 			menu.setGroupEnabled(
-					R.id.selectCourseContextMenuControls,
+					R.id.manageCourseContextMenuControls,
 					((!mIsLock) && mConfigAdapter.getIsCreator())
 				);
 			
@@ -284,16 +292,15 @@ public class SelectCourse extends BaseExpandableListActivity {
 				int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
 				
 				boolean isCreator = SimpleRecognizer.checkCourseCreator(
-						this,
 						((Course) mAdapter.getChild(groupPosition, childPosition)).getCreator()
 					);
 				
-				menu.findItem(R.id.selectCourseContextMenuEdit)
+				menu.findItem(R.id.manageCourseContextMenuEdit)
 						.setEnabled((!mIsLock) && isCreator)
 						.setVisible(isCreator);
 			}
 			
-			menu.findItem(R.id.selectCourseContextMenuDelete).setEnabled(!mIsLock);
+			menu.findItem(R.id.manageCourseContextMenuDelete).setEnabled(!mIsLock);
 		}
 	}
 	
@@ -310,19 +317,17 @@ public class SelectCourse extends BaseExpandableListActivity {
 			final Course course = (Course) mAdapter.getChild(groupPosition, childPosition);
 			
 			switch (item.getItemId()) {
-				case (R.id.selectCourseContextMenuExport): {
+				case (R.id.manageCourseContextMenuExport): {
 					mAsyncCourseExport = new AsyncCourseExport(initCourseData(course, true));
 					
-					Intent iPickDirectory = new Intent(this, FileManager.class);
-					iPickDirectory.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_DIRECTORY);
-					this.startActivityForResult(iPickDirectory, FileManager.REQUEST_DIRECTORY);
+					FileManager.requestPickDirectory(this);
 					
 					return true;
 				}
-				case (R.id.selectCourseContextMenuShowInfo): {
+				case (R.id.manageCourseContextMenuShowInfo): {//TODO: Dialog
 					LayoutInflater inflater = LayoutInflater.from(this);
 					View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-					View viewContent = inflater.inflate(R.layout.alert_dialog_select_course_show_info, null);
+					View viewContent = inflater.inflate(R.layout.alert_dialog_manage_course_show_info, null);
 					
 					TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
 					
@@ -360,14 +365,14 @@ public class SelectCourse extends BaseExpandableListActivity {
 					
 					return true;
 				}
-				case (R.id.selectCourseContextMenuEdit): {
-					if (SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {
+				case (R.id.manageCourseContextMenuEdit): {
+					if (SimpleRecognizer.checkCourseCreator(course.getCreator())) {//TODO: Dialog
 						LayoutInflater inflater = LayoutInflater.from(this);
 						View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-						View viewContent = inflater.inflate(R.layout.alert_dialog_select_course_edit, null);
+						View viewContent = inflater.inflate(R.layout.alert_dialog_manage_course_edit, null);
 						
 						TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-						textViewTitle.setText(R.string.select_course_context_menu_edit);
+						textViewTitle.setText(R.string.manage_course_context_menu_edit);
 						textViewTitle.setSelected(true);
 						
 						final EditText editTextTitle = (EditText) viewContent.findViewById(R.id.editTextTitle);
@@ -398,7 +403,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 									course.setVersion(Integer.parseInt(editTextVersion.getText().toString().trim()));
 									//course.setCreator(editTextCreator.getText().toString().trim());
 									
-									DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(SelectCourse.this);
+									DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 									
 									dbAdapter.write();
 									
@@ -413,10 +418,10 @@ public class SelectCourse extends BaseExpandableListActivity {
 						
 						AlertDialog alert = builder.create();
 						alert.show();
-					} else {
+					} else {//TODO: Dialog
 						AlertDialog.Builder builder = new AlertDialog.Builder(this);
 						builder.setTitle(R.string.dialog_title_forbidden);
-						builder.setMessage(R.string.select_course_dialog_not_creator_message);
+						builder.setMessage(R.string.manage_course_dialog_not_creator_message);
 						
 						builder.setNeutralButton(R.string.dialog_button_close, null);
 						
@@ -426,8 +431,8 @@ public class SelectCourse extends BaseExpandableListActivity {
 					
 					return true;
 				}
-				case (R.id.selectCourseContextMenuDelete): {
-					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				case (R.id.manageCourseContextMenuDelete): {
+					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 					
 					dbAdapter.write();
 					
@@ -449,22 +454,20 @@ public class SelectCourse extends BaseExpandableListActivity {
 	}
 	
 	private void doInit() {
-		mConfigAdapter = ConfigAdapter.getInstance(this);
-		
-		
+		mConfigAdapter = ConfigAdapter.getInstance();
 		
 		this.setTitle(mConfigAdapter.getIsCreator()
-				? R.string.select_course_name_creator
-				: R.string.select_course_name_viewer
+				? R.string.manage_course_name_creator
+				: R.string.manage_course_name_viewer
 			);
 		
-		this.setContentView(R.layout.select_course);
+		this.setContentView(R.layout.manage_course);
 		
 		this.setSupportProgressBarIndeterminateVisibility(false);
 		
 		mAdapter = new CourseAdapter(this);
-		//mView = (ExpandableListView) this.findViewById(android.R.id.list);
-		mView = this.getExpandableListView();
+		mView = (ExpandableListView) this.findViewById(android.R.id.list);
+		//mView = this.getExpandableListView();
 		
 		mView.setEmptyView(this.findViewById(R.id.textViewEmpty));
 		mView.setAdapter(mAdapter);
@@ -475,13 +478,17 @@ public class SelectCourse extends BaseExpandableListActivity {
 		//mView.setItemsCanFocus(false);
 		mView.setChoiceMode(ExpandableListView.CHOICE_MODE_SINGLE);
 		
+		mView.setOnChildClickListener(this);
+		mView.setOnGroupExpandListener(this);
+		mView.setOnGroupCollapseListener(this);
+		
 		initData();
 	}
 	
 	private void initData() {
 		mAdapter.clear();
 		
-		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 		
 		dbAdapter.open();
 		
@@ -523,7 +530,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 		mConfigAdapter.getValues();
 		
 		if ((mCourse == null) || (mCourse.getId() != mConfigAdapter.getCourseId())) {
-			DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+			DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 			
 			dbAdapter.open();
 			
@@ -537,16 +544,24 @@ public class SelectCourse extends BaseExpandableListActivity {
 		}
 	}
 	
-	private void lockUI(boolean isLock) {
+	@Override
+	public void onLockView(boolean isLock) {
 		mIsLock = isLock;
 		
-		this.supportInvalidateOptionsMenu();
-		
-		this.setSupportProgressBarIndeterminateVisibility(isLock);
+		if (!this.isDestroy()) {
+			this.supportInvalidateOptionsMenu();
+			
+			this.setSupportProgressBarIndeterminateVisibility(isLock);
+		}
+	}
+	
+	@Override
+	public boolean isLock() {
+		return mIsLock;
 	}
 	
 	private Course initCourseData(Course course, boolean isWithPHash) {
-		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 		
 		dbAdapter.open();
 		
@@ -596,17 +611,17 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		Course course = (Course) mAdapter.getChild(groupPosition, childPosition);
 		
-		mConfigAdapter.setCourseId(course.getId());
+		mConfigAdapter.setCourseId(course.getId()).setValues();
 		
 		if (mConfigAdapter.getIsCreator()) {
-			if (SimpleRecognizer.checkCourseCreator(this, course.getCreator())) {
+			if (SimpleRecognizer.checkCourseCreator(course.getCreator())) {
 				Intent iManageItem = new Intent(this, ManageItem.class);
 				iManageItem.putExtra(Course.KEY, course);
 				this.startActivity(iManageItem);
-			} else {
+			} else {//TODO: Dialog
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.dialog_title_forbidden);
-				builder.setMessage(R.string.select_course_dialog_not_creator_message);
+				builder.setMessage(R.string.manage_course_dialog_not_creator_message);
 				
 				builder.setNeutralButton(R.string.dialog_button_close, null);
 				
@@ -710,13 +725,9 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		private long mInitTime = 0L;
 		
-		private Context mContext = null;
-		
 		private Course mCourse = null;
 		
 		public AsyncCourseExport(Course course) {
-			mContext = SelectCourse.this.getApplicationContext();
-			
 			mCourse = course;
 		}
 		
@@ -724,7 +735,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
 			
-			lockUI(true);
+			ManageCourse.this.onLockView(true);
 		}
 		
 		@Override
@@ -738,9 +749,9 @@ public class SelectCourse extends BaseExpandableListActivity {
 			
 			sb.append(Text.LF).append(dbName);
 			
-			if (SimpleRecognizer.mediaReceiver.isExternalStorageAvailable()) {
-				if (SimpleRecognizer.mediaReceiver.isExternalStorageWritable()) {
-					DataBaseAdapter dbAdapter = new DataBaseAdapter(SelectCourse.this, dbName);
+			if (SimpleRecognizer.getMediaReceiver().isExternalStorageAvailable()) {
+				if (SimpleRecognizer.getMediaReceiver().isExternalStorageWritable()) {
+					DataBaseAdapter dbAdapter = new DataBaseAdapter(dbName);
 					
 					dbAdapter.write();
 					
@@ -766,7 +777,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 							
 							sb.append("Exported.");
 						} catch (IOException e) {
-							Log.e(LOG_TAG, "Course file not copied >> " + file.getPath());
+							Log.e(LOG_TAG, ("Course file not copied >> " + file.getPath()));
 							Log.w(LOG_TAG, e.toString());
 							
 							sb.append("Failed, IOException.");
@@ -788,7 +799,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		@Override
 		protected void onPostExecute(String result) {
-			if (SelectCourse.this.isAlive()) {
+			if (!ManageCourse.this.isDestroy()) {
 				StringBuilder sb = new StringBuilder();
 				
 				if (BuildConfig.DEBUG) {
@@ -798,15 +809,15 @@ public class SelectCourse extends BaseExpandableListActivity {
 				}
 				
 				sb.append(result);
-				
-				LayoutInflater inflater = LayoutInflater.from(mContext);
+				//TODO: Dialog
+				LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				
 				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.select_course_context_menu_export);
+				textViewTitle.setText(R.string.manage_course_context_menu_export);
 				textViewTitle.setSelected(true);
 				
-				AlertDialog.Builder builder = new AlertDialog.Builder(SelectCourse.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(ManageCourse.this);
 				builder.setCustomTitle(viewTitle);
 				builder.setMessage(sb.toString());
 				
@@ -815,7 +826,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 				AlertDialog alert = builder.create();
 				alert.show();
 				
-				lockUI(false);
+				ManageCourse.this.onLockView(false);
 			}
 		}
 		
@@ -832,17 +843,11 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		private long mInitTime = 0L;
 		
-		private Context mContext = null;
-		
-		public AsyncCourseImport() {
-			mContext = SelectCourse.this.getApplicationContext();
-		}
-		
 		@Override
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
 			
-			lockUI(true);
+			ManageCourse.this.onLockView(true);
 		}
 		
 		@Override
@@ -854,15 +859,15 @@ public class SelectCourse extends BaseExpandableListActivity {
 				
 				sb.append(Text.LF).append(dbName).append(Text.SEPARATOR);
 				
-				if (SimpleRecognizer.mediaReceiver.isExternalStorageAvailable()) {
-					DataBaseAdapter dbAdapter = new DataBaseAdapter(SelectCourse.this, dbName);
+				if (SimpleRecognizer.getMediaReceiver().isExternalStorageAvailable()) {
+					DataBaseAdapter dbAdapter = new DataBaseAdapter(dbName);
 					
 					dbAdapter.write();
 					
 					try {
 						dbAdapter.copyFrom(path);
 					} catch (IOException e) {
-						Log.e(LOG_TAG, "File not found >> " + path);
+						Log.e(LOG_TAG, ("File not found >> " + path));
 						Log.w(LOG_TAG, e.toString());
 						
 						sb.append("Failed, IOException.");
@@ -884,7 +889,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 					dbAdapter.delete();
 					
 					if (listCourse != null) {
-						dbAdapter = DataBaseAdapter.getInstance(SelectCourse.this);
+						dbAdapter = DataBaseAdapter.getInstance();
 						
 						dbAdapter.write();
 						
@@ -914,7 +919,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 		
 		@Override
 		protected void onPostExecute(String result) {
-			if (SelectCourse.this.isAlive()) {
+			if (!ManageCourse.this.isDestroy()) {
 				StringBuilder sb = new StringBuilder();
 				
 				if (BuildConfig.DEBUG) {
@@ -924,15 +929,15 @@ public class SelectCourse extends BaseExpandableListActivity {
 				}
 				
 				sb.append(result);
-				
-				LayoutInflater inflater = LayoutInflater.from(mContext);
+				//TODO: Dialog
+				LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				
 				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.select_course_menu_import);
+				textViewTitle.setText(R.string.manage_course_menu_import);
 				textViewTitle.setSelected(true);
 				
-				AlertDialog.Builder builder = new AlertDialog.Builder(SelectCourse.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(ManageCourse.this);
 				builder.setCustomTitle(viewTitle);
 				builder.setMessage(sb.toString());
 				
@@ -943,7 +948,7 @@ public class SelectCourse extends BaseExpandableListActivity {
 				
 				initView();
 				
-				lockUI(false);
+				ManageCourse.this.onLockView(false);
 			}
 		}
 		

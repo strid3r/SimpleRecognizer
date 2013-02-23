@@ -8,16 +8,9 @@
 
 package ru.strider.simplerecognizer.database;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Process;
 import android.util.Log;
 
 import java.io.File;
@@ -26,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import ru.strider.simplerecognizer.R;
 import ru.strider.simplerecognizer.SimpleRecognizer;
 import ru.strider.util.Text;
 
@@ -40,67 +32,54 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	private static final String LOG_TAG = DataBaseHelper.class.getSimpleName();
 	
 	private static final String ASSETS_DB_PATH = "Databases" + File.separator;
-	private static final String PACKAGE_DB_PATH = "databases" + File.separator;
 	
-	private static String DB_NAME_SRC = null;
+	private static final String DB_PATH = SimpleRecognizer.getPackageContext().getApplicationInfo()
+			.dataDir + File.separator + "databases" + File.separator;
 	
-	private static String DB_NAME = null;
-	private static String DB_PATH = null;
+	private static final String DB_NAME = "SimpleRecognizer";
+	private static final String DB_NAME_EMPTY = "SimpleRecognizer_Empty";
 	
-	private Context mContext = null;
+	private static final String DB_EXTENSION = ".db";
+	
+	private static final int DB_VERSION = 1;
+	private static final int DB_VERSION_EMPTY = 1;
+	
+	private String mDbNameSrc = null;
+	private String mDbName = null;
+	private int mDbVersion = 0;
 	
 	private SQLiteDatabase mDataBase = null; 
 	
-	private int mDataBaseSize = -1;
+	private DataBaseHelper() {
+		super(SimpleRecognizer.getPackageContext(), DB_NAME + DB_EXTENSION, null, DB_VERSION);
+		
+		mDbNameSrc = mDbName = DB_NAME + DB_EXTENSION;
+		mDbVersion = DB_VERSION;
+	}
 	
-	/**
-	 * Takes and keeps a reference of the passed context in order
-	 * to access to the application assets and resources.
-	 * 
-	 * @param context
-	 */
-	public DataBaseHelper(Context context, String dbNameSrc, String dbName, int dbVersion) {
-		super(context, dbName, null, dbVersion);
+	public DataBaseHelper(String dbName) {
+		super(SimpleRecognizer.getPackageContext(), dbName, null, DB_VERSION_EMPTY);
 		
-		mContext = context;
-		
-		DB_NAME_SRC = dbNameSrc;
-		
-		DB_NAME = dbName;
-		DB_PATH = mContext.getApplicationInfo().dataDir + File.separator + PACKAGE_DB_PATH;
-		
-		AssetManager assetManager = mContext.getAssets();
-		
-		InputStream is = null;
-		
-		try {
-			is = assetManager.open(ASSETS_DB_PATH + DB_NAME_SRC);
-			
-			mDataBaseSize = is.available();
-		} catch (IOException e) {
-			Log.e(LOG_TAG, "Error Loading DataBase From Assets >> Assets/" + ASSETS_DB_PATH + DB_NAME_SRC);
-			Log.w(LOG_TAG, e.toString());
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e) {
-					//
-				}
-			}
-		}
+		mDbNameSrc = DB_NAME_EMPTY + DB_EXTENSION; 
+		mDbName = dbName;
+		mDbVersion = DB_VERSION_EMPTY;
+	}
+	
+	public static DataBaseHelper getInstance() {
+		return DataBaseHolder.INSTANCE;
 	}
 	
 	/**
 	 * Creates an empty database on the system and rewrites it with own database.
 	 * 
+	 * @return True if the database exists and valid, false otherwise.
+	 * 
 	 * @throws IOException
 	 */
-	public void createDataBase(final Activity activity) throws IOException {
+	public boolean createDataBase() throws IOException {
 		SQLiteDatabase db = null;
 		
-		boolean isExists = checkDataBase();
-		if (isExists) {
+		if (checkDataBase()) {
 			try {
 				db = this.getWritableDatabase();
 			} catch (SQLException sqle) {
@@ -112,16 +91,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			}
 		}
 		
-		isExists = checkDataBase();
-		if (isExists && !checkDataBaseSize()) {
-			deleteDataBase();
-		}
+		boolean isInvalid = false;
 		
-		isExists = checkDataBase();
-		
-		db = this.getReadableDatabase();
-		
-		if (!isExists) {
+		if (!checkDataBase()) {
+			db = this.getReadableDatabase();
+			
 			if (db != null) {
 				db.close();
 			}
@@ -129,120 +103,109 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 			try {
 				copyDataBase();
 				
-				Log.i(LOG_TAG, "Database copied");
+				Log.i(LOG_TAG, ("Database" + Text.SEPARATOR + "Copied"));
 			} catch (IOException e) {
-				Log.e(LOG_TAG, "Database not copied");
-				Log.w(LOG_TAG, "Error copying Database >> " + e.toString());
-				//throw new Error("ErrorCopyingDataBase");
+				Log.e(LOG_TAG, ("Database" + Text.SEPARATOR + "Not copied"));
+				Log.w(LOG_TAG, ("Error copying Database >> " + e.toString()));
+				//throw (new IllegalStateException("Error copying DataBase"));
 			}
 			
-			isExists = checkDataBase();
-			if (!isExists || (isExists && !checkDataBaseSize())) {
-				activity.runOnUiThread(new Runnable() {
-						
-						@Override
-						public void run() {
-							Resources res = mContext.getResources();
-							
-							StringBuilder sb = new StringBuilder();
-							sb.append(res.getString(R.string.database_create_error_tip_1))
-									.append(Text.LF);
-							sb.append(res.getString(R.string.database_create_error_tip_1_help))
-									.append(Text.LF).append(Text.LF);
-							sb.append(res.getString(R.string.database_create_error_tip_2));
-							
-							AlertDialog.Builder builder = new AlertDialog.Builder((Context) activity);
-							builder.setTitle(R.string.database_create_error_title);
-							builder.setMessage(sb.toString());
-							builder.setCancelable(false);
-							builder.setPositiveButton(R.string.dialog_button_close, new DialogInterface.OnClickListener() {
-								
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									Log.i(LOG_TAG, "Exiting Application...");
-									
-									activity.finish();
-									
-									Process.killProcess(Process.myPid());
-								}
-								
-							});
-							
-							AlertDialog alert = builder.create();
-							alert.setCanceledOnTouchOutside(false);
-							alert.show();
-						}
-						
-					});
-				
-				synchronized (activity) {
-					while (true) {
-						try {
-							activity.wait();
-						} catch (InterruptedException e) {
-							Log.w(LOG_TAG, "InterruptedException >> " + e.toString());
-						}
-					}
+			if (checkDataBase()) {
+				if (!checkSize()) {
+					isInvalid = true;
+					
+					deleteDataBase();
 				}
+			} else {
+				isInvalid = true;
 			}
 		} else {
-			SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "Database already exists"
-					+ " >> dbVersion = " + Integer.toString(db.getVersion()));
-			
-			db.close();
+			SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, ("Database already exists >> "
+					+ "dbVersion = " + Integer.toString(mDbVersion)));
 		}
+		
+		return (!isInvalid);
 	}
 	
 	/**
-	 * Check if the database already exist to avoid re-copying the file
+	 * Checks if the database already exist to avoid re-copying the file
 	 * each time application opened.
 	 * 
-	 * @return true if it exists, false otherwise.
+	 * @return True if the database exists, false otherwise.
 	 */
 	private boolean checkDataBase() {
 		boolean isExists = false;
 		
-		SQLiteDatabase db = null;
-		
-		File dbFile = new File(DB_PATH + DB_NAME);
+		File dbFile = new File(DB_PATH + mDbName);
 		
 		if (dbFile.exists()) {
+			SQLiteDatabase db = null;
+			
 			try {
-				db = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+				db = SQLiteDatabase.openDatabase(dbFile.getPath(), null, SQLiteDatabase.OPEN_READONLY);
 			} catch (SQLException sqle) {
 				//
-			} finally {
-				if (db != null) {
-					isExists = true;
-					
-					db.close();
-				}
+			}
+			
+			if (db != null) {
+				isExists = true;
+				
+				db.close();
 			}
 		}
 		
-		SimpleRecognizer.logIfDebug(Log.VERBOSE, "dbFile", dbFile + Text.SEPARATOR + isExists);
+		SimpleRecognizer.logIfDebug(
+				Log.VERBOSE,
+				"dbFile",
+				(dbFile.getPath() + Text.SEPARATOR + isExists)
+			);
 		
 		return isExists;
 	}
 	
 	/**
-	 * Check if the database file size equals to assets file to avoid
+	 * Checks if the database file size equals to assets file to avoid
 	 * opening corrupted file.
 	 * 
-	 * @return true if it equals, false otherwise.
+	 * @return True if size is valid, false otherwise.
 	 */
-	private boolean checkDataBaseSize() {
-		boolean isEquals = false;
+	private boolean checkSize() {
+		boolean isValid = false;
 		
-		File dbFile = new File(DB_PATH + DB_NAME);
+		File dbFile = new File(DB_PATH + mDbName);
 		
-		if (dbFile.exists() && (dbFile.length() != mDataBaseSize)) {
-			Log.w("dbFile", dbFile + Text.SEPARATOR + "Bad File Size");
-		} else {
-			isEquals = true;
+		if (dbFile.exists() && dbFile.isFile()) {
+			String dbPath = ASSETS_DB_PATH + mDbNameSrc;
+			
+			int dbSize = -1;
+			
+			InputStream is = null;
+			
+			try {
+				is = SimpleRecognizer.getPackageContext().getAssets().open(dbPath);
+				
+				dbSize = is.available();
+			} catch (IOException e) {
+				Log.e(LOG_TAG, ("Error loading Database from Assets >> assets/" + dbPath));
+				Log.w(LOG_TAG, e.toString());
+			} finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+						//
+					}
+				}
+			}
+			
+			if (dbFile.length() == dbSize) {
+				isValid = true;
+			} else {
+				Log.w("dbFile", (dbFile.getPath() + Text.SEPARATOR + "Bad File Size"));
+			}
 		}
 		
-		return isEquals;
+		return isValid;
 	}
 	
 	/**
@@ -251,19 +214,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	 * handled. This is done by transferring stream of bytes.
 	 */
 	private void copyDataBase() throws IOException {
-		AssetManager assetManager = mContext.getAssets();
-		
 		File dbDir = new File(DB_PATH);
 		
 		if (!dbDir.exists()) {
 			dbDir.mkdirs();
 		}
 		
-		InputStream is = assetManager.open(ASSETS_DB_PATH + DB_NAME_SRC);
-		OutputStream os = new FileOutputStream(DB_PATH + DB_NAME);
+		InputStream is = SimpleRecognizer.getPackageContext().getAssets()
+				.open(ASSETS_DB_PATH + mDbNameSrc);
+		OutputStream os = new FileOutputStream(DB_PATH + mDbName);
 		
 		byte[] buffer = new byte[1024];
-		int length = -1;
+		int length = 0;
 		
 		while ((length = is.read(buffer)) != -1) {
 			os.write(buffer, 0, length);
@@ -277,19 +239,31 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 	
 	/**
 	 * Opens database.
+	 * 
+	 * @return True on success, false otherwise.
 	 */
 	public boolean openDataBase() throws SQLException {
-		mDataBase = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READWRITE);
+		String dbPath = DB_PATH + mDbName;
 		
-		SimpleRecognizer.logIfDebug(Log.VERBOSE, "dbFullPath", DB_PATH + DB_NAME);
+		mDataBase = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READWRITE);
+		
+		SimpleRecognizer.logIfDebug(Log.VERBOSE, "dbFullPath", dbPath);
 		
 		return (mDataBase != null);
 	}
 	
+	/**
+	 * Deletes database.
+	 * 
+	 * @return True if the database was successfully deleted, false otherwise.
+	 */
 	public boolean deleteDataBase() throws SQLException {
-		return mContext.deleteDatabase(DB_NAME);
+		return SimpleRecognizer.getPackageContext().deleteDatabase(mDbName);
 	}
 	
+	/**
+	 * Closes any open database object.
+	 */
 	@Override
 	public synchronized void close() {
 		if (mDataBase != null) {
@@ -366,21 +340,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onUpgrade() called");
 		
 		if (newVersion > oldVersion) {
-			if (oldVersion == 1) {
+			/*if (oldVersion == 1) {
 				// 1 —› X
 				try {
-					boolean isDeleted = deleteDataBase();
-					
-					if (isDeleted) {
-						Log.i(LOG_TAG, "On upgrade Database deleted >> oldVersion = " + Integer.toString(oldVersion)
-								+ ", newVersion = " + Integer.toString(newVersion));
+					if (deleteDataBase()) {
+						Log.i(LOG_TAG, ("On upgrade Database deleted >> oldVersion = " + Integer.toString(oldVersion)
+								+ ", newVersion = " + Integer.toString(newVersion)));
 					} else {
-						Log.w(LOG_TAG, "On upgrade Database not deleted >> oldVersion = " + Integer.toString(oldVersion)
-								+ ", newVersion = " + Integer.toString(newVersion));
+						Log.w(LOG_TAG, ("On upgrade Database not deleted >> oldVersion = " + Integer.toString(oldVersion)
+								+ ", newVersion = " + Integer.toString(newVersion)));
 					}
 				} catch (SQLException sqle) {
-					Log.e(LOG_TAG, "Delete Database on upgrade >> oldVersion = " + Integer.toString(oldVersion)
-							+ ", newVersion = " + Integer.toString(newVersion) + " >> " + sqle.toString());
+					Log.e(LOG_TAG, ("Delete Database on upgrade >> oldVersion = " + Integer.toString(oldVersion)
+							+ ", newVersion = " + Integer.toString(newVersion) + " >> " + sqle.toString()));
 					throw sqle;
 				}
 			} else {
@@ -393,7 +365,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 				}
 				
 				// etc.
-			}
+			}*/
 		}
 		/*
 		db.execSQL("DROP TABLE IF EXISTS PHash;");
@@ -403,6 +375,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TRIGGER IF EXISTS fk_ItemCourse_course_id;");
 		
 		onCreate(db);*/
+	}
+	
+	/**
+	 * DataBaseHelper DataBaseHolder Class.
+	 * 
+	 * @author strider
+	 */
+	private static class DataBaseHolder {
+		
+		private static final DataBaseHelper INSTANCE = new DataBaseHelper();
+		
 	}
 	
 }

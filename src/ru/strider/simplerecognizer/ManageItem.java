@@ -50,13 +50,14 @@ import ru.strider.simplerecognizer.model.Item;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.util.BuildConfig;
 import ru.strider.util.Text;
+import ru.strider.view.OnLockViewListener;
 
 /**
  * BaseListActivity ManageItem Class.
  * 
  * @author strider
  */
-public class ManageItem extends BaseListActivity {
+public class ManageItem extends BaseListActivity implements OnLockViewListener {
 	
 	private static final String LOG_TAG = ManageItem.class.getSimpleName();
 	
@@ -88,14 +89,14 @@ public class ManageItem extends BaseListActivity {
 		
 		useConfigValues();
 		
-		SimpleRecognizer.mediaReceiver.startWatchingExternalStorage(this);
+		SimpleRecognizer.getMediaReceiver().startWatchingExternalStorage(this);
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
 		
-		SimpleRecognizer.mediaReceiver.stopWatchingExternalStorage(this);
+		SimpleRecognizer.getMediaReceiver().stopWatchingExternalStorage(this);
 	}
 	
 	@Override
@@ -154,10 +155,7 @@ public class ManageItem extends BaseListActivity {
 			case (R.id.manageItemMenuImport): {
 				mAsyncItemImport = new AsyncItemImport();
 				
-				Intent iPickFile = new Intent(this, FileManager.class);
-				iPickFile.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_FILE);
-				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_ALL);
-				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
+				FileManager.requestPickFile(this, FileManager.FILE_TYPE_ALL);
 				
 				return true;
 			}
@@ -167,7 +165,7 @@ public class ManageItem extends BaseListActivity {
 				return true;
 			}
 			case (R.id.manageItemMenuDeleteCourse): {
-				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 				
 				dbAdapter.write();
 				
@@ -215,7 +213,7 @@ public class ManageItem extends BaseListActivity {
 			);
 		
 		if (mConfigAdapter.getIsCreator()) {
-			boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
+			boolean isCreator = SimpleRecognizer.checkCourseCreator(mCourse.getCreator());
 			
 			menu.findItem(R.id.manageItemContextMenuEdit)
 					.setEnabled((!mIsLock) && isCreator)
@@ -234,9 +232,7 @@ public class ManageItem extends BaseListActivity {
 		
 		switch (menuItem.getItemId()) {
 			case (R.id.manageItemContextMenuApplySelection): {
-				mConfigAdapter.setItemId(item.getId());
-				
-				mConfigAdapter.setValues();
+				mConfigAdapter.setItemId(item.getId()).setValues();
 				
 				Intent iMainCamera = new Intent(this, MainCamera.class);
 				iMainCamera.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -244,7 +240,7 @@ public class ManageItem extends BaseListActivity {
 				
 				return true;
 			}
-			case (R.id.manageItemContextMenuShowContent): {
+			case (R.id.manageItemContextMenuShowContent): {//TODO: Dialog
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_item_show_content, null);
@@ -272,7 +268,7 @@ public class ManageItem extends BaseListActivity {
 				
 				return true;
 			}
-			case (R.id.manageItemContextMenuEdit): {
+			case (R.id.manageItemContextMenuEdit): {//TODO: Dialog
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
@@ -304,7 +300,7 @@ public class ManageItem extends BaseListActivity {
 							item.setContent(editTextContent.getText().toString().trim());
 							item.setVideoUri(editTextVideoUri.getText().toString().trim());
 							
-							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManageItem.this);
+							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 							
 							dbAdapter.write();
 							
@@ -323,7 +319,7 @@ public class ManageItem extends BaseListActivity {
 				return true;
 			}
 			case (R.id.manageItemContextMenuDelete): {
-				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 				
 				dbAdapter.write();
 				
@@ -342,7 +338,7 @@ public class ManageItem extends BaseListActivity {
 	}
 	
 	private void doInit() {
-		mConfigAdapter = ConfigAdapter.getInstance(this);
+		mConfigAdapter = ConfigAdapter.getInstance();
 		
 		mCourse = this.getIntent().getParcelableExtra(Course.KEY);
 		
@@ -370,7 +366,7 @@ public class ManageItem extends BaseListActivity {
 	private void initData() {
 		mAdapter.clear();
 		
-		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 		
 		dbAdapter.open();
 		
@@ -399,12 +395,20 @@ public class ManageItem extends BaseListActivity {
 		mView.setItemChecked(getItemPosition(), true);
 	}
 	
-	private void lockUI(boolean isLock) {
+	@Override
+	public void onLockView(boolean isLock) {
 		mIsLock = isLock;
 		
-		this.supportInvalidateOptionsMenu();
-		
-		this.setSupportProgressBarIndeterminateVisibility(isLock);
+		if (!this.isDestroy()) {
+			this.supportInvalidateOptionsMenu();
+			
+			this.setSupportProgressBarIndeterminateVisibility(isLock);
+		}
+	}
+	
+	@Override
+	public boolean isLock() {
+		return mIsLock;
 	}
 	
 	private int getItemPosition() {
@@ -423,9 +427,7 @@ public class ManageItem extends BaseListActivity {
 		
 		Item item = mAdapter.getItem(position);
 		
-		mConfigAdapter.setItemId(item.getId());
-		
-		mConfigAdapter.setValues();
+		mConfigAdapter.setItemId(item.getId()).setValues();
 		
 		Intent iManagePHash = new Intent(this, ManagePHash.class);
 		iManagePHash.putExtra(Course.KEY, mCourse);
@@ -474,7 +476,7 @@ public class ManageItem extends BaseListActivity {
 		}
 	}
 	
-	private AlertDialog buildAddItem(String content) {
+	private AlertDialog buildAddItem(String content) {//TODO: Dialog
 		LayoutInflater inflater = LayoutInflater.from(this);
 		View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 		View viewContent = inflater.inflate(R.layout.alert_dialog_manage_item_edit, null);
@@ -503,7 +505,7 @@ public class ManageItem extends BaseListActivity {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManageItem.this);
+					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 					
 					dbAdapter.write();
 					
@@ -537,17 +539,11 @@ public class ManageItem extends BaseListActivity {
 		
 		private long mInitTime = 0L;
 		
-		//private Context mContext = null;
-		
-		public AsyncItemImport() {
-			//mContext = ManageItem.this.getApplicationContext();
-		}
-		
 		@Override
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
 			
-			lockUI(true);
+			ManageItem.this.onLockView(true);
 		}
 		
 		@Override
@@ -555,7 +551,7 @@ public class ManageItem extends BaseListActivity {
 			List<String> listContent = new ArrayList<String>();
 			
 			for (String path : params) {
-				if (SimpleRecognizer.mediaReceiver.isExternalStorageAvailable()) {
+				if (SimpleRecognizer.getMediaReceiver().isExternalStorageAvailable()) {
 					String content = null;
 					
 					// 1st Implementation // TODO: FIND A WAY TO READ RUSSIAN CHARS
@@ -638,7 +634,7 @@ public class ManageItem extends BaseListActivity {
 		
 		@Override
 		protected void onPostExecute(List<String> result) {
-			if (ManageItem.this.isAlive()) {
+			if (!ManageItem.this.isDestroy()) {
 				StringBuilder sb = new StringBuilder();
 				
 				if (BuildConfig.DEBUG) {
@@ -651,7 +647,7 @@ public class ManageItem extends BaseListActivity {
 					buildAddItem(content).show();
 				}
 				
-				lockUI(false);
+				ManageItem.this.onLockView(false);
 			}
 		}
 		

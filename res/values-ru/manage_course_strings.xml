@@ -2,77 +2,77 @@
 <!-- Copyright (C) 2012-2013 strider
 	 
 	 Simple Recognizer
-	 RU Strings Select Course XML
+	 RU Strings Manage Course XML
 	 By © strider 2012-2013.
 -->
 <resources>
 	
 	<!-- MAIN -->
-	<string name="select_course_name_viewer">
+	<string name="manage_course_name_viewer">
 		Выбор Курса
 	</string>
 	
-	<string name="select_course_name_creator">
+	<string name="manage_course_name_creator">
 		Управление Курсами
 	</string>
 	
 	<!-- MENU -->
-	<string name="select_course_menu_switch_mode_creator">
+	<string name="manage_course_menu_switch_mode_creator">
 		К Создателю
 	</string>
 	
-	<string name="select_course_menu_switch_mode_viewer">
+	<string name="manage_course_menu_switch_mode_viewer">
 		К Зрителю
 	</string>
 	
-	<string name="select_course_menu_import">
+	<string name="manage_course_menu_import">
 		Импорт
 	</string>
 	
-	<string name="select_course_menu_add_course">
+	<string name="manage_course_menu_add_course">
 		Добавить Курс
 	</string>
 	
 	<!-- CONTEXT MENU -->
-	<string name="select_course_context_menu_header_title">
+	<string name="manage_course_context_menu_header_title">
 		Меню Подтверждения
 	</string>
 	
-	<string name="select_course_context_menu_export">
+	<string name="manage_course_context_menu_export">
 		Экспорт
 	</string>
 	
-	<string name="select_course_context_menu_show_info">
+	<string name="manage_course_context_menu_show_info">
 		Показать Инфо
 	</string>
 	
-	<string name="select_course_context_menu_edit">
+	<string name="manage_course_context_menu_edit">
 		Изменить Курс
 	</string>
 	
-	<string name="select_course_context_menu_delete">
+	<string name="manage_course_context_menu_delete">
 		Удалить Курс
 	</string>
 	
 	<!-- DIALOG -->
-	<string name="select_course_dialog_not_creator_message">
+	<string name="manage_course_dialog_not_creator_message">
 		Вы не можете управлять этим курсом,
 		\nпотому что Вы не его создатель.
 	</string>
 	
-	<string name="select_course_dialog_title_title">
+	<string name="manage_course_dialog_title_title">
 		Название
 	</string>
 	
-	<string name="select_course_dialog_category_title">
+	<string name="manage_course_dialog_category_title">
 		Категория
 	</string>
 	
-	<string name="select_course_dialog_version_title">
+	<string name="manage_course_dialog_version_title">
 		Версия
 	</string>
 	
-	<string name="select_course_dialog_creator_title">
+	<string name="manage_course_dialog_creator_title">
 		Создатель
 	</string>
 	

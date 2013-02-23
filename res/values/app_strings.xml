@@ -45,24 +45,23 @@
 	
 	<!-- DATABASE -->
 	<string name="database_create_error_title">
-		Unable to create Database file
+		Unable to create local Database
 	</string>
 	
-	<string name="database_create_error_tip_1">
+	<string name="database_create_error_info">
 		1. Please try to clear App Data and launch it again:
-	</string>
-	
-	<string name="database_create_error_tip_1_help">
-		( Manage apps -> App -> Clear data ).
-	</string>
-	
-	<string name="database_create_error_tip_2">
-		2. Also check the available Internal Memory free space.
+		\n( Manage apps -> App -> Clear data ).
+		\n\n2. Also check the available Internal Memory free space.
 	</string>
 	
 	<!-- DIALOG -->
 	<string name="dialog_ad_free_found">
-		To use this Application, You must Disable/Uninstall AdFree package:
+		To use this Application, You must Disable / Uninstall the following package:
+		\nAdFree :: com.bigtincan.adfree (former com.bigtincan.android.adfree).
+	</string>
+	
+	<string name="dialog_ad_free_hosts">
+		\n( /etc/hosts :: System is modified )
 	</string>
 	
 	<string name="dialog_title_caution">
@@ -112,6 +111,10 @@
 	<!-- ERROR -->
 	<string name="error_no_items">
 		« No items »
+	</string>
+	
+	<string name="error_no_network">
+		« No network »
 	</string>
 	
 </resources>

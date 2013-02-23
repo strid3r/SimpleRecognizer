@@ -18,7 +18,10 @@ import android.content.res.Resources;
 import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Process;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -34,6 +37,8 @@ import cloud4apps.Utils;
 import com.actionbarsherlock.app.ActionBar;
 
 import ru.strider.app.MediaReceiver;
+import ru.strider.simplerecognizer.database.DataBaseAdapter;
+import ru.strider.simplerecognizer.util.AdMob;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
 import ru.strider.util.BuildConfig;
 import ru.strider.widget.util.Font;
@@ -51,9 +56,15 @@ public class SimpleRecognizer extends Application {
 	
 	private static final String LOG_DEBUG = "[ DEBUG ] ";
 	
-	public static MediaReceiver mediaReceiver = null;
+	private static Context sPackageContext = null;
 	
-	public Locale mLocale = null;
+	private static boolean sIsDataBase = false;
+	
+	private static boolean sIsAdMobHazard = false;
+	
+	private static MediaReceiver sMediaReceiver = null;
+	
+	private Locale mLocale = null;
 	
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -61,7 +72,7 @@ public class SimpleRecognizer extends Application {
 		
 		super.onConfigurationChanged(newConfig);
 		
-		// FIXME: VERY BAD APPROACH
+		// FIXME: VERY BAD APPROACH. Required by TOR...
 		/*if (mLocale != null) {
 			Locale.setDefault(mLocale);
 			
@@ -80,9 +91,39 @@ public class SimpleRecognizer extends Application {
 		
 		super.onCreate();
 		
+		sPackageContext = this.getApplicationContext();
+		
+		doInit();
+	}
+	
+	@Override
+	public void onLowMemory() {
+		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: On Low Memory");
+		
+		super.onLowMemory();
+	}
+	
+	@Override
+	public void onTerminate() { // Only for Emulator
+		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Terminated");
+		
+		super.onTerminate();
+		
+		if (sPackageContext != null) {
+			sPackageContext = null;
+		}
+	}
+	
+	private void doInit() {
 		//PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		
-		int versionCode = PrefsAdapter.getVersionCode(this);
+		//AdMob.checkLisenceAsync(); // ENABLE FOR DEPLOYMENT
+		
+		sIsDataBase = DataBaseAdapter.getInstance().createDataBase();
+		
+		sIsAdMobHazard = AdMob.checkAdFreePackage();
+		
+		int versionCode = PrefsAdapter.getVersionCode();
 		
 		try {
 			PackageInfo info = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
@@ -94,20 +135,20 @@ public class SimpleRecognizer extends Application {
 				//	//
 				//}
 				
-				PrefsAdapter.setVersionCode(this, info.versionCode);
+				PrefsAdapter.setVersionCode(info.versionCode);
 			}
 		} catch (NameNotFoundException e) {
 			Log.e(LOG_TAG, "onCreate() >> " + e.toString());
 		}
 		
-		mediaReceiver = new MediaReceiver();
+		sMediaReceiver = new MediaReceiver();
 		
-		// FIXME: VERY BAD APPROACH
+		// FIXME: VERY BAD APPROACH. Required by TOR...
 		Resources res = this.getResources();
 		
 		Configuration config = res.getConfiguration();
 		
-		String languageCode = PrefsAdapter.getInstance(this, true).getLanguageCode();
+		String languageCode = PrefsAdapter.getInstance().getValues().getLanguageCode();
 		
 		if ((!languageCode.equals(res.getString(R.string.locale_language_code_default)))
 				&& (!config.locale.getLanguage().equals(languageCode))) {
@@ -122,18 +163,20 @@ public class SimpleRecognizer extends Application {
 		//
 	}
 	
-	@Override
-	public void onLowMemory() {
-		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: On Low Memory");
-		
-		super.onLowMemory();
+	public static Context getPackageContext() {
+		return sPackageContext;
 	}
 	
-	@Override
-	public void onTerminate() {
-		Log.i(LOG_TAG, this.getString(R.string.app_name) + " :: Terminated");
-		
-		super.onTerminate();
+	public static boolean isDataBase() {
+		return sIsDataBase;
+	}
+	
+	public static boolean isAdMobHazard() {
+		return sIsAdMobHazard;
+	}
+	
+	public static MediaReceiver getMediaReceiver() {
+		return sMediaReceiver;
 	}
 	
 	public static ActionBar initActionBar(Activity activity, ActionBar actionBar) {
@@ -141,7 +184,7 @@ public class SimpleRecognizer extends Application {
 			return null;
 		}
 		
-		Resources res = ((Context) activity).getResources();
+		Resources res = sPackageContext.getResources();
 		
 		TextView title = null;
 		
@@ -165,7 +208,7 @@ public class SimpleRecognizer extends Application {
 		}
 		
 		if (title != null) {
-			title.setTypeface(getTypefaceMain(activity.getResources()));
+			title.setTypeface(getTypefaceMain());
 			title.setTextSize(
 					TypedValue.COMPLEX_UNIT_SP,
 					Math.round(title.getTextSize() / res.getDisplayMetrics().scaledDensity + 4.0f)
@@ -179,8 +222,10 @@ public class SimpleRecognizer extends Application {
 		return actionBar;
 	}
 	
-	public static Typeface getTypefaceMain(Resources res) {
+	public static Typeface getTypefaceMain() {
 		String font = null;
+		
+		Resources res = sPackageContext.getResources();
 		
 		if (res.getConfiguration().locale.getLanguage()
 				.equals(res.getString(R.string.locale_language_code_ru))) {
@@ -231,26 +276,45 @@ public class SimpleRecognizer extends Application {
 		}
 	}
 	
-	public static Toast makeToast(Context context, int resId, int duration) throws Resources.NotFoundException {
-		return makeToast(context, context.getResources().getText(resId), duration);
+	public static Toast makeToast(int resId, int duration) throws Resources.NotFoundException {
+		return makeToast(sPackageContext.getResources().getText(resId), duration);
 	}
 	
-	public static Toast makeToast(Context context, CharSequence text, int duration) {
-		LayoutInflater inflater = LayoutInflater.from(context);
+	public static Toast makeToast(CharSequence text, int duration) {
+		LayoutInflater inflater = LayoutInflater.from(sPackageContext);
 		View view = inflater.inflate(R.layout.toast, null);
 		
 		TextView textView = (TextView) view.findViewById(R.id.textViewToast);
 		textView.setText(text);
 		
-		Toast toast = new Toast(context.getApplicationContext()); 
+		Toast toast = new Toast(sPackageContext); 
 		toast.setView(view);
 		toast.setDuration(duration);
 		
 		return toast;
 	}
 	
-	public static boolean checkCourseCreator(Context context, String creator) {
-		return TextUtils.equals(Utils.GetEmail(context), creator);
+	public static boolean checkCourseCreator(String creator) {
+		return TextUtils.equals(Utils.GetEmail(sPackageContext), creator);
+	}
+	
+	public static boolean isNetworkAvailable() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) sPackageContext
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		
+		NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+		
+		return ((networkInfo != null) && networkInfo.isConnectedOrConnecting());
+	}
+	
+	public static void exit(Activity activity) {
+		Log.i(LOG_TAG, "Exiting Application...");
+		
+		if (activity != null) {
+			activity.finish();
+		}
+		
+		Process.killProcess(Process.myPid());
 	}
 	
 }

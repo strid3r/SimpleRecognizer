@@ -10,12 +10,9 @@ package ru.strider.simplerecognizer;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.ShutterCallback;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -27,7 +24,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,7 +42,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import ru.strider.adapter.BaseArrayAdapter;
-import ru.strider.app.BaseActivity;
+import ru.strider.app.BaseFragmentActivity;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.model.Item;
@@ -55,6 +51,7 @@ import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.ImagePHash;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
 import ru.strider.util.Text;
+import ru.strider.view.OnLockViewListener;
 import ru.strider.widget.CameraPreview;
 
 /**
@@ -62,7 +59,8 @@ import ru.strider.widget.CameraPreview;
  * 
  * @author strider
  */
-public class MainCamera extends BaseActivity implements ShutterCallback, PictureCallback {
+public class MainCamera extends BaseFragmentActivity implements OnLockViewListener,
+		Camera.ShutterCallback, Camera.PictureCallback {
 	
 	private static final String LOG_TAG = MainCamera.class.getSimpleName();
 	
@@ -106,7 +104,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 	protected void onResume() {
 		super.onResume();
 		
-		Preferences.usePreferencesValues(this, false);
+		PrefsAdapter.getInstance().getValues().useValues(this, false);
 		
 		useConfigValues();
 		
@@ -123,13 +121,6 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		
 		mLastBackPress = 0L;
 		mToastBackPress.cancel();
-		
-		if (this.isFinishing()) {
-			PrefsAdapter.release();
-			ConfigAdapter.release();
-			
-			DataBaseAdapter.release();
-		}
 	}
 	
 	@Override
@@ -195,7 +186,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 				return true;
 			}
 			case (R.id.mainMenuCourse): {
-				Intent iSelectCourse = new Intent(this, SelectCourse.class);
+				Intent iSelectCourse = new Intent(this, ManageCourse.class);
 				this.startActivity(iSelectCourse);
 				
 				return true;
@@ -218,11 +209,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 				return true;
 			}
 			case (R.id.mainMenuExit): {
-				Log.i(LOG_TAG, "Exiting Application...");
-				
-				this.finish();
-				
-				Process.killProcess(Process.myPid());
+				SimpleRecognizer.exit(this);
 				
 				return true;
 			}
@@ -247,9 +234,9 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 	}
 	
 	private void doInit() {
-		this.setInitPreferences(false);
+		this.setInitPreference(false);
 		
-		mConfigAdapter = ConfigAdapter.getInstance(this);
+		mConfigAdapter = ConfigAdapter.getInstance();
 		
 		mActionBar = this.getSupportActionBar();
 		mActionBar.setHomeButtonEnabled(false);
@@ -262,11 +249,11 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		mViewSwitcher.setDisplayedChild(VIEW_SHUTTER_BUTTON_POSITION);
 		
 		((ImageButton) mViewSwitcher.findViewById(R.id.imageButtonShutter))
-				.setOnClickListener(new OnClickListener() {
+				.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View view) {
-					lockUI(true);
+					onLockView(true);
 					
 					mCamera.takePicture(MainCamera.this, null, null, MainCamera.this);
 				}
@@ -274,12 +261,16 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 			});
 		
 		mToastBackPress = SimpleRecognizer.makeToast(
-				this,
 				R.string.key_button_back_double_press,
 				Toast.LENGTH_LONG
 			);
 		
-		this.setCheckAdFree(true);
+		if (!SimpleRecognizer.isDataBase()) {
+			DataBaseAdapter.DataBaseDialog.newInstance().show(
+					this.getSupportFragmentManager(),
+					DataBaseAdapter.DataBaseDialog.KEY
+				);
+		}
 	}
 	
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -313,29 +304,37 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		mConfigAdapter.getValues();
 	}
 	
-	private void lockUI(boolean isLock) {
+	@Override
+	public void onLockView(boolean isLock) {
 		mIsLock = isLock;
 		
-		if (isLock) {
-			mActionBar.hide();
-		} else {
-			if (mCamera != null) {
-				try {
-					mCamera.startPreview();
-				} catch (Exception e) {
-					//
+		if (!this.isDestroy()) {
+			if (isLock) {
+				mActionBar.hide();
+			} else {
+				if (mCamera != null) {
+					try {
+						mCamera.startPreview();
+					} catch (Exception e) {
+						//
+					}
 				}
+				
+				mActionBar.show();
 			}
 			
-			mActionBar.show();
+			this.supportInvalidateOptionsMenu();
+			
+			mViewSwitcher.setDisplayedChild(isLock
+					? VIEW_SHUTTER_PROGRESS_POSITION
+					: VIEW_SHUTTER_BUTTON_POSITION
+				);
 		}
-		
-		this.supportInvalidateOptionsMenu();
-		
-		mViewSwitcher.setDisplayedChild(isLock
-				? VIEW_SHUTTER_PROGRESS_POSITION
-				: VIEW_SHUTTER_BUTTON_POSITION
-			);
+	}
+	
+	@Override
+	public boolean isLock() {
+		return mIsLock;
 	}
 	
 	private void obtainCamera() {
@@ -357,7 +356,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 			mCamera.setParameters(parameters);
 			
 			mPreview.setCamera(mCamera);
-		} else {
+		} else {//TODO: Dialog
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string.main_dialog_camera_error_title);
 			builder.setMessage("Couldn't obtain Camera with ID: " + Integer.toString(mCameraId));
@@ -414,7 +413,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 			obtainCamera();
 			
 			mPreview.switchCamera();
-		} else {
+		} else {//TODO: Dialog
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string.main_dialog_camera_alert_title);
 			builder.setMessage(R.string.main_dialog_camera_alert_message);
@@ -439,7 +438,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 	public void onPictureTaken(byte[] data, Camera camera) {
 		SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "onPictureTaken() called");
 		
-		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 		
 		dbAdapter.open();
 		
@@ -449,7 +448,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		
 		if (course != null) {
 			(new AsyncGetImagePHash(data, course)).execute();
-		} else {
+		} else {//TODO: Dialog
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string.dialog_title_caution);
 			builder.setMessage(R.string.main_dialog_no_course_message);
@@ -460,7 +459,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Intent iSelectCourse = new Intent(MainCamera.this, SelectCourse.class);
+						Intent iSelectCourse = new Intent(MainCamera.this, ManageCourse.class);
 						MainCamera.this.startActivity(iSelectCourse);
 					}
 					
@@ -472,7 +471,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 					
 					@Override
 					public void onDismiss(DialogInterface dialog) {
-						lockUI(false);
+						onLockView(false);
 					}
 					
 				});
@@ -549,6 +548,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		return camera;
 	}
 	
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	public static String getOptimalFocusMode(List<String> listFocusMode) {
 		String optimalFocusMode = null;
 		
@@ -581,15 +581,11 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		
 		private long mInitTime = 0L;
 		
-		private Context mContext = null;
-		
 		private byte[] mData = null;
 		
 		private Course mCourse = null;
 		
 		public AsyncGetImagePHash(byte[] data, Course course) {
-			mContext = MainCamera.this.getApplicationContext();
-			
 			mData = data;
 			
 			mCourse = course;
@@ -607,14 +603,14 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 		
 		@Override
 		protected void onPostExecute(String result) {
-			if (MainCamera.this.isAlive()) {
+			if (!MainCamera.this.isDestroy()) {
 				StringBuilder sb = new StringBuilder();
 				
 				sb.append("Work Time: ");
 				sb.append(SystemClock.elapsedRealtime() - mInitTime);
 				sb.append(" ms.").append(Text.LF);
 				
-				final DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(MainCamera.this);
+				final DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 				
 				if (mConfigAdapter.getIsCreator()) {
 					dbAdapter.open();
@@ -623,9 +619,9 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 					
 					dbAdapter.close();
 					
-					if (SimpleRecognizer.checkCourseCreator(mContext, mCourse.getCreator())) {
+					if (SimpleRecognizer.checkCourseCreator(mCourse.getCreator())) {
 						final BaseArrayAdapter<Item> adapter = new BaseArrayAdapter<Item>(
-								mContext,
+								SimpleRecognizer.getPackageContext(),
 								R.layout.spinner_item_activated
 							);
 						adapter.setDropDownViewResource(R.layout.list_item_single_choice_activated);
@@ -643,8 +639,8 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 							
 							adapter.addData(listItem);
 						}
-						
-						LayoutInflater inflater = LayoutInflater.from(mContext);
+						//TODO: Dialog
+						LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
 						View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 						View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
 						
@@ -703,16 +699,16 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 								
 								@Override
 								public void onDismiss(DialogInterface dialog) {
-									lockUI(false);
+									MainCamera.this.onLockView(false);
 								}
 								
 							});
 						
 						alert.show();
-					} else {
+					} else {//TODO: Dialog
 						AlertDialog.Builder builder = new AlertDialog.Builder(MainCamera.this);
 						builder.setTitle(R.string.dialog_title_forbidden);
-						builder.setMessage(R.string.select_course_dialog_not_creator_message);
+						builder.setMessage(R.string.manage_course_dialog_not_creator_message);
 						
 						builder.setNeutralButton(R.string.dialog_button_close, null);
 						
@@ -722,7 +718,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 								
 								@Override
 								public void onDismiss(DialogInterface dialog) {
-									lockUI(false);
+									MainCamera.this.onLockView(false);
 								}
 								
 							});
@@ -775,8 +771,8 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 						sb.append(Text.LF).append(Text.LF);
 						sb.append(itemResult.getContent());
 					}
-					
-					LayoutInflater inflater = LayoutInflater.from(mContext);
+					//TODO: DIalog
+					LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
 					View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 					View viewContent = inflater.inflate(R.layout.alert_dialog_item, null);
 					
@@ -794,7 +790,8 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 						if (videoUri != null) {
 							final Uri uri = Uri.parse(videoUri);
 							
-							buttonVideo.setTextColor(mContext.getResources().getColor(R.color.main));
+							buttonVideo.setTextColor(SimpleRecognizer.getPackageContext()
+									.getResources().getColor(R.color.main));
 							buttonVideo.setClickable(true);
 							
 							buttonVideo.setOnClickListener(new View.OnClickListener() {
@@ -835,7 +832,7 @@ public class MainCamera extends BaseActivity implements ShutterCallback, Picture
 							
 							@Override
 							public void onDismiss(DialogInterface dialog) {
-								lockUI(false);
+								MainCamera.this.onLockView(false);
 							}
 							
 						});

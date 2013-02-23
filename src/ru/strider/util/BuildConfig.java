@@ -27,7 +27,7 @@ public class BuildConfig {
 	 * <br>Debug 	: true
 	 * <br>Release 	: false
 	 */
-	public static final boolean DEBUG = true;//FIXME: TURN RELEASE ON
+	public static final boolean DEBUG = true; // FIXME: FALSE FOR DEPLOYMENT
 	
 	/**
 	 * Defines current project Version state.
@@ -40,7 +40,7 @@ public class BuildConfig {
 	public static final String VERSION = VERSION_BETA;
 	
 	private BuildConfig() {
-		throw new AssertionError();
+		throw (new AssertionError());
 	}
 	
 }

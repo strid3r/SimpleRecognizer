@@ -18,7 +18,7 @@
 
 typedef std::vector<std::vector<double> > pix_map_t;
 
-template <typename T,unsigned S>
+template <typename T, unsigned S>
 inline unsigned sizeOfArray(const T (&v)[S]) {
 	return S;
 }
@@ -99,7 +99,7 @@ static jobjectArray ImagePHash::nativeApplyDCT(JNIEnv* env, jclass clazz, jobjec
 	}
 
 	for (jsize i = 0; i < size; i++) {
-		jdoubleArray inRow = (jdoubleArray) env->GetObjectArrayElement(in, i);
+		jdoubleArray inRow = reinterpret_cast<jdoubleArray>(env->GetObjectArrayElement(in, i));
 
 		if (inRow == NULL) {
 			return NULL; // Illegal Argument //

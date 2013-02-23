@@ -35,10 +35,6 @@ public class ConfigAdapter {
 	
 	public static final String DEFAULT_VALUE_DIRECTORY = File.listRoots()[0].getPath();
 	
-	private static volatile ConfigAdapter sInstance = null;
-	
-	private Context mContext = null;
-	
 	private long mCourseId = 0L;
 	private long mItemId = 0L;
 	
@@ -46,46 +42,20 @@ public class ConfigAdapter {
 	
 	private String mDirectory = null;
 	
-	private ConfigAdapter(Context context) {
-		mContext = context.getApplicationContext();
+	private ConfigAdapter() {
+		//
 	}
 	
-	public static ConfigAdapter getInstance(Context context) {
-		return getInstance(context, false);
+	public static ConfigAdapter getInstance() {
+		return ConfigHolder.INSTANCE;
 	}
 	
-	public static ConfigAdapter getInstance(Context context, boolean isInit) {
-		ConfigAdapter localInstance = sInstance;
-		
-		if (localInstance == null) {
-			synchronized (ConfigAdapter.class) {
-				localInstance = sInstance;
-				
-				if (localInstance == null) {
-					sInstance = localInstance = new ConfigAdapter(context);
-				}
-			}
-		}
-		
-		if (isInit) {
-			localInstance.getValues();
-		}
-		
-		return localInstance;
-	}
-	
-	public static synchronized void release() {
-		if (sInstance != null) {
-			sInstance = null;
-		}
-	}
-	
-	public void getValues() {
+	public ConfigAdapter getValues() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "getValues() called");
 		
-		SharedPreferences config = getSharedPreferences(mContext);
+		SharedPreferences config = getSharedPreferences();
 		
-		Resources res = mContext.getResources();
+		Resources res = SimpleRecognizer.getPackageContext().getResources();
 		
 		mCourseId = config.getLong(res.getString(R.string.config_key_course_id), DEFAULT_VALUE_COURSE_ID);
 		mItemId = config.getLong(res.getString(R.string.config_key_item_id), DEFAULT_VALUE_ITEM_ID);
@@ -93,16 +63,18 @@ public class ConfigAdapter {
 		mIsCreator = config.getBoolean(res.getString(R.string.config_key_is_creator), DEFAULT_VALUE_IS_CREATOR);
 		
 		mDirectory = config.getString(res.getString(R.string.config_key_directory), DEFAULT_VALUE_DIRECTORY);
+		
+		return this;
 	}
 	
-	public void setValues() {
+	public ConfigAdapter setValues() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "setValues() called");
 		
-		SharedPreferences config = getSharedPreferences(mContext);
+		SharedPreferences config = getSharedPreferences();
 		
 		Editor editor = config.edit();
 		
-		Resources res = mContext.getResources();
+		Resources res = SimpleRecognizer.getPackageContext().getResources();
 		
 		editor.putLong(res.getString(R.string.config_key_course_id), mCourseId);
 		editor.putLong(res.getString(R.string.config_key_item_id), mItemId);
@@ -112,45 +84,55 @@ public class ConfigAdapter {
 		editor.putString(res.getString(R.string.config_key_directory), mDirectory);
 		
 		editor.commit();
+		
+		return this;
 	}
 	
 	public long getCourseId() {
 		return mCourseId;
 	}
 	
-	public void setCourseId(long courseId) {
+	public ConfigAdapter setCourseId(long courseId) {
 		mCourseId = courseId;
+		
+		return this;
 	}
 	
 	public long getItemId() {
 		return mItemId;
 	}
 	
-	public void setItemId(long itemId) {
+	public ConfigAdapter setItemId(long itemId) {
 		mItemId = itemId;
+		
+		return this;
 	}
 	
 	public boolean getIsCreator() {
 		return mIsCreator;
 	}
 	
-	public void setIsCreator(boolean isCreator) {
+	public ConfigAdapter setIsCreator(boolean isCreator) {
 		mIsCreator = isCreator;
+		
+		return this;
 	}
 	
 	public String getDirectory() {
 		return mDirectory;
 	}
 	
-	public void setDirectory(String directory) {
+	public ConfigAdapter setDirectory(String directory) {
 		mDirectory = directory;
+		
+		return this;
 	}
 	
 	public void setDefaultValues() {
 		setDefaultValues(false);
 	}
 	
-	public void setDefaultValues(boolean isWithSwitchMode) {
+	public ConfigAdapter setDefaultValues(boolean isWithSwitchMode) {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "setDefaultValues() called");
 		
 		setCourseId(DEFAULT_VALUE_COURSE_ID);
@@ -163,21 +145,34 @@ public class ConfigAdapter {
 		setDirectory(DEFAULT_VALUE_DIRECTORY);
 		
 		setValues();
+		
+		return this;
 	}
 	
-	public static SharedPreferences getSharedPreferences(Context context) {
-		return context.getSharedPreferences(
-				context.getString(R.string.config_file_name),
+	public static SharedPreferences getSharedPreferences() {
+		return SimpleRecognizer.getPackageContext().getSharedPreferences(
+				SimpleRecognizer.getPackageContext().getString(R.string.config_file_name),
 				Context.MODE_PRIVATE
 			);
 	}
 	
-	public static void clearValues(Context context) {
-		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "clearValues(Context context) called");
+	public static void clearValues() {
+		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "clearValues() called");
 		
-		SharedPreferences config = getSharedPreferences(context);
+		SharedPreferences config = getSharedPreferences();
 		
 		config.edit().clear().commit();
+	}
+	
+	/**
+	 * ConfigAdapter ConfigHolder Class.
+	 * 
+	 * @author strider
+	 */
+	private static class ConfigHolder {
+		
+		private static final ConfigAdapter INSTANCE = new ConfigAdapter();
+		
 	}
 	
 }

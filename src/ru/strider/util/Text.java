@@ -51,7 +51,7 @@ public class Text {
 		);
 	
 	private Text() {
-		//
+		throw (new AssertionError());
 	}
 	
 	@TargetApi(Build.VERSION_CODES.FROYO)

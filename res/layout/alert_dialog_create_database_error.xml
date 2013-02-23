@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 strider
+	 
+	 Simple Recognizer
+	 Layout Alert Dialog Create Database Error XML
+	 By © strider 2013.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/linearLayoutAlertDialogCreateDatabaseError"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:orientation="vertical"
+			  android:padding="2.0dp">
+	
+	<!-- CONTENT -->
+	<ScrollView android:id="@+id/scrollViewAlertDialogCreateDatabaseErrorContent"
+				android:layout_width="match_parent"
+				android:layout_height="0.0dp"
+				android:layout_weight="1.0"
+				android:layout_margin="4.0dp"
+				android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+				android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+				android:scrollbarSize="8.0dp">
+		
+		<!-- CREATE DATABASE ERROR -->
+		<LinearLayout android:id="@+id/linearLayoutAlertDialogCreateDatabaseErrorContent"
+					  android:layout_width="match_parent"
+					  android:layout_height="wrap_content"
+					  android:orientation="vertical">
+			
+			<!-- INFO -->
+			<ru.strider.widget.MainTextView android:id="@+id/textViewCreateDatabaseError"
+											android:text="@string/database_create_error_info"
+											style="@style/Main.AlertDialog.TextView" />
+			
+		</LinearLayout>
+		
+	</ScrollView>
+	
+	<!-- CONTROLS -->
+	<LinearLayout android:id="@+id/linearLayoutAlertDialogCreateDatabaseErrorControls"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:layout_weight="0.0"
+				  android:orientation="horizontal">
+		
+		<!-- CLOSE -->
+		<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogClose"
+									  android:text="@string/dialog_button_close_controls"
+									  android:textSize="24sp"
+									  android:textColor="@color/main"
+									  style="@style/Main.Button.TextView.Info" />
+		
+	</LinearLayout>
+	
+</LinearLayout>

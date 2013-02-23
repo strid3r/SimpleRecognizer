@@ -2,41 +2,39 @@
  * Copyright (C) 2013 strider
  * 
  * Application
- * ExpandableListActivity BaseExpandableListActivity Class
+ * PreferenceActivity BasePreferenceActivity Class
  * By © strider 2013.
  */
 
 package ru.strider.app;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.ExpandableListView;
 
-import com.actionbarsherlock.app.SherlockExpandableListActivity;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-import ru.strider.simplerecognizer.Preferences;
 import ru.strider.simplerecognizer.SimpleRecognizer;
 import ru.strider.simplerecognizer.util.AdMob;
+import ru.strider.simplerecognizer.util.PrefsAdapter;
 
 /**
- * ExpandableListActivity BaseExpandableListActivity Class.
+ * PreferenceActivity BasePreferenceActivity Class.
  * 
  * @author strider
  */
-public class BaseExpandableListActivity extends SherlockExpandableListActivity
-		implements ActivityLifecycle {
+public class BasePreferenceActivity extends SherlockPreferenceActivity
+		implements OnSharedPreferenceChangeListener {
 	
-	private static final String LOG_TAG = BaseExpandableListActivity.class.getSimpleName();
+	private static final String LOG_TAG = BasePreferenceActivity.class.getSimpleName();
 	
-	private volatile boolean mIsAlive = false;
-	private boolean mIsSaveInstanceState = false;
-	private boolean mIsRestoreInstanceState = false;
+	private volatile boolean mIsDestroy = false;
 	
-	private boolean mIsCheckAdFree = false;
-	private boolean mIsPreferences = false;
+	private boolean mIsLicense = false;
+	private boolean mIsPreference = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,26 +46,31 @@ public class BaseExpandableListActivity extends SherlockExpandableListActivity
 		
 		super.onCreate(savedInstanceState);
 		
-		mIsAlive = true;
-		mIsRestoreInstanceState = (savedInstanceState != null);
+		mIsDestroy = false;
 		
-		mIsCheckAdFree = false;
-		mIsPreferences = true;
+		mIsLicense = true;
+		mIsPreference = true;
 		
 		SimpleRecognizer.initActionBar(this, this.getSupportActionBar());
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onResume() called");
 		
 		super.onResume();
 		
-		//AdMob.initLisenceAsync(this, mIsCheckAdFree); // FIXME: ENABLE FOR DEPLOYMENT
-		
-		if (mIsPreferences) {
-			Preferences.usePreferencesValues(this);
+		if (mIsLicense) {
+			//AdMob.initLicense(this); // FIXME: ENABLE FOR DEPLOYMENT
 		}
+		
+		if (mIsPreference) {
+			PrefsAdapter.getInstance().getValues().useValues(this);
+		}
+		
+		this.getPreferenceScreen().getSharedPreferences()
+				.registerOnSharedPreferenceChangeListener(this);
 	}
 	
 	@Override
@@ -75,10 +78,9 @@ public class BaseExpandableListActivity extends SherlockExpandableListActivity
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onSIS() called");
 		
 		super.onSaveInstanceState(outState);
-		
-		mIsSaveInstanceState = true;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onPause() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onPause() called");
@@ -86,17 +88,28 @@ public class BaseExpandableListActivity extends SherlockExpandableListActivity
 		super.onPause();
 		
 		AdMob.removeAdView(this);
+		
+		this.getPreferenceScreen().getSharedPreferences()
+				.unregisterOnSharedPreferenceChangeListener(this);
 	}
 	
 	@Override
 	protected void onDestroy() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onDestroy() called");
 		
-		mIsAlive = false;
+		mIsDestroy = true;
 		
 		AdMob.destroyAdView(this);
 		
 		super.onDestroy();
+	}
+	
+	public boolean isDestroy() {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			return mIsDestroy;
+		} else {
+			return super.isDestroyed();
+		}
 	}
 	/*
 	@Override
@@ -122,50 +135,21 @@ public class BaseExpandableListActivity extends SherlockExpandableListActivity
 		}
 	}
 	
-	public void setCheckAdFree(boolean isCheckAdFree) {
-		mIsCheckAdFree = isCheckAdFree;
+	public void setInitLicense(boolean isLicense) {
+		mIsLicense = isLicense;
 	}
 	
-	public void setInitPreferences(boolean isPreferences) {
-		mIsPreferences = isPreferences;
-	}
-	
-	@Override
-	public BaseExpandableListActivity getActivity() {
-		return this;
+	public void setInitPreference(boolean isPreference) {
+		mIsPreference = isPreference;
 	}
 	
 	@Override
-	public boolean isAlive() {
-		return mIsAlive;
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+		PrefsAdapter.requestedOrientation = this.getResources().getConfiguration().orientation;
+		
+		PrefsAdapter.getInstance().getValues().useValues(this);
 	}
-	
-	@Override
-	public boolean isSaveInstanceState() {
-		return mIsSaveInstanceState;
-	}
-	
-	@Override
-	public boolean isRestoreInstanceState() {
-		return mIsRestoreInstanceState;
-	}
-	
-	@Override
-	public boolean onChildClick(ExpandableListView parent, View view, int groupPosition,
-			int childPosition, long id) {
-		return false;
-	}
-	
-	@Override
-	public void onGroupExpand(int groupPosition) {
-		//
-	}
-	
-	@Override
-	public void onGroupCollapse(int groupPosition) {
-		//
-	}
-	
+	/*
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
@@ -199,5 +183,5 @@ public class BaseExpandableListActivity extends SherlockExpandableListActivity
 			}
 		}
 	}
-	
+	*/
 }

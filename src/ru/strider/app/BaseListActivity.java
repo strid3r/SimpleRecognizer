@@ -8,6 +8,7 @@
 
 package ru.strider.app;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -17,25 +18,23 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-import ru.strider.simplerecognizer.Preferences;
 import ru.strider.simplerecognizer.SimpleRecognizer;
 import ru.strider.simplerecognizer.util.AdMob;
+import ru.strider.simplerecognizer.util.PrefsAdapter;
 
 /**
  * ListActivity BaseListActivity Class.
  * 
  * @author strider
  */
-public class BaseListActivity extends SherlockListActivity implements ActivityLifecycle {
+public class BaseListActivity extends SherlockListActivity {
 	
 	private static final String LOG_TAG = BaseListActivity.class.getSimpleName();
 	
-	private volatile boolean mIsAlive = false;
-	private boolean mIsSaveInstanceState = false;
-	private boolean mIsRestoreInstanceState = false;
+	private volatile boolean mIsDestroy = false;
 	
-	private boolean mIsCheckAdFree = false;
-	private boolean mIsPreferences = false;
+	private boolean mIsLicense = false;
+	private boolean mIsPreference = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +46,10 @@ public class BaseListActivity extends SherlockListActivity implements ActivityLi
 		
 		super.onCreate(savedInstanceState);
 		
-		mIsAlive = true;
-		mIsRestoreInstanceState = (savedInstanceState != null);
+		mIsDestroy = false;
 		
-		mIsCheckAdFree = false;
-		mIsPreferences = true;
+		mIsLicense = true;
+		mIsPreference = true;
 		
 		SimpleRecognizer.initActionBar(this, this.getSupportActionBar());
 	}
@@ -62,10 +60,12 @@ public class BaseListActivity extends SherlockListActivity implements ActivityLi
 		
 		super.onResume();
 		
-		//AdMob.initLisenceAsync(this, mIsCheckAdFree); // FIXME: ENABLE FOR DEPLOYMENT
+		if (mIsLicense) {
+			//AdMob.initLicense(this); // FIXME: ENABLE FOR DEPLOYMENT
+		}
 		
-		if (mIsPreferences) {
-			Preferences.usePreferencesValues(this);
+		if (mIsPreference) {
+			PrefsAdapter.getInstance().getValues().useValues(this);
 		}
 	}
 	
@@ -74,8 +74,6 @@ public class BaseListActivity extends SherlockListActivity implements ActivityLi
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onSIS() called");
 		
 		super.onSaveInstanceState(outState);
-		
-		mIsSaveInstanceState = true;
 	}
 	
 	@Override
@@ -91,11 +89,19 @@ public class BaseListActivity extends SherlockListActivity implements ActivityLi
 	protected void onDestroy() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "onDestroy() called");
 		
-		mIsAlive = false;
+		mIsDestroy = true;
 		
 		AdMob.destroyAdView(this);
 		
 		super.onDestroy();
+	}
+	
+	public boolean isDestroy() {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			return mIsDestroy;
+		} else {
+			return super.isDestroyed();
+		}
 	}
 	/*
 	@Override
@@ -121,32 +127,12 @@ public class BaseListActivity extends SherlockListActivity implements ActivityLi
 		}
 	}
 	
-	public void setCheckAdFree(boolean isCheckAdFree) {
-		mIsCheckAdFree = isCheckAdFree;
+	public void setInitLicense(boolean isLicense) {
+		mIsLicense = isLicense;
 	}
 	
-	public void setInitPreferences(boolean isPreferences) {
-		mIsPreferences = isPreferences;
-	}
-	
-	@Override
-	public BaseListActivity getActivity() {
-		return this;
-	}
-	
-	@Override
-	public boolean isAlive() {
-		return mIsAlive;
-	}
-	
-	@Override
-	public boolean isSaveInstanceState() {
-		return mIsSaveInstanceState;
-	}
-	
-	@Override
-	public boolean isRestoreInstanceState() {
-		return mIsRestoreInstanceState;
+	public void setInitPreference(boolean isPreference) {
+		mIsPreference = isPreference;
 	}
 	
 	@Override

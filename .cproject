@@ -27,11 +27,12 @@
 								</outputEntries>
 							</builder>
 							<tool id="com.android.gcc.compiler.1257508511" name="Android GCC Compiler" superClass="com.android.gcc.compiler">
-								<option id="com.android.gcc.option.includePath.922361177" superClass="com.android.gcc.option.includePath" valueType="includePath"/>
+								<option id="com.android.gcc.option.includePath.922361177" superClass="com.android.gcc.option.includePath"/>
 								<inputType id="com.android.gcc.inputType.928678947" superClass="com.android.gcc.inputType"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.android.toolchain.gcc.1784934937.361018243" name="android-support-v4.jar" rcbsApplicability="disable" resourcePath="libs/android-support-v4.jar" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="jni"/>
 					</sourceEntries>

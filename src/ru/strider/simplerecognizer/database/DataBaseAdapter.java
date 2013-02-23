@@ -8,13 +8,19 @@
 
 package ru.strider.simplerecognizer.database;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import ru.strider.app.BaseDialogFragment;
+import ru.strider.simplerecognizer.R;
+import ru.strider.simplerecognizer.SimpleRecognizer;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.model.Item;
 import ru.strider.simplerecognizer.model.PHash;
@@ -56,75 +65,31 @@ public class DataBaseAdapter {
 	public static final String KEY_PHASH_COMMENT = "comment";
 	public static final String KEY_PHASH_ITEM_ID = "item_id";
 	
-	private static final int DB_VERSION = 1;
-	private static final int DB_VERSION_EMPTY = 1;
-	
-	private static final String DB_NAME = "SimpleRecognizer.db";
-	private static final String DB_NAME_EMPTY = "SimpleRecognizer_Empty.db";
-	
 	private static final String SQL_QUERY_PRAGMA_FK_ON = "PRAGMA foreign_keys=ON;";
-	
-	private static volatile DataBaseAdapter sInstance = null;
 	
 	private DataBaseHelper mDataBaseHelper = null;
 	
 	private SQLiteDatabase mDataBase = null;
 	
-	private DataBaseAdapter(Activity activity) {
-		mDataBaseHelper = new DataBaseHelper(
-				((Context) activity).getApplicationContext(),
-				DB_NAME,
-				DB_NAME,
-				DB_VERSION
-			);
-		
-		createDataBase(activity);
+	private DataBaseAdapter() {
+		mDataBaseHelper = DataBaseHelper.getInstance();
 	}
 	
-	public DataBaseAdapter(Activity activity, String dbName) {
-		mDataBaseHelper = new DataBaseHelper(
-				((Context) activity).getApplicationContext(),
-				DB_NAME_EMPTY,
-				dbName,
-				DB_VERSION_EMPTY
-			);
-		
-		createDataBase(activity);
+	public DataBaseAdapter(String dbName) {
+		mDataBaseHelper = new DataBaseHelper(dbName);
 	}
 	
-	public static DataBaseAdapter getInstance(Activity activity) {
-		DataBaseAdapter localInstance = sInstance;
-		
-		if (localInstance == null) {
-			synchronized (DataBaseAdapter.class) {
-				localInstance = sInstance;
-				
-				if (localInstance == null) {
-					sInstance = localInstance = new DataBaseAdapter(activity);
-				}
-			}
-		}
-		
-		return localInstance;
+	public static DataBaseAdapter getInstance() {
+		return DataBaseHolder.INSTANCE;
 	}
 	
-	public static synchronized void release() {
-		if (sInstance != null) {
-			sInstance.close();
-			
-			sInstance = null;
-		}
-	}
-	
-	public DataBaseAdapter createDataBase(Activity activity) {
+	public boolean createDataBase() {
 		try {
-			mDataBaseHelper.createDataBase(activity);
+			return mDataBaseHelper.createDataBase();
 		} catch (IOException e) {
-			Log.e(LOG_TAG, "Unable To Create Database >> " + e.toString());
-			throw new Error("UnableToCreateDatabase");
+			Log.e(LOG_TAG, ("Unable to create Database >> " + e.toString()));
+			throw (new IllegalStateException("Unable to create Database"));
 		}
-		
-		return this;
 	}
 	
 	public DataBaseAdapter open() throws SQLException {
@@ -134,7 +99,7 @@ public class DataBaseAdapter {
 			
 			mDataBase = mDataBaseHelper.getReadableDatabase();
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "Open Database >> " + sqle.toString());
+			Log.e(LOG_TAG, ("Open Database >> " + sqle.toString()));
 			throw sqle;
 		}
 		
@@ -149,7 +114,7 @@ public class DataBaseAdapter {
 			mDataBase = mDataBaseHelper.getWritableDatabase();
 			mDataBase.execSQL(SQL_QUERY_PRAGMA_FK_ON);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "Write Database >> " + sqle.toString());
+			Log.e(LOG_TAG, ("Write Database >> " + sqle.toString()));
 			throw sqle;
 		}
 		
@@ -167,7 +132,7 @@ public class DataBaseAdapter {
 				Log.e(LOG_TAG, "Database not deleted");
 			}
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "Delete Database >> " + sqle.toString());
+			Log.e(LOG_TAG, ("Delete Database >> " + sqle.toString()));
 			throw sqle;
 		}
 		
@@ -175,10 +140,10 @@ public class DataBaseAdapter {
 	}
 	
 	public synchronized void close() {
+		mDataBase = null;
+		
 		if (mDataBaseHelper != null) {
 			mDataBaseHelper.close();
-			
-			mDataBase = null;
 		}
 	}
 	
@@ -309,7 +274,7 @@ public class DataBaseAdapter {
 			
 			return cursor;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getAllCourse() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getAllCourse() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -325,7 +290,7 @@ public class DataBaseAdapter {
 			
 			return cursor;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getAllItem() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getAllItem() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -341,7 +306,7 @@ public class DataBaseAdapter {
 			
 			return cursor;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getAllPHash() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getAllPHash() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -371,7 +336,7 @@ public class DataBaseAdapter {
 			
 			return course;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getCourse(long id) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getCourse(long id) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -402,7 +367,7 @@ public class DataBaseAdapter {
 			
 			return course;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getCourse(String category, String title) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getCourse(String category, String title) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -440,7 +405,7 @@ public class DataBaseAdapter {
 					listCourse.add(course);
 				} while (cursor.moveToNext());
 				
-				//Collections.sort(listCourse, Course.ORDER_<>);//TODO: equals + hashCode...
+				Collections.sort(listCourse);
 			}
 			
 			cursor.close();
@@ -456,7 +421,7 @@ public class DataBaseAdapter {
 			
 			return getListCourse(cursor);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCourse() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getListCourse() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -472,7 +437,7 @@ public class DataBaseAdapter {
 			
 			return getListCourse(cursor);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCourse(String category) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getListCourse(String category) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -515,7 +480,7 @@ public class DataBaseAdapter {
 			
 			return listCategory;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListCategory() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getListCategory() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -548,7 +513,7 @@ public class DataBaseAdapter {
 			
 			return listTitle;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListTitle(String category) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getListTitle(String category) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -565,7 +530,7 @@ public class DataBaseAdapter {
 			return mDataBase.update(TABLE_COURSE, cv, KEY_COURSE_ID + "=?",
 					new String[] { Long.toString(course.getId()) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "updateCourse(Course course) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("updateCourse(Course course) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -581,7 +546,7 @@ public class DataBaseAdapter {
 		try {
 			return mDataBase.insert(TABLE_COURSE, null, cv);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "addCourse(Course course) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("addCourse(Course course) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -623,7 +588,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_COURSE, KEY_COURSE_ID + "=?",
 					new String[] { Long.toString(id) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteCourse(long id) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("deleteCourse(long id) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -643,7 +608,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getCourseCount() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getCourseCount() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -673,7 +638,7 @@ public class DataBaseAdapter {
 			
 			return item;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItem(long id) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getItem(long id) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -704,7 +669,7 @@ public class DataBaseAdapter {
 			
 			return item;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItem(String title, long courseId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getItem(String title, long courseId) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -742,7 +707,7 @@ public class DataBaseAdapter {
 						listItem.add(item);
 					} while (cursor.moveToNext());
 					
-					//Collections.sort(listItem);//TODO: equals + hashCode...
+					Collections.sort(listItem);
 				}
 				
 				cursor.close();
@@ -750,7 +715,7 @@ public class DataBaseAdapter {
 			
 			return listItem;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListItem(long courseId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getListItem(long courseId) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -789,7 +754,7 @@ public class DataBaseAdapter {
 			return mDataBase.update(TABLE_ITEM, cv, KEY_ITEM_ID + "=?",
 					new String[] { Long.toString(item.getId()) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "updateItem(Item item) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("updateItem(Item item) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -805,7 +770,7 @@ public class DataBaseAdapter {
 		try {
 			return mDataBase.insert(TABLE_ITEM, null, cv);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "addItem(Item item) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("addItem(Item item) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -847,7 +812,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_ITEM, KEY_ITEM_ID + "=?",
 					new String[] { Long.toString(id) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteItem(long id) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("deleteItem(long id) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -857,7 +822,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_ITEM, KEY_ITEM_COURSE_ID + "=?",
 					new String[] { Long.toString(courseId) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteListItem(long courseId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("deleteListItem(long courseId) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -877,7 +842,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItemCount() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getItemCount() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -899,7 +864,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getItemCount(long courseId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getItemCount(long courseId) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -928,7 +893,7 @@ public class DataBaseAdapter {
 			
 			return pHash;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getPHash(long id) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getPHash(long id) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -957,7 +922,7 @@ public class DataBaseAdapter {
 						listPHash.add(pHash);
 					} while (cursor.moveToNext());
 					
-					//Collections.sort(listPHash);//TODO: equals + hashCode...
+					Collections.sort(listPHash);
 				}
 				
 				cursor.close();
@@ -965,7 +930,7 @@ public class DataBaseAdapter {
 			
 			return listPHash;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getListPHash(long itemId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getListPHash(long itemId) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -981,7 +946,7 @@ public class DataBaseAdapter {
 			return mDataBase.update(TABLE_PHASH, cv, KEY_PHASH_ID + "=?",
 					new String[] { Long.toString(pHash.getId()) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "updatePHash(PHash pHash) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("updatePHash(PHash pHash) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -996,7 +961,7 @@ public class DataBaseAdapter {
 		try {
 			return mDataBase.insert(TABLE_PHASH, null, cv);
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "addPHash(PHash pHash) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("addPHash(PHash pHash) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -1014,7 +979,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_PHASH, KEY_PHASH_ID + "=?",
 					new String[] { Long.toString(id) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deletePHash(long id) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("deletePHash(long id) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -1024,7 +989,7 @@ public class DataBaseAdapter {
 			return mDataBase.delete(TABLE_PHASH, KEY_PHASH_ITEM_ID + "=?",
 					new String[] { Long.toString(itemId) });
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "deleteListPHash(long itemId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("deleteListPHash(long itemId) >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -1044,7 +1009,7 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getPHashCount() >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getPHashCount() >> " + sqle.toString()));
 			throw sqle;
 		}
 	}
@@ -1066,9 +1031,86 @@ public class DataBaseAdapter {
 			
 			return count;
 		} catch (SQLException sqle) {
-			Log.e(LOG_TAG, "getPHashCount(long itemId) >> " + sqle.toString());
+			Log.e(LOG_TAG, ("getPHashCount(long itemId) >> " + sqle.toString()));
 			throw sqle;
 		}
+	}
+	
+	/**
+	 * DataBaseAdapter DataBaseHolder Class.
+	 * 
+	 * @author strider
+	 */
+	private static class DataBaseHolder {
+		
+		private static final DataBaseAdapter INSTANCE = new DataBaseAdapter();
+		
+	}
+	
+	/**
+	 * BaseDialogFragment DataBaseDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class DataBaseDialog extends BaseDialogFragment {
+		
+		//private static final String LOG_TAG = DataBaseDialog.class.getSimpleName();
+		
+		public static final String KEY = DataBaseDialog.class.getSimpleName();
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		public static DataBaseDialog newInstance() {
+			DataBaseDialog fragment = new DataBaseDialog();
+			
+			Bundle args = new Bundle();
+			
+			fragment.setArguments(args);
+			fragment.setCancelable(false);
+			
+			return fragment;
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_create_database_error, null);
+			
+			this.setNeutralButton((Button) mView.findViewById(R.id.buttonAlertDialogClose));
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText(R.string.database_create_error_title);
+			textViewTitle.setSelected(true);
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+		}
+		
+		@Override
+		public void onNeutralClick(View view) {
+			super.onNeutralClick(view);
+			
+			SimpleRecognizer.exit(this.getSherlockActivity());
+		}
+		
 	}
 	
 }

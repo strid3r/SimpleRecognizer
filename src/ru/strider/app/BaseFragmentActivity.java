@@ -2,7 +2,7 @@
  * Copyright (C) 2013 strider
  * 
  * Application
- * Activity BaseActivity Class
+ * FragmentActivity BaseFragmentActivity Class
  * By © strider 2013.
  */
 
@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 import ru.strider.simplerecognizer.SimpleRecognizer;
@@ -21,13 +21,13 @@ import ru.strider.simplerecognizer.util.AdMob;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
 
 /**
- * Activity BaseActivity Class.
+ * FragmentActivity BaseFragmentActivity Class.
  * 
  * @author strider
  */
-public class BaseActivity extends SherlockActivity {
+public class BaseFragmentActivity extends SherlockFragmentActivity {
 	
-	private static final String LOG_TAG = BaseActivity.class.getSimpleName();
+	private static final String LOG_TAG = BaseFragmentActivity.class.getSimpleName();
 	
 	private volatile boolean mIsDestroy = false;
 	

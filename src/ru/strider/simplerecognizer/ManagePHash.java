@@ -49,13 +49,14 @@ import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.ImagePHash;
 import ru.strider.util.BuildConfig;
 import ru.strider.util.Text;
+import ru.strider.view.OnLockViewListener;
 
 /**
  * BaseListActivity ManagePHash Class.
  * 
  * @author strider
  */
-public class ManagePHash extends BaseListActivity {
+public class ManagePHash extends BaseListActivity implements OnLockViewListener {
 	
 	private static final String LOG_TAG = ManagePHash.class.getSimpleName();
 	
@@ -88,14 +89,14 @@ public class ManagePHash extends BaseListActivity {
 		
 		useConfigValues();
 		
-		SimpleRecognizer.mediaReceiver.startWatchingExternalStorage(this);
+		SimpleRecognizer.getMediaReceiver().startWatchingExternalStorage(this);
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
 		
-		SimpleRecognizer.mediaReceiver.stopWatchingExternalStorage(this);
+		SimpleRecognizer.getMediaReceiver().stopWatchingExternalStorage(this);
 	}
 	
 	@Override
@@ -141,7 +142,7 @@ public class ManagePHash extends BaseListActivity {
 			action.setGroupEnabled(R.id.managePHashMenuControls, (!mIsLock));
 		}
 		
-		boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
+		boolean isCreator = SimpleRecognizer.checkCourseCreator(mCourse.getCreator());
 		
 		menu.findItem(R.id.managePHashMenuDeleteItem)
 				.setEnabled((!mIsLock) && isCreator)
@@ -161,20 +162,17 @@ public class ManagePHash extends BaseListActivity {
 			case (R.id.managePHashMenuImport): {
 				mAsyncPHashImport = new AsyncPHashImport();
 				
-				Intent iPickFile = new Intent(this, FileManager.class);
-				iPickFile.putExtra(FileManager.KEY_REQUEST_CODE, FileManager.REQUEST_FILE);
-				iPickFile.putExtra(FileManager.KEY_FILE_TYPE, FileManager.FILE_TYPE_IMAGE);
-				this.startActivityForResult(iPickFile, FileManager.REQUEST_FILE);
+				FileManager.requestPickFile(this, FileManager.FILE_TYPE_IMAGE);
 				
 				return true;
 			}
 			case (R.id.managePHashMenuAddPHash): {
-				buildAddPHash(null).show();
+				buildAddPHash(null).show();//TODO: Dialog
 				
 				return true;
 			}
 			case (R.id.managePHashMenuDeleteItem): {
-				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 				
 				dbAdapter.write();
 				
@@ -222,7 +220,7 @@ public class ManagePHash extends BaseListActivity {
 			);
 		
 		if (mConfigAdapter.getIsCreator()) {
-			boolean isCreator = SimpleRecognizer.checkCourseCreator(this, mCourse.getCreator());
+			boolean isCreator = SimpleRecognizer.checkCourseCreator(mCourse.getCreator());
 			
 			menu.findItem(R.id.managePHashContextMenuEdit)
 					.setEnabled((!mIsLock) && isCreator)
@@ -240,7 +238,7 @@ public class ManagePHash extends BaseListActivity {
 		final PHash pHash = mAdapter.getItem(info.position);
 		
 		switch (item.getItemId()) {
-			case (R.id.managePHashContextMenuShowComment): {
+			case (R.id.managePHashContextMenuShowComment): {//TODO: Dialog
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_show_comment, null);
@@ -265,7 +263,7 @@ public class ManagePHash extends BaseListActivity {
 				return true;
 			}
 			case (R.id.managePHashContextMenuEdit): {
-				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 				
 				dbAdapter.open();
 				
@@ -286,7 +284,7 @@ public class ManagePHash extends BaseListActivity {
 					
 					adapter.addData(listItem);
 				}
-				
+				//TODO: Dialog
 				LayoutInflater inflater = LayoutInflater.from(this);
 				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
@@ -319,7 +317,7 @@ public class ManagePHash extends BaseListActivity {
 							pHash.setComment(editTextComment.getText().toString().trim());
 							pHash.setItemId(adapter.getItem(spinnerItem.getSelectedItemPosition()).getId());
 							
-							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManagePHash.this);
+							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 							
 							dbAdapter.write();
 							
@@ -338,7 +336,7 @@ public class ManagePHash extends BaseListActivity {
 				return true;
 			}
 			case (R.id.managePHashContextMenuDelete): {
-				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+				DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 				
 				dbAdapter.write();
 				
@@ -357,7 +355,7 @@ public class ManagePHash extends BaseListActivity {
 	}
 	
 	private void doInit() {
-		mConfigAdapter = ConfigAdapter.getInstance(this);
+		mConfigAdapter = ConfigAdapter.getInstance();
 		
 		Intent intent = this.getIntent();
 		
@@ -390,7 +388,7 @@ public class ManagePHash extends BaseListActivity {
 	private void initData() {
 		mAdapter.clear();
 		
-		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 		
 		dbAdapter.open();
 		
@@ -417,12 +415,20 @@ public class ManagePHash extends BaseListActivity {
 		mConfigAdapter.getValues();
 	}
 	
-	private void lockUI(boolean isLock) {
+	@Override
+	public void onLockView(boolean isLock) {
 		mIsLock = isLock;
 		
-		this.supportInvalidateOptionsMenu();
-		
-		this.setSupportProgressBarIndeterminateVisibility(isLock);
+		if (!this.isDestroy()) {
+			this.supportInvalidateOptionsMenu();
+			
+			this.setSupportProgressBarIndeterminateVisibility(isLock);
+		}
+	}
+	
+	@Override
+	public boolean isLock() {
+		return mIsLock;
 	}
 	
 	@Override
@@ -471,8 +477,8 @@ public class ManagePHash extends BaseListActivity {
 		}
 	}
 	
-	private AlertDialog buildAddPHash(String pHashHex) {
-		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(this);
+	private AlertDialog buildAddPHash(String pHashHex) {//TODO: Dialog
+		DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 		
 		dbAdapter.open();
 		
@@ -524,7 +530,7 @@ public class ManagePHash extends BaseListActivity {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance(ManagePHash.this);
+					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 					
 					dbAdapter.write();
 					
@@ -557,17 +563,11 @@ public class ManagePHash extends BaseListActivity {
 		
 		private long mInitTime = 0L;
 		
-		//private Context mContext = null;
-		
-		public AsyncPHashImport() {
-			//mContext = ManagePHash.this.getApplicationContext();
-		}
-		
 		@Override
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
 			
-			lockUI(true);
+			ManagePHash.this.onLockView(true);
 		}
 		
 		@Override
@@ -575,7 +575,7 @@ public class ManagePHash extends BaseListActivity {
 			List<String> listPHashHex = new ArrayList<String>();
 			
 			for (String path : params) {
-				if (SimpleRecognizer.mediaReceiver.isExternalStorageAvailable()) {
+				if (SimpleRecognizer.getMediaReceiver().isExternalStorageAvailable()) {
 					String pHashHex = ImagePHash.getPHash(path);
 					
 					if (pHashHex != null) {
@@ -591,7 +591,7 @@ public class ManagePHash extends BaseListActivity {
 		
 		@Override
 		protected void onPostExecute(List<String> result) {
-			if (ManagePHash.this.isAlive()) {
+			if (!ManagePHash.this.isDestroy()) {
 				StringBuilder sb = new StringBuilder();
 				
 				if (BuildConfig.DEBUG) {
@@ -604,7 +604,7 @@ public class ManagePHash extends BaseListActivity {
 					buildAddPHash(pHashHex).show();
 				}
 				
-				lockUI(false);
+				ManagePHash.this.onLockView(false);
 			}
 		}
 		

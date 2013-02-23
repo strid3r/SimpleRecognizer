@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import ru.strider.simplerecognizer.SimpleRecognizer;
+import ru.strider.util.Text;
 
 /**
  * BroadcastReceiver MediaReceiver Interface.
@@ -59,16 +60,28 @@ public class MediaReceiver extends BroadcastReceiver {
 		String state = Environment.getExternalStorageState();
 		
 		if (state.equals(Environment.MEDIA_MOUNTED)) {
-			SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "Media :: Writable");
+			SimpleRecognizer.logIfDebug(
+					Log.DEBUG,
+					LOG_TAG,
+					("Media" + Text.SEPARATOR + "Writable")
+				);
 			
 			mIsExternalStorageAvailable = mIsExternalStorageWritable = true;
 		} else if (state.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-			SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "Media :: Available");
+			SimpleRecognizer.logIfDebug(
+					Log.DEBUG,
+					LOG_TAG,
+					("Media" + Text.SEPARATOR + "Available")
+				);
 			
 			mIsExternalStorageAvailable = true;
 			mIsExternalStorageWritable = false;
 		} else {
-			SimpleRecognizer.logIfDebug(Log.DEBUG, LOG_TAG, "Media :: N/A");
+			SimpleRecognizer.logIfDebug(
+					Log.DEBUG,
+					LOG_TAG,
+					("Media" + Text.SEPARATOR + Text.NOT_AVAILABLE)
+				);
 			
 			mIsExternalStorageAvailable = mIsExternalStorageWritable = false;
 		}
@@ -76,7 +89,7 @@ public class MediaReceiver extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(LOG_TAG, "Storage: " + intent.getData());
+		Log.i(LOG_TAG, ("Storage: " + intent.getData()));
 		
 		updateExternalStorageState();
 	}

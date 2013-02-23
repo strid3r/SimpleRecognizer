@@ -25,12 +25,6 @@ extern "C++" {
 		static const char* CLASS_NAME = "ru/strider/simplerecognizer/util/ImagePHash";
 
 		/*
-		 * Method:    nativeSetDCTSize
-		 * Signature: (I)V
-		 */
-		static void nativeSetDCTSize(JNIEnv* env, jclass clazz, jint size);
-
-		/*
 		 * Method:    nativeApplyDCT
 		 * Signature: ([[D)[[D
 		 */

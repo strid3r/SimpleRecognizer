@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import ru.strider.app.BaseActivity;
+import ru.strider.simplerecognizer.util.PrefsAdapter;
 import ru.strider.util.BuildConfig;
 import ru.strider.util.Text;
 
@@ -37,15 +38,15 @@ public class About extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 		
-		Preferences.usePreferencesValues(this, false);
+		PrefsAdapter.getInstance().getValues().useValues(this, false);
 	}
 	
 	private void doInit() {
-		this.setInitPreferences(false);
+		this.setInitPreference(false);
 		
 		this.setContentView(R.layout.about);
 		
-		((TextView) this.findViewById(R.id.textViewAboutName)).setSelected(true);
+		//((TextView) this.findViewById(R.id.textViewAboutName)).setSelected(true);
 		
 		TextView textViewVersion = (TextView) this.findViewById(R.id.textViewAboutVersion);
 		
@@ -69,9 +70,9 @@ public class About extends BaseActivity {
 			Log.e(LOG_TAG, e.toString());
 		}
 		
-		textViewVersion.setSelected(true);
+		//textViewVersion.setSelected(true);
 		
-		((TextView) this.findViewById(R.id.textViewAboutCopyright)).setSelected(true);
+		//((TextView) this.findViewById(R.id.textViewAboutCopyright)).setSelected(true);
 	}
 	
 }

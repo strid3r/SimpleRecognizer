@@ -41,7 +41,7 @@ public class DateTime {
 	private static DateFormat sDateFormatLocal = new SimpleDateFormat(PATTERN_SHORT, Locale.ENGLISH);
 	
 	private DateTime() {
-		//
+		throw (new AssertionError());
 	}
 	
 	/**

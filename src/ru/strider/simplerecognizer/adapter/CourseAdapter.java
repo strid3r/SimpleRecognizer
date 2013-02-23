@@ -74,9 +74,12 @@ public class CourseAdapter extends BaseExpandableListAdapter
 		}
 	}
 	
-	public void addData(List<?> listGroup, List<? extends List<?>> listChild, List<? extends List<?>> listCount) {
+	public void addData(List<?> listGroup, List<? extends List<?>> listChild,
+			List<? extends List<?>> listCount) {
 		if ((listGroup.size() != listChild.size()) || (listChild.size() != listCount.size())) {
-			throw new IllegalArgumentException("Group, Child and Count data sizes must be equal.");
+			throw (new IllegalArgumentException(
+					"Group, Child and Count data sizes must be equal."
+				));
 		}
 		
 		for (int i = 0; i < listGroup.size(); i++) {

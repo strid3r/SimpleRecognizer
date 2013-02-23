@@ -20,7 +20,7 @@ import ru.strider.util.Text;
  * 
  * @author strider
  */
-public class PHash implements Parcelable {
+public class PHash implements Comparable<PHash>, Parcelable {
 	
 	//private static final String LOG_TAG = PHash.class.getSimpleName();
 	
@@ -160,6 +160,20 @@ public class PHash implements Parcelable {
 		}
 		
 		return sb.toString();
+	}
+	
+	@Override
+	public int compareTo(PHash pHash) {
+		// ItemId
+		int cmpItemId = ((mItemId < pHash.mItemId) ? -1
+				: ((mItemId == pHash.mItemId) ? 0 : 1));
+		
+		if (cmpItemId != 0) {
+			return cmpItemId;
+		} else {
+			// HexValue
+			return mHexValue.compareTo(pHash.mHexValue);
+		}
 	}
 	
 	@Override

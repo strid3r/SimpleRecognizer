@@ -8,10 +8,6 @@
 <resources>
 	
 	<!-- MAIN -->
-	<string name="app_name">
-		Simple Recognizer
-	</string>
-	
 	<string name="app_footer">
 		Загрузка&#8230;
 	</string>
@@ -46,24 +42,23 @@
 	
 	<!-- DATABASE -->
 	<string name="database_create_error_title">
-		Не удалось создать файл базы данных
+		Не удалось создать локальную базу данных
 	</string>
 	
-	<string name="database_create_error_tip_1">
-		1. Пожалуйста, попробуйте очистить данные приложения и запустить его заново:
-	</string>
-	
-	<string name="database_create_error_tip_1_help">
-		( Manage apps -> App -> Clear data ).
-	</string>
-	
-	<string name="database_create_error_tip_2">
-		2. Также проверьте наличие доступного свободного места во внутренней памяти
+	<string name="database_create_error_info">
+		1. Пожалуйста, попробуйте очистить данные Приложения и запустить его заново:
+		\n( Manage apps -> App -> Clear data ).
+		\n\n2. Также проверьте наличие доступного свободного места во внутренней памяти.
 	</string>
 	
 	<!-- DIALOG -->
 	<string name="dialog_ad_free_found">
-		Чтобы использовать данное Приложение, Вы должны Отключить/Удалить AdFree Package:
+		Чтобы использовать данное Приложение, Вы должны Отключить / Удалить следующее ПО:
+		\nAdFree :: com.bigtincan.adfree (бывший com.bigtincan.android.adfree).
+	</string>
+	
+	<string name="dialog_ad_free_hosts">
+		\n( /etc/hosts :: Системный файл изменён )
 	</string>
 	
 	<string name="dialog_title_caution">
@@ -75,7 +70,7 @@
 	</string>
 	
 	<string name="dialog_button_buy_license">
-		Buy License
+		Приобрести Лицензию
 	</string>
 	
 	<string name="dialog_button_try_next">
@@ -113,6 +108,10 @@
 	<!-- ERROR -->
 	<string name="error_no_items">
 		« Нет данных »
+	</string>
+	
+	<string name="error_no_network">
+		« Нет сети »
 	</string>
 	
 </resources>
