@@ -43,20 +43,24 @@
 	</string>
 	
 	<!-- DIALOG -->
-	<string name="manage_phash_dialog_item_title">
-		Item
-	</string>
-	
 	<string name="manage_phash_dialog_item_prompt">
 		Choose an Item
 	</string>
 	
-	<string name="manage_phash_dialog_hex_value_title">
+	<string name="manage_phash_dialog_hex_value_hint">
 		Hex Value
 	</string>
 	
-	<string name="manage_phash_dialog_comment_title">
+	<string name="manage_phash_dialog_comment_hint">
 		Comment
+	</string>
+	
+	<string name="manage_phash_dialog_add_hint">
+		Adding PHash&#8230;
+	</string>
+	
+	<string name="manage_phash_dialog_delete_hint">
+		Deleting PHash&#8230;
 	</string>
 	
 </resources>

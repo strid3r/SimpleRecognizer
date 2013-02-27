@@ -9,7 +9,10 @@
 package ru.strider.simplerecognizer;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
@@ -17,18 +20,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Process;
 import android.os.SystemClock;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -41,7 +42,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import ru.strider.adapter.BaseArrayAdapter;
+import ru.strider.app.BaseDialogFragment;
 import ru.strider.app.BaseFragmentActivity;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
@@ -50,6 +51,8 @@ import ru.strider.simplerecognizer.model.PHash;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
 import ru.strider.simplerecognizer.util.ImagePHash;
 import ru.strider.simplerecognizer.util.PrefsAdapter;
+import ru.strider.simplerecognizer.view.OnItemListener;
+import ru.strider.util.BuildConfig;
 import ru.strider.util.Text;
 import ru.strider.view.OnLockViewListener;
 import ru.strider.widget.CameraPreview;
@@ -59,7 +62,7 @@ import ru.strider.widget.CameraPreview;
  * 
  * @author strider
  */
-public class MainCamera extends BaseFragmentActivity implements OnLockViewListener,
+public class MainCamera extends BaseFragmentActivity implements OnLockViewListener, OnItemListener,
 		Camera.ShutterCallback, Camera.PictureCallback {
 	
 	private static final String LOG_TAG = MainCamera.class.getSimpleName();
@@ -337,6 +340,16 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		return mIsLock;
 	}
 	
+	@Override
+	public void onItemChanged() {
+		//
+	}
+	
+	@Override
+	public void onDeleteItem(Object item) {
+		//
+	}
+	
 	private void obtainCamera() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "obtainCamera() called");
 		
@@ -356,39 +369,35 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 			mCamera.setParameters(parameters);
 			
 			mPreview.setCamera(mCamera);
-		} else {//TODO: Dialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.main_dialog_camera_error_title);
-			builder.setMessage("Couldn't obtain Camera with ID: " + Integer.toString(mCameraId));
-			builder.setCancelable(false);
+		} else {//TODO: Fix
+			SimpleRecognizer.MessageDialog dialog = SimpleRecognizer.MessageDialog.newInstance(
+					this.getString(R.string.main_dialog_camera_error_title),
+					("Couldn't obtain Camera with ID: " + Integer.toString(mCameraId)),
+					null
+				);
+			dialog.setCancelable(false);
 			
-			if ((mCameraCount > 1) && (mCameraId != CAMERA_DEFAULT_ID)) {
-				builder.setNegativeButton(R.string.dialog_button_try_next, new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							switchCamera();
-						}
-						
-					});
-			}
-			
-			builder.setPositiveButton(R.string.dialog_button_exit, new DialogInterface.OnClickListener() {
+			dialog.setNegativeButton(R.string.dialog_button_try_next, (new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Log.i(LOG_TAG, "Exiting Application...");
-						
-						MainCamera.this.finish();
-						
-						Process.killProcess(Process.myPid());
+						switchCamera();
 					}
 					
-				});
+				}));
 			
-			AlertDialog alert = builder.create();
-			alert.setCanceledOnTouchOutside(false);
-			alert.show();
+			dialog.setPositiveButton(R.string.dialog_button_exit, (new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						SimpleRecognizer.exit(MainCamera.this);
+					}
+					
+				}));
+			
+			dialog.show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
+			
+			dialog.getNegativeButton().setEnabled((mCameraCount > 1) && (mCameraId != CAMERA_DEFAULT_ID));
 		}
 	}
 	
@@ -408,20 +417,19 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		if (mCameraCount > 1) {
 			releaseCamera();
 			
+			mCameraLockedId = mCameraId;
+			
 			mCameraId = (mCameraLockedId + 1) % mCameraCount;
 			
 			obtainCamera();
 			
 			mPreview.switchCamera();
-		} else {//TODO: Dialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.main_dialog_camera_alert_title);
-			builder.setMessage(R.string.main_dialog_camera_alert_message);
-			
-			builder.setNeutralButton(R.string.dialog_button_close, null);
-			
-			AlertDialog alert = builder.create();
-			alert.show();
+		} else {
+			SimpleRecognizer.MessageNeutralDialog.newInstance(
+					this.getString(R.string.main_dialog_camera_alert_title),
+					this.getString(R.string.main_dialog_camera_alert_message),
+					null
+				).show(this.getSupportFragmentManager(), SimpleRecognizer.MessageNeutralDialog.KEY);
 		}
 	}
 	
@@ -444,39 +452,57 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		
 		Course course = dbAdapter.getCourse(mConfigAdapter.getCourseId());
 		
+		Item item = null;
+		
+		if (mConfigAdapter.getIsCreator()) {
+			item = dbAdapter.getItem(mConfigAdapter.getItemId());
+		}
+		
 		dbAdapter.close();
 		
+		SimpleRecognizer.MessageDialog dialog = null;
+		
 		if (course != null) {
-			(new AsyncGetImagePHash(data, course)).execute();
-		} else {//TODO: Dialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.dialog_title_caution);
-			builder.setMessage(R.string.main_dialog_no_course_message);
+			if ((!mConfigAdapter.getIsCreator()) || (item != null)) {
+				(new AsyncGetImagePHash(data, course, item)).execute();
+			} else {
+				dialog = SimpleRecognizer.MessageDialog.newInstance(
+						this.getString(R.string.dialog_title_caution),
+						this.getString(R.string.main_dialog_no_item_message),
+						null
+					);
+			}
+		} else {
+			dialog = SimpleRecognizer.MessageDialog.newInstance(
+					this.getString(R.string.dialog_title_caution),
+					this.getString(R.string.main_dialog_no_course_message),
+					null
+				);
+		}
+		
+		if (dialog != null) {//TODO: Fix
+			dialog.setNegativeButton(R.string.dialog_button_close, null);
 			
-			builder.setNegativeButton(R.string.dialog_button_close, null);
-			
-			builder.setPositiveButton(R.string.main_menu_course, new DialogInterface.OnClickListener() {
+			dialog.setPositiveButton(R.string.main_menu_course, (new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Intent iSelectCourse = new Intent(MainCamera.this, ManageCourse.class);
-						MainCamera.this.startActivity(iSelectCourse);
+						Intent iManageCourse = new Intent(MainCamera.this, ManageCourse.class);
+						MainCamera.this.startActivity(iManageCourse);
 					}
 					
-				});
+				}));
 			
-			AlertDialog alert = builder.create();
-			
-			alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					
 					@Override
 					public void onDismiss(DialogInterface dialog) {
-						onLockView(false);
+						MainCamera.this.onLockView(false);
 					}
 					
 				});
 			
-			alert.show();
+			dialog.show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
 		}
 	}
 	
@@ -571,11 +597,156 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 	}
 	
 	/**
-	 * AsyncTask AsyncGetPHash<Void, Void, String> Class.
+	 * BaseDialogFragment ItemInfoDialog Class.
 	 * 
 	 * @author strider
 	 */
-	private class AsyncGetImagePHash extends AsyncTask<Void, Void, String> {
+	public static class ItemInfoDialog extends BaseDialogFragment {
+		
+		//private static final String LOG_TAG = ItemInfoDialog.class.getSimpleName();
+		
+		public static final String KEY = ItemInfoDialog.class.getSimpleName();
+		
+		private OnLockViewListener mLockViewListener = null;
+		
+		private Item mItem = null;
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		public static ItemInfoDialog newInstance(Item item) {
+			ItemInfoDialog fragment = new ItemInfoDialog();
+			
+			Bundle args = new Bundle();
+			args.putParcelable(Item.KEY, item);
+			
+			fragment.setArguments(args);
+			
+			return fragment;
+		}
+		
+		public Item getItem() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.<Item> getParcelable(Item.KEY) : null);
+		}
+		
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+			
+			try {
+				mLockViewListener = (OnLockViewListener) activity;
+			} catch (ClassCastException e) {
+				throw (new ClassCastException(
+						activity.toString() + " must implement OnLockViewListener."
+					));
+			}
+		}
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			mItem = getItem();
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_item_info, null);
+			
+			this.registerNegativeButton(mView, R.id.buttonAlertDialogVideo);
+			this.registerPositiveButton(mView, R.id.buttonAlertDialogClose);
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText((mItem != null) ? mItem.getTitle() : "Item not Found");
+			textViewTitle.setSelected(true);
+			
+			TextView textViewContent = (TextView) mView.findViewById(R.id.textViewItemContent);
+			textViewContent.setText(Html.fromHtml((!TextUtils.isEmpty(mItem.getContent()))
+					? mItem.getContent().replace(Text.LF, Text.BR)
+					: Text.NOT_AVAILABLE
+				));
+			
+			if (TextUtils.isEmpty(mItem.getContent())) {
+				textViewContent.setGravity(Gravity.CENTER);
+			}
+			
+			if ((mItem != null) && (!TextUtils.isEmpty(mItem.getVideoUri()))) {
+				Button buttonVideo = this.getPositiveButton();
+				buttonVideo.setTextColor(this.getResources().getColor(R.color.main));
+				buttonVideo.setClickable(true);
+			}
+			
+			// TODO: FIND A WAY FOR TRANSPARENCY
+			//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);
+			//alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+		}
+		
+		@Override
+		public void onDestroy() {
+			mItem = null;
+			
+			super.onDestroy();
+		}
+		
+		@Override
+		public void onDetach() {
+			mLockViewListener = null;
+			
+			super.onDetach();
+		}
+		
+		private void unlockView() {
+			if (mLockViewListener != null) {
+				mLockViewListener.onLockView(false);
+			}
+		}
+		
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			unlockView();
+			
+			super.onDismiss(dialog);
+		}
+		
+		@Override
+		public void onNegativeClick(View view) {
+			Intent iVideoUri = new Intent(Intent.ACTION_VIEW, Uri.parse(mItem.getVideoUri()));
+			this.startActivity(iVideoUri);
+			
+			super.onNegativeClick(view);
+		}
+		
+	}
+	
+	/**
+	 * AsyncTask AsyncGetPHash<Void, Void, PHash> Class.
+	 * 
+	 * @author strider
+	 */
+	private class AsyncGetImagePHash extends AsyncTask<Void, Void, PHash> {
 		
 		//private static final String LOG_TAG = "AsyncGetImagePHash";
 		
@@ -584,11 +755,13 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		private byte[] mData = null;
 		
 		private Course mCourse = null;
+		private Item mItem = null;
 		
-		public AsyncGetImagePHash(byte[] data, Course course) {
+		public AsyncGetImagePHash(byte[] data, Course course, Item item) {
 			mData = data;
 			
 			mCourse = course;
+			mItem = item;
 		}
 		
 		@Override
@@ -597,138 +770,60 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		}
 		
 		@Override
-		protected String doInBackground(Void... params) {
-			return ImagePHash.getPHash(mData);
+		protected PHash doInBackground(Void... params) {
+			return (new PHash(
+					ImagePHash.getPHash(mData),
+					null,
+					((mItem != null) ? mItem.getId() : 0L)
+				));
 		}
 		
 		@Override
-		protected void onPostExecute(String result) {
+		protected void onPostExecute(PHash result) {
 			if (!MainCamera.this.isDestroy()) {
-				StringBuilder sb = new StringBuilder();
-				
-				sb.append("Work Time: ");
-				sb.append(SystemClock.elapsedRealtime() - mInitTime);
-				sb.append(" ms.").append(Text.LF);
-				
-				final DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
-				
 				if (mConfigAdapter.getIsCreator()) {
-					dbAdapter.open();
-					
-					List<Item> listItem = dbAdapter.getListItem(mCourse.getId());
-					
-					dbAdapter.close();
-					
 					if (SimpleRecognizer.checkCourseCreator(mCourse.getCreator())) {
-						final BaseArrayAdapter<Item> adapter = new BaseArrayAdapter<Item>(
-								SimpleRecognizer.getPackageContext(),
-								R.layout.spinner_item_activated
-							);
-						adapter.setDropDownViewResource(R.layout.list_item_single_choice_activated);
-						
-						int itemPosition = AdapterView.INVALID_POSITION;
-						
-						if (listItem != null) {
-							for (Item item : listItem) {
-								if (item.getId() == mConfigAdapter.getItemId()) {
-									itemPosition = listItem.indexOf(item);
-									
-									break;
-								}
-							}
-							
-							adapter.addData(listItem);
-						}
-						//TODO: Dialog
-						LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
-						View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-						View viewContent = inflater.inflate(R.layout.alert_dialog_manage_phash_edit, null);
-						
-						TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-						textViewTitle.setText(mCourse.getCategory() + Text.SEPARATOR + mCourse.getTitle());
-						textViewTitle.setSelected(true);
-						
-						final Spinner spinnerItem = (Spinner) viewContent.findViewById(R.id.spinnerItem);
-						spinnerItem.setAdapter(adapter);
-						spinnerItem.setSelection(itemPosition);
-						
-						final EditText editTextHexValue = (EditText) viewContent.findViewById(R.id.editTextHexValue);
-						editTextHexValue.setText(result);
-						
-						final EditText editTextComment = (EditText) viewContent.findViewById(R.id.editTextComment);
-						
-						AlertDialog.Builder builder = new AlertDialog.Builder(MainCamera.this);
-						builder.setCustomTitle(viewTitle);
-						builder.setView(viewContent);
-						
-						builder.setNegativeButton(R.string.dialog_button_cancel, null);
-						
-						builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
+						ManagePHash.AddPHashDialog.newInstance(mItem, result)
+								.setOnDismissListener(new DialogInterface.OnDismissListener() {
 								
 								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									int itemPosition = spinnerItem.getSelectedItemPosition();
+								public void onDismiss(DialogInterface dialog) {
+									MainCamera.this.onLockView(false);
+								}
+								
+							}).show(
+									MainCamera.this.getSupportFragmentManager(),
+									ManagePHash.AddPHashDialog.KEY
+								);
+					} else {
+						SimpleRecognizer.MessageNeutralDialog.newInstance(
+								MainCamera.this.getString(R.string.dialog_title_forbidden),
+								MainCamera.this.getString(R.string.manage_course_dialog_not_creator_message),
+								null
+							).setOnDismissListener(new DialogInterface.OnDismissListener() {
 									
-									if (itemPosition != AdapterView.INVALID_POSITION) {
-										dbAdapter.write();
-										
-										dbAdapter.addPHash(new PHash(
-												editTextHexValue.getText().toString().trim(),
-												editTextComment.getText().toString().trim(),
-												adapter.getItem(spinnerItem.getSelectedItemPosition()).getId()
-											));
-										
-										dbAdapter.close();
-									} else {
-										AlertDialog.Builder builder = new AlertDialog.Builder(MainCamera.this);
-										builder.setTitle(R.string.dialog_title_caution);
-										builder.setMessage(R.string.main_dialog_no_item_message);
-										
-										builder.setNeutralButton(R.string.dialog_button_close, null);
-										
-										AlertDialog alert = builder.create();
-										alert.show();
+									@Override
+									public void onDismiss(DialogInterface dialog) {
+										MainCamera.this.onLockView(false);
 									}
-								}
-								
-							});
-						
-						AlertDialog alert = builder.create();
-						
-						alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-								
-								@Override
-								public void onDismiss(DialogInterface dialog) {
-									MainCamera.this.onLockView(false);
-								}
-								
-							});
-						
-						alert.show();
-					} else {//TODO: Dialog
-						AlertDialog.Builder builder = new AlertDialog.Builder(MainCamera.this);
-						builder.setTitle(R.string.dialog_title_forbidden);
-						builder.setMessage(R.string.manage_course_dialog_not_creator_message);
-						
-						builder.setNeutralButton(R.string.dialog_button_close, null);
-						
-						AlertDialog alert = builder.create();
-						
-						alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-								
-								@Override
-								public void onDismiss(DialogInterface dialog) {
-									MainCamera.this.onLockView(false);
-								}
-								
-							});
-						
-						alert.show();
+									
+								}).show(
+										MainCamera.this.getSupportFragmentManager(),
+										SimpleRecognizer.MessageNeutralDialog.KEY
+									);
 					}
-				} else { // FIXME: PREPARE LAYOUT FOR DEPLOYMENT
-					sb.append("pHashHex: ").append((result != null) ? result : "null");
+				} else { // FIXME: [ DEBUG ] PREPARE FOR DEPLOYMENT
+					StringBuilder sb = new StringBuilder();
+					
+					sb.append("Work Time: ");
+					sb.append(SystemClock.elapsedRealtime() - mInitTime);
+					sb.append(" ms.").append(Text.LF);
+					
+					sb.append("pHashHex: ").append(result.getHexValue());
 					
 					Item itemResult = null;
+					
+					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
 					
 					dbAdapter.open();
 					
@@ -739,7 +834,7 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 					List<PHash> listPHash = new ArrayList<PHash>();
 					
 					for (Item item : listItem) {
-						item.initAllHammingDistance(result);
+						item.initAllHammingDistance(result.getHexValue());
 						
 						PHash pHashItemMin = Item.findPHashMin(item.getListPHash());
 						
@@ -767,77 +862,24 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 						sb.append(" NO MATCH FOUND");
 					}
 					
-					if (itemResult != null) {
-						sb.append(Text.LF).append(Text.LF);
-						sb.append(itemResult.getContent());
-					}
-					//TODO: DIalog
-					LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
-					View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-					View viewContent = inflater.inflate(R.layout.alert_dialog_item, null);
-					
-					TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-					textViewTitle.setText((itemResult != null) ? itemResult.getTitle() : "Item not Found");
-					textViewTitle.setSelected(true);
-					
-					TextView textViewContent = (TextView) viewContent.findViewById(R.id.textViewItem);
-					textViewContent.setText(Html.fromHtml(sb.toString().replace(Text.LF, Text.BR)));
-					
-					Button buttonVideo = (Button) viewContent.findViewById(R.id.buttonAlertDialogVideo);
-					if (itemResult != null) {
-						String videoUri = itemResult.getVideoUri();
-						
-						if (videoUri != null) {
-							final Uri uri = Uri.parse(videoUri);
+					if (BuildConfig.DEBUG) {
+						if (itemResult != null) {
+							sb.append(Text.LF).append(Text.LF);
+							sb.append(itemResult.getContent());
 							
-							buttonVideo.setTextColor(SimpleRecognizer.getPackageContext()
-									.getResources().getColor(R.color.main));
-							buttonVideo.setClickable(true);
-							
-							buttonVideo.setOnClickListener(new View.OnClickListener() {
-									
-									@Override
-									public void onClick(View view) {
-										Intent iVideoUri = new Intent(Intent.ACTION_VIEW, uri);
-										MainCamera.this.startActivity(iVideoUri);
-									}
-									
-								});
+							itemResult.setContent(sb.toString());
+						} else {
+							itemResult = new Item(
+									"[ DEBUG ] Item not Found",
+									sb.toString(),
+									null,
+									mCourse.getId()
+								);
 						}
 					}
 					
-					Button buttonClose = (Button) viewContent.findViewById(R.id.buttonAlertDialogClose);
-					
-					AlertDialog.Builder builder = new AlertDialog.Builder(MainCamera.this);
-					builder.setCustomTitle(viewTitle);
-					builder.setView(viewContent);
-					builder.setCancelable(true);
-					
-					final AlertDialog alert = builder.create();
-					alert.setCanceledOnTouchOutside(true);
-					// TODO: FIND A WAY FOR TRANSPARENCY
-					//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);
-					//alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-					
-					buttonClose.setOnClickListener(new View.OnClickListener() {
-							
-							@Override
-							public void onClick(View v) {
-								alert.dismiss();
-							}
-							
-						});
-					
-					alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-							
-							@Override
-							public void onDismiss(DialogInterface dialog) {
-								MainCamera.this.onLockView(false);
-							}
-							
-						});
-					
-					alert.show();
+					ItemInfoDialog.newInstance(itemResult)
+							.show(MainCamera.this.getSupportFragmentManager(), ItemInfoDialog.KEY);
 				}
 			}
 		}

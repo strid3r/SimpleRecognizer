@@ -8,8 +8,10 @@
 
 package ru.strider.simplerecognizer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -20,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +30,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +45,13 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.view.Window;
 
+import ru.strider.app.BaseDialogFragment;
 import ru.strider.app.BaseFragmentActivity;
 import ru.strider.simplerecognizer.adapter.CourseAdapter;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
 import ru.strider.simplerecognizer.util.ConfigAdapter;
+import ru.strider.simplerecognizer.view.OnItemListener;
 import ru.strider.util.BuildConfig;
 import ru.strider.util.Text;
 import ru.strider.view.OnLockViewListener;
@@ -55,7 +61,7 @@ import ru.strider.view.OnLockViewListener;
  * 
  * @author strider
  */
-public class ManageCourse extends BaseFragmentActivity implements OnLockViewListener,
+public class ManageCourse extends BaseFragmentActivity implements OnLockViewListener, OnItemListener,
 		ExpandableListView.OnChildClickListener,
 		ExpandableListView.OnGroupExpandListener, ExpandableListView.OnGroupCollapseListener {
 	
@@ -192,57 +198,9 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				
 				return true;
 			}
-			case (R.id.manageCourseMenuAddCourse): {//TODO: Dialog
-				LayoutInflater inflater = LayoutInflater.from(this);
-				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-				View viewContent = inflater.inflate(R.layout.alert_dialog_manage_course_edit, null);
-				
-				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.manage_course_menu_add_course);
-				textViewTitle.setSelected(true);
-				
-				final EditText editTextTitle = (EditText) viewContent.findViewById(R.id.editTextTitle);
-				
-				final EditText editTextCategory = (EditText) viewContent.findViewById(R.id.editTextCategory);
-				
-				final EditText editTextVersion = (EditText) viewContent.findViewById(R.id.editTextVersion);
-				editTextVersion.setText(Integer.toString(Course.INIT_VERSION));
-				editTextVersion.setEnabled(false);
-				
-				final EditText editTextCreator = (EditText) viewContent.findViewById(R.id.editTextCreator);
-				editTextCreator.setText(Utils.GetEmail(this));
-				editTextCreator.setEnabled(false);
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setCustomTitle(viewTitle);
-				builder.setView(viewContent);
-				
-				builder.setNegativeButton(R.string.dialog_button_cancel, null);
-				
-				builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
-							
-							dbAdapter.write();
-							
-							dbAdapter.addCourse(new Course(
-									editTextTitle.getText().toString().trim(),
-									editTextCategory.getText().toString().trim(),
-									Integer.parseInt(editTextVersion.getText().toString().trim()),
-									editTextCreator.getText().toString().trim()
-								));
-							
-							dbAdapter.close();
-							
-							initView();
-						}
-						
-					});
-				
-				AlertDialog alert = builder.create();
-				alert.show();
+			case (R.id.manageCourseMenuAddCourse): {
+				AddCourseDialog.newInstance(null)
+						.show(this.getSupportFragmentManager(), AddCourseDialog.KEY);
 				
 				return true;
 			}
@@ -314,7 +272,7 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 			int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
 			int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
 			
-			final Course course = (Course) mAdapter.getChild(groupPosition, childPosition);
+			Course course = (Course) mAdapter.getChild(groupPosition, childPosition);
 			
 			switch (item.getItemId()) {
 				case (R.id.manageCourseContextMenuExport): {
@@ -324,123 +282,32 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 					
 					return true;
 				}
-				case (R.id.manageCourseContextMenuShowInfo): {//TODO: Dialog
-					LayoutInflater inflater = LayoutInflater.from(this);
-					View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-					View viewContent = inflater.inflate(R.layout.alert_dialog_manage_course_show_info, null);
-					
-					TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-					
-					StringBuilder sb = new StringBuilder();
-					
-					int color = this.getResources().getColor(R.color.main);
-					
-					sb.append("<font color=\"").append(color).append("\">");
-					sb.append(course.getCategory());
-					sb.append("</font>");
-					sb.append(Text.SEPARATOR);
-					sb.append("<font color=\"").append(color).append("\">");
-					sb.append(course.getTitle());
-					sb.append("</font>");
-					
-					textViewTitle.setText(Html.fromHtml(sb.toString()));
-					textViewTitle.setSelected(true);
-					
-					EditText editTextVersion = (EditText) viewContent.findViewById(R.id.editTextVersion);
-					editTextVersion.setText(Integer.toString(course.getVersion()));
-					editTextVersion.setEnabled(false);
-					
-					EditText editTextCreator = (EditText) viewContent.findViewById(R.id.editTextCreator);
-					editTextCreator.setText(course.getCreator());
-					editTextCreator.setEnabled(false);
-					
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					builder.setCustomTitle(viewTitle);
-					builder.setView(viewContent);
-					
-					builder.setNeutralButton(R.string.dialog_button_close, null);
-					
-					AlertDialog alert = builder.create();
-					alert.show();
+				case (R.id.manageCourseContextMenuShowInfo): {
+					ShowCourseDialog.newInstance(course)
+							.show(this.getSupportFragmentManager(), ShowCourseDialog.KEY);
 					
 					return true;
 				}
 				case (R.id.manageCourseContextMenuEdit): {
-					if (SimpleRecognizer.checkCourseCreator(course.getCreator())) {//TODO: Dialog
-						LayoutInflater inflater = LayoutInflater.from(this);
-						View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-						View viewContent = inflater.inflate(R.layout.alert_dialog_manage_course_edit, null);
-						
-						TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-						textViewTitle.setText(R.string.manage_course_context_menu_edit);
-						textViewTitle.setSelected(true);
-						
-						final EditText editTextTitle = (EditText) viewContent.findViewById(R.id.editTextTitle);
-						editTextTitle.setText(course.getTitle());
-						
-						final EditText editTextCategory = (EditText) viewContent.findViewById(R.id.editTextCategory);
-						editTextCategory.setText(course.getCategory());
-						
-						final EditText editTextVersion = (EditText) viewContent.findViewById(R.id.editTextVersion);
-						editTextVersion.setText(Integer.toString(course.getVersion()));
-						
-						final EditText editTextCreator = (EditText) viewContent.findViewById(R.id.editTextCreator);
-						editTextCreator.setText(course.getCreator());
-						editTextCreator.setEnabled(false);
-						
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);
-						builder.setCustomTitle(viewTitle);
-						builder.setView(viewContent);
-						
-						builder.setNegativeButton(R.string.dialog_button_cancel, null);
-						
-						builder.setPositiveButton(R.string.dialog_button_save, new DialogInterface.OnClickListener() {
-								
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									course.setTitle(editTextTitle.getText().toString().trim());
-									course.setCategory(editTextCategory.getText().toString().trim());
-									course.setVersion(Integer.parseInt(editTextVersion.getText().toString().trim()));
-									//course.setCreator(editTextCreator.getText().toString().trim());
-									
-									DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
-									
-									dbAdapter.write();
-									
-									dbAdapter.updateCourse(course);
-									
-									dbAdapter.close();
-									
-									initView();
-								}
-								
-							});
-						
-						AlertDialog alert = builder.create();
-						alert.show();
-					} else {//TODO: Dialog
-						AlertDialog.Builder builder = new AlertDialog.Builder(this);
-						builder.setTitle(R.string.dialog_title_forbidden);
-						builder.setMessage(R.string.manage_course_dialog_not_creator_message);
-						
-						builder.setNeutralButton(R.string.dialog_button_close, null);
-						
-						AlertDialog alert = builder.create();
-						alert.show();
+					if (SimpleRecognizer.checkCourseCreator(course.getCreator())) {
+						AddCourseDialog.newInstance(course)
+								.show(this.getSupportFragmentManager(), AddCourseDialog.KEY);
+					} else {
+						SimpleRecognizer.MessageNeutralDialog.newInstance(
+								this.getString(R.string.dialog_title_forbidden),
+								this.getString(R.string.manage_course_dialog_not_creator_message),
+								null
+							).show(
+									this.getSupportFragmentManager(),
+									SimpleRecognizer.MessageNeutralDialog.KEY
+								);
 					}
 					
 					return true;
 				}
 				case (R.id.manageCourseContextMenuDelete): {
-					DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
-					
-					dbAdapter.write();
-					
-					dbAdapter.deleteCourse(course.getId());
-					
-					dbAdapter.close();
-					
-					initView();
+					DeleteCourseDialog.newInstance(course)
+							.show(this.getSupportFragmentManager(), DeleteCourseDialog.KEY);
 					
 					return true;
 				}
@@ -518,12 +385,6 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 		mAdapter.notifyDataSetChanged();
 	}
 	
-	private void initView() {
-		initData();
-		
-		useConfigValues();
-	}
-	
 	private void useConfigValues() {
 		SimpleRecognizer.logIfDebug(Log.INFO, LOG_TAG, "useConfigValues() called");
 		
@@ -558,6 +419,34 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 	@Override
 	public boolean isLock() {
 		return mIsLock;
+	}
+	
+	@Override
+	public void onItemChanged() {
+		onLockView(true);
+		
+		if (!this.isDestroy()) {
+			initData();
+			
+			useConfigValues();
+		}
+		
+		onLockView(false);
+	}
+	
+	@Override
+	public void onDeleteItem(Object item) {
+		onLockView(true);
+		
+		if (!this.isDestroy()) {
+			Course course = (Course) item;
+			
+			mAdapter.removeChild(mAdapter.indexOfGroup(course.getCategory()), course);
+			
+			mAdapter.notifyDataSetChanged();
+		}
+		
+		onLockView(false);
 	}
 	
 	private Course initCourseData(Course course, boolean isWithPHash) {
@@ -618,15 +507,15 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				Intent iManageItem = new Intent(this, ManageItem.class);
 				iManageItem.putExtra(Course.KEY, course);
 				this.startActivity(iManageItem);
-			} else {//TODO: Dialog
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.dialog_title_forbidden);
-				builder.setMessage(R.string.manage_course_dialog_not_creator_message);
-				
-				builder.setNeutralButton(R.string.dialog_button_close, null);
-				
-				AlertDialog alert = builder.create();
-				alert.show();
+			} else {
+				SimpleRecognizer.MessageNeutralDialog.newInstance(
+						this.getString(R.string.dialog_title_forbidden),
+						this.getString(R.string.manage_course_dialog_not_creator_message),
+						null
+					).show(
+							this.getSupportFragmentManager(),
+							SimpleRecognizer.MessageNeutralDialog.KEY
+						);
 			}			
 		} else {
 			this.finish();
@@ -715,6 +604,537 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 	}
 	
 	/**
+	 * BaseDialogFragment AddCourseDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class AddCourseDialog extends BaseDialogFragment implements OnLockViewListener {
+		
+		//private static final String LOG_TAG = AddCourseDialog.class.getSimpleName();
+		
+		public static final String KEY = AddCourseDialog.class.getSimpleName();
+		
+		private static final String KEY_MODE = "Mode";
+		
+		private static final int VIEW_FORM_POSITION = 0;
+		private static final int VIEW_PROGRESS_POSITION = 1;
+		
+		private OnItemListener mCourseListener = null;
+		
+		private Course mCourse = null;
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		private ViewSwitcher mViewSwitcher = null;
+		
+		private EditText mEditTextTitle = null;
+		private EditText mEditTextCategory = null;
+		private EditText mEditTextVersion = null;
+		private EditText mEditTextCreator = null;
+		
+		private boolean mIsLock = false;
+		
+		private boolean mIsEditMode = false;
+		
+		public static AddCourseDialog newInstance(Course course) {
+			AddCourseDialog fragment = new AddCourseDialog();
+			
+			Bundle args = new Bundle();
+			args.putParcelable(Course.KEY, course);
+			
+			fragment.setArguments(args);
+			
+			return fragment;
+		}
+		
+		public Course getCourse() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.<Course> getParcelable(Course.KEY) : null);
+		}
+		
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+			
+			try {
+				mCourseListener = (OnItemListener) activity;
+			} catch (ClassCastException e) {
+				throw (new ClassCastException(
+						activity.toString() + " must implement OnItemListener."
+					));
+			}
+		}
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			if (savedInstanceState != null) {
+				mCourse = savedInstanceState.getParcelable(Course.KEY);
+				
+				mIsEditMode = savedInstanceState.getBoolean(KEY_MODE, false);
+			} else {
+				mCourse = getCourse();
+				
+				if (mCourse == null) {
+					mCourse = new Course();
+					
+					mCourse.setVersion(Course.INIT_VERSION);
+					mCourse.setCreator(Utils.GetEmail((Context) this.getSherlockActivity()));
+				} else {
+					if (mCourse.getId() != 0L) {
+						mIsEditMode = true;
+					}
+				}
+			}
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_add_course, null);
+			
+			mViewSwitcher = (ViewSwitcher) mView.findViewById(R.id.viewSwitcherAlertDialogAddCourse);
+			
+			this.registerNegativeButton(mView, R.id.buttonAlertDialogCancel);
+			this.registerPositiveButton(mView, R.id.buttonAlertDialogOk);
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText(mIsEditMode
+					? R.string.manage_course_context_menu_edit
+					: R.string.manage_course_menu_add_course
+				);
+			textViewTitle.setSelected(true);
+			
+			mEditTextTitle = (EditText) mView.findViewById(R.id.editTextCourseTitle);
+			mEditTextTitle.setText(mCourse.getTitle());
+			
+			mEditTextCategory = (EditText) mView.findViewById(R.id.editTextCourseCategory);
+			mEditTextCategory.setText(mCourse.getCategory());
+			
+			mEditTextVersion = (EditText) mView.findViewById(R.id.editTextCourseVersion);
+			mEditTextVersion.setText(Integer.toString(mCourse.getVersion()));
+			mEditTextVersion.setEnabled(mIsEditMode);
+			
+			mEditTextCreator = (EditText) mView.findViewById(R.id.editTextCourseCreator);
+			mEditTextCreator.setText(mCourse.getCreator());
+			mEditTextCreator.setEnabled(!mIsEditMode);
+			
+			TextView textViewAddCourse = (TextView) mView.findViewById(R.id.textViewAddCourseHint);
+			textViewAddCourse.setSelected(true);
+		}
+		
+		@Override
+		public void onSaveInstanceState(Bundle outState) {
+			super.onSaveInstanceState(outState);
+			
+			mCourse.setTitle(mEditTextTitle.getText().toString().trim());
+			mCourse.setCategory(mEditTextCategory.getText().toString().trim());
+			mCourse.setVersion(Integer.parseInt(mEditTextVersion.getText().toString().trim()));
+			mCourse.setCreator(mEditTextCreator.getText().toString().trim());
+			
+			outState.putParcelable(Course.KEY, mCourse);
+			
+			outState.putBoolean(KEY_MODE, mIsEditMode);
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+			
+			mViewSwitcher = null;
+			
+			mEditTextTitle = null;
+			mEditTextCategory = null;
+			mEditTextVersion = null;
+			mEditTextCreator = null;
+		}
+		
+		@Override
+		public void onDestroy() {
+			mCourse = null;
+			
+			super.onDestroy();
+		}
+		
+		@Override
+		public void onDetach() {
+			mCourseListener = null;
+			
+			super.onDetach();
+		}
+		
+		@Override
+		public void onLockView(boolean isLock) {
+			mIsLock = isLock;
+			
+			if (!this.isDestroy()) {
+				mViewSwitcher.setDisplayedChild(isLock
+						? VIEW_PROGRESS_POSITION
+						: VIEW_FORM_POSITION
+					);
+			}
+			
+			this.setCancelable(!isLock);
+		}
+		
+		@Override
+		public boolean isLock() {
+			return mIsLock;
+		}
+		
+		private void courseChanged() {
+			if (mCourseListener != null) {
+				mCourseListener.onItemChanged();
+			}
+		}
+		
+		@Override
+		public void onPositiveClick(View view) {
+			onLockView(true);
+			
+			mCourse.setTitle(mEditTextTitle.getText().toString().trim());
+			mCourse.setCategory(mEditTextCategory.getText().toString().trim());
+			mCourse.setVersion(Integer.parseInt(mEditTextVersion.getText().toString().trim()));
+			mCourse.setCreator(mEditTextCreator.getText().toString().trim());
+			
+			DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
+			
+			dbAdapter.write();
+			
+			if (mIsEditMode) {
+				dbAdapter.updateCourse(mCourse);
+			} else {
+				dbAdapter.addCourse(mCourse);
+			}
+			
+			dbAdapter.close();
+			
+			courseChanged();
+			
+			super.onPositiveClick(view);
+			
+			onLockView(false);
+		}
+		
+	}
+	
+	/**
+	 * BaseDialogFragment DeleteCourseDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class DeleteCourseDialog extends BaseDialogFragment implements OnLockViewListener {
+		
+		//private static final String LOG_TAG = DeleteCourseDialog.class.getSimpleName();
+		
+		public static final String KEY = DeleteCourseDialog.class.getSimpleName();
+		
+		private static final int VIEW_FORM_POSITION = 0;
+		private static final int VIEW_PROGRESS_POSITION = 1;
+		
+		private OnItemListener mCourseListener = null;
+		
+		private Course mCourse = null;
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		private ViewSwitcher mViewSwitcher = null;
+		
+		private boolean mIsLock = false;
+		
+		public static DeleteCourseDialog newInstance(Course course) {
+			DeleteCourseDialog fragment = new DeleteCourseDialog();
+			
+			Bundle args = new Bundle();
+			args.putParcelable(Course.KEY, course);
+			
+			fragment.setArguments(args);
+			
+			return fragment;
+		}
+		
+		public Course getCourse() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.<Course> getParcelable(Course.KEY) : null);
+		}
+		
+		@Override
+		public void onAttach(Activity activity) {
+			super.onAttach(activity);
+			
+			try {
+				mCourseListener = (OnItemListener) activity;
+			} catch (ClassCastException e) {
+				throw (new ClassCastException(
+						activity.toString() + " must implement OnItemListener."
+					));
+			}
+		}
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			mCourse = getCourse();
+			
+			if (mCourse == null) {
+				throw (new IllegalArgumentException(
+						"The Fragment requires valid Course as an argument."
+					));
+			}
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_delete, null);
+			
+			mViewSwitcher = (ViewSwitcher) mView.findViewById(R.id.viewSwitcherAlertDialogDelete);
+			
+			this.registerNegativeButton(mView, R.id.buttonAlertDialogCancel);
+			this.registerPositiveButton(mView, R.id.buttonAlertDialogDelete);
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			
+			StringBuilder sb = new StringBuilder();
+			
+			int color = this.getResources().getColor(R.color.main);
+			
+			sb.append("<font color=\"").append(color).append("\">");
+			sb.append(mCourse.getCategory());
+			sb.append("</font>");
+			sb.append(Text.SEPARATOR);
+			sb.append("<font color=\"").append(color).append("\">");
+			sb.append(mCourse.getTitle());
+			sb.append("</font>");
+			
+			textViewTitle.setText(Html.fromHtml(sb.toString()));
+			textViewTitle.setSelected(true);
+			
+			TextView textViewDeleteCourse = (TextView) mView.findViewById(R.id.textViewDeleteConfirm);
+			textViewDeleteCourse.setSelected(true);
+			
+			TextView textViewDeleteHint = (TextView) mView.findViewById(R.id.textViewDeleteHint);
+			textViewDeleteHint.setText(R.string.manage_course_dialog_delete_hint);
+			textViewDeleteHint.setSelected(true);
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+			
+			mViewSwitcher = null;
+		}
+		
+		@Override
+		public void onDestroy() {
+			mCourse = null;
+			
+			super.onDestroy();
+		}
+		
+		@Override
+		public void onDetach() {
+			mCourseListener = null;
+			
+			super.onDetach();
+		}
+		
+		@Override
+		public void onLockView(boolean isLock) {
+			mIsLock = isLock;
+			
+			if (!this.isDestroy()) {
+				mViewSwitcher.setDisplayedChild(isLock
+						? VIEW_PROGRESS_POSITION
+						: VIEW_FORM_POSITION
+					);
+			}
+			
+			this.setCancelable(!isLock);
+		}
+		
+		@Override
+		public boolean isLock() {
+			return mIsLock;
+		}
+		
+		private void deleteCourse() {
+			if (mCourseListener != null) {
+				mCourseListener.onDeleteItem(mCourse);
+			}
+		}
+		
+		@Override
+		public void onPositiveClick(View view) {
+			onLockView(true);
+			
+			DataBaseAdapter dbAdapter = DataBaseAdapter.getInstance();
+			
+			dbAdapter.write();
+			
+			dbAdapter.deleteCourse(mCourse.getId());
+			
+			dbAdapter.close();
+			
+			deleteCourse();
+			
+			super.onPositiveClick(view);
+			
+			onLockView(false);
+		}
+		
+	}
+	
+	/**
+	 * BaseDialogFragment ShowCourseDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class ShowCourseDialog extends BaseDialogFragment {
+		
+		//private static final String LOG_TAG = ShowCourseDialog.class.getSimpleName();
+		
+		public static final String KEY = ShowCourseDialog.class.getSimpleName();
+		
+		private Course mCourse = null;
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		public static ShowCourseDialog newInstance(Course course) {
+			ShowCourseDialog fragment = new ShowCourseDialog();
+			
+			Bundle args = new Bundle();
+			args.putParcelable(Course.KEY, course);
+			
+			fragment.setArguments(args);
+			
+			return fragment;
+		}
+		
+		public Course getCourse() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.<Course> getParcelable(Course.KEY) : null);
+		}
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			mCourse = getCourse();
+			
+			if (mCourse == null) {
+				throw (new IllegalArgumentException(
+						"The Fragment requires valid Course as an argument."
+					));
+			}
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_show_course, null);
+			
+			this.registerNeutralButton(mView, R.id.buttonAlertDialogClose);
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			
+			StringBuilder sb = new StringBuilder();
+			
+			int color = this.getResources().getColor(R.color.main);
+			
+			sb.append("<font color=\"").append(color).append("\">");
+			sb.append(mCourse.getCategory());
+			sb.append("</font>");
+			sb.append(Text.SEPARATOR);
+			sb.append("<font color=\"").append(color).append("\">");
+			sb.append(mCourse.getTitle());
+			sb.append("</font>");
+			
+			textViewTitle.setText(Html.fromHtml(sb.toString()));
+			textViewTitle.setSelected(true);
+			
+			TextView textViewVersion = (TextView) mView.findViewById(R.id.textViewCourseVersion);
+			textViewVersion.setText(Integer.toString(mCourse.getVersion()));
+			
+			TextView textViewCreator = (TextView) mView.findViewById(R.id.textViewCourseCreator);
+			textViewCreator.setText((!TextUtils.isEmpty(mCourse.getCreator()))
+					? mCourse.getCreator()
+					: Text.NOT_AVAILABLE
+				);
+			
+			if (TextUtils.isEmpty(mCourse.getCreator())) {
+				textViewCreator.setGravity(Gravity.CENTER);
+			}
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+		}
+		
+		@Override
+		public void onDestroy() {
+			mCourse = null;
+			
+			super.onDestroy();
+		}
+		
+	}
+	
+	/**
 	 * AsyncTask AsyncCourseExport<String, Void, String> Class.
 	 * 
 	 * @author strider
@@ -788,10 +1208,12 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 					
 					dbAdapter.delete();
 				} else {
-					sb.append("Failed, external storage not writable.");
+					sb.append(SimpleRecognizer.getPackageContext()
+							.getString(R.string.error_media_storage_not_writable));
 				}
 			} else {
-				sb.append("Failed, external storage not available.");
+				sb.append(SimpleRecognizer.getPackageContext()
+						.getString(R.string.error_media_storage_not_available));
 			}
 			
 			return sb.toString();
@@ -809,25 +1231,18 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				}
 				
 				sb.append(result);
-				//TODO: Dialog
-				LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
-				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				
-				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.manage_course_context_menu_export);
-				textViewTitle.setSelected(true);
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(ManageCourse.this);
-				builder.setCustomTitle(viewTitle);
-				builder.setMessage(sb.toString());
-				
-				builder.setNeutralButton(R.string.dialog_button_close, null);
-				
-				AlertDialog alert = builder.create();
-				alert.show();
-				
-				ManageCourse.this.onLockView(false);
+				SimpleRecognizer.MessageNeutralDialog.newInstance(
+						ManageCourse.this.getString(R.string.manage_course_context_menu_export),
+						sb.toString(),
+						null
+					).show(
+							ManageCourse.this.getSupportFragmentManager(),
+							SimpleRecognizer.MessageNeutralDialog.KEY
+						);
 			}
+			
+			ManageCourse.this.onLockView(false);
 		}
 		
 	}
@@ -910,7 +1325,8 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 					
 					sb.append("Imported.");
 				} else {
-					sb.append("Failed, external storage not available.");
+					sb.append(SimpleRecognizer.getPackageContext()
+							.getString(R.string.error_media_storage_not_available));
 				}
 			}
 			
@@ -929,27 +1345,20 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				}
 				
 				sb.append(result);
-				//TODO: Dialog
-				LayoutInflater inflater = LayoutInflater.from(SimpleRecognizer.getPackageContext());
-				View viewTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 				
-				TextView textViewTitle = (TextView) viewTitle.findViewById(R.id.textViewAlertDialogTitle);
-				textViewTitle.setText(R.string.manage_course_menu_import);
-				textViewTitle.setSelected(true);
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(ManageCourse.this);
-				builder.setCustomTitle(viewTitle);
-				builder.setMessage(sb.toString());
-				
-				builder.setNeutralButton(R.string.dialog_button_close, null);
-				
-				AlertDialog alert = builder.create();
-				alert.show();
-				
-				initView();
-				
-				ManageCourse.this.onLockView(false);
+				SimpleRecognizer.MessageNeutralDialog.newInstance(
+						ManageCourse.this.getString(R.string.manage_course_menu_import),
+						sb.toString(),
+						null
+					).show(
+							ManageCourse.this.getSupportFragmentManager(),
+							SimpleRecognizer.MessageNeutralDialog.KEY
+						);
 			}
+			
+			ManageCourse.this.onLockView(false);
+			
+			ManageCourse.this.onItemChanged();
 		}
 		
 	}

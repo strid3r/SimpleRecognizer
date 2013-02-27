@@ -56,24 +56,32 @@
 	
 	<!-- DIALOG -->
 	<string name="manage_course_dialog_not_creator_message">
-		You can not manage this course,
+		You can not manage this Course,
 		\nbecause you are not its creator.
 	</string>
 	
-	<string name="manage_course_dialog_title_title">
+	<string name="manage_course_dialog_title_hint">
 		Title
 	</string>
 	
-	<string name="manage_course_dialog_category_title">
+	<string name="manage_course_dialog_category_hint">
 		Category
 	</string>
 	
-	<string name="manage_course_dialog_version_title">
+	<string name="manage_course_dialog_version_hint">
 		Version
 	</string>
 	
-	<string name="manage_course_dialog_creator_title">
+	<string name="manage_course_dialog_creator_hint">
 		Creator
+	</string>
+	
+	<string name="manage_course_dialog_add_hint">
+		Adding Course&#8230;
+	</string>
+	
+	<string name="manage_course_dialog_delete_hint">
+		Deleting Course&#8230;
 	</string>
 	
 </resources>

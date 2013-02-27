@@ -100,12 +100,24 @@
 		Cancel
 	</string>
 	
+	<string name="dialog_button_delete">
+		Delete
+	</string>
+	
 	<string name="dialog_button_video_controls">
 		‹‹ Video ››
 	</string>
 	
 	<string name="dialog_button_close_controls">
 		‹‹ Close ››
+	</string>
+	
+	<string name="dialog_delete_confirm">
+		Are you sure?
+	</string>
+	
+	<string name="dialog_delete_hint">
+		Deleting&#8230;
 	</string>
 	
 	<!-- ERROR -->
@@ -115,6 +127,14 @@
 	
 	<string name="error_no_network">
 		« No network »
+	</string>
+	
+	<string name="error_media_storage_not_available">
+		Failed, external storage is not available.
+	</string>
+	
+	<string name="error_media_storage_not_writable">
+		Failed, external storage is not writable.
 	</string>
 	
 </resources>

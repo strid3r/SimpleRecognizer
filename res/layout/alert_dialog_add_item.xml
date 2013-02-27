@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2012-2013 strider
+	 
+	 Simple Recognizer
+	 Layout Alert Dialog Add Item XML
+	 By © strider 2012-2013.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/linearLayoutAlertDialogAddItem"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:orientation="vertical"
+			  android:padding="2.0dp">
+	
+	<!-- SWITCH MODE -->
+	<ViewSwitcher android:id="@+id/viewSwitcherAlertDialogAddItem"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:measureAllChildren="false">
+		
+		<!-- FORM -->
+		<LinearLayout android:id="@+id/linearLayoutAlertDialogAddItemForm"
+					  android:layout_width="match_parent"
+					  android:layout_height="wrap_content"
+					  android:orientation="vertical">
+			
+			<!-- CONTENT -->
+			<ScrollView android:id="@+id/scrollViewAlertDialogAddItemContent"
+						android:layout_width="match_parent"
+						android:layout_height="0.0dp"
+						android:layout_weight="1.0"
+						android:layout_margin="4.0dp"
+						android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+						android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+						android:scrollbarSize="8.0dp">
+				
+				<!-- ITEM -->
+				<LinearLayout android:id="@+id/linearLayoutAlertDialogAddItemContent"
+							  android:layout_width="match_parent"
+							  android:layout_height="wrap_content"
+							  android:orientation="vertical">
+					
+					<!-- TITLE -->
+					<EditText android:id="@+id/editTextItemTitle"
+							  android:hint="@string/manage_item_dialog_title_hint"
+							  style="@style/Main.AlertDialog.EditView.Title" />
+					
+					<!-- CONTENT -->
+					<EditText android:id="@+id/editTextItemContent"
+							  android:hint="@string/manage_item_dialog_content_hint"
+							  style="@style/Main.AlertDialog.EditView.Text" />
+					
+					<!-- VIDEO URI -->
+					<EditText android:id="@+id/editTextItemVideoUri"
+							  android:hint="@string/manage_item_dialog_video_uri_hint"
+							  style="@style/Main.AlertDialog.EditView.Title" />
+					
+				</LinearLayout>
+				
+			</ScrollView>
+			
+			<!-- CONTROLS -->
+			<LinearLayout android:id="@+id/linearLayoutAlertDialogItemControls"
+						  android:layout_width="match_parent"
+						  android:layout_height="wrap_content"
+						  android:layout_weight="0.0"
+						  android:orientation="horizontal"
+						  android:weightSum="1.0">
+				
+				<!-- CANCEL -->
+				<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogCancel"
+											  android:text="@string/dialog_button_cancel"
+											  android:layout_width="0.0dp"
+											  android:layout_weight="0.5"
+											  android:textSize="22sp"
+											  android:textColor="@color/main"
+											  style="@style/Main.Button.TextView.Info" />
+				
+				<!-- OK -->
+				<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogOk"
+											  android:text="@string/dialog_button_ok"
+											  android:layout_width="0.0dp"
+											  android:layout_weight="0.5"
+											  android:textSize="22sp"
+											  android:textColor="@color/main"
+											  style="@style/Main.Button.TextView.Info" />
+				
+			</LinearLayout>
+			
+		</LinearLayout>
+		
+		<!-- PROGRESS -->
+		<LinearLayout android:id="@+id/linearLayoutAlertDialogAddItemProgress"
+					  android:layout_width="match_parent"
+					  android:layout_height="wrap_content"
+					  android:layout_margin="8.0dp"
+					  android:layout_gravity="center"
+					  android:gravity="center"
+					  android:orientation="horizontal">
+			
+			<!-- PROGRESS BAR -->
+			<ProgressBar android:id="@+id/progressBarAddItem"
+						 android:layout_width="wrap_content"
+						 android:layout_height="wrap_content"
+						 android:layout_marginLeft="10.0dp"
+						 android:layout_marginTop="2.0dp"
+						 android:layout_marginRight="10.0dp"
+						 android:layout_marginBottom="2.0dp"
+						 android:layout_gravity="center"
+						 android:indeterminate="true"
+						 android:indeterminateOnly="true"
+						 android:indeterminateDrawable="@drawable/progress_indeterminate" />
+			
+			<!-- HINT -->
+			<ru.strider.widget.MainTextView android:id="@+id/textViewAddItemHint"
+											android:text="@string/manage_item_dialog_add_hint"
+											android:layout_width="wrap_content"
+											android:textSize="24sp"
+											style="@style/Main.AlertDialog.TextView.Title" />
+			
+		</LinearLayout>
+		
+	</ViewSwitcher>
+	
+</LinearLayout>

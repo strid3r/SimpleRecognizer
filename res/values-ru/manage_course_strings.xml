@@ -60,20 +60,28 @@
 		\nпотому что Вы не его создатель.
 	</string>
 	
-	<string name="manage_course_dialog_title_title">
+	<string name="manage_course_dialog_title_hint">
 		Название
 	</string>
 	
-	<string name="manage_course_dialog_category_title">
+	<string name="manage_course_dialog_category_hint">
 		Категория
 	</string>
 	
-	<string name="manage_course_dialog_version_title">
+	<string name="manage_course_dialog_version_hint">
 		Версия
 	</string>
 	
-	<string name="manage_course_dialog_creator_title">
+	<string name="manage_course_dialog_creator_hint">
 		Создатель
+	</string>
+	
+	<string name="manage_course_dialog_add_hint">
+		Добавление Курса&#8230;
+	</string>
+	
+	<string name="manage_course_dialog_delete_hint">
+		Удаление Курса&#8230;
 	</string>
 	
 </resources>

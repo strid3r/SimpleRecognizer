@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -449,7 +450,10 @@ public class FileManager extends BaseListActivity {
 				}
 			}
 		} else {
-			//TODO: Couldn't read alert
+			SimpleRecognizer.makeToast(
+					("Couldn't read file:\n" + file.getPath()),
+					Toast.LENGTH_LONG
+				).show();
 		}
 	}
 	

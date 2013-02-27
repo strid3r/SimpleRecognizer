@@ -125,13 +125,30 @@ public class CourseAdapter extends BaseExpandableListAdapter
 		return (getGroupCount() - 1);
 	}
 	
+	public int removeGroup(Object group) {
+		int location = indexOfGroup(group);
+		
+		if (location != -1) {
+			if (mListGroup.remove(group)) {
+				mListChild.remove(location);
+				mListCount.remove(location);
+			}
+			
+			if (mIsNotifyOnChange) {
+				notifyDataSetChanged();
+			}
+		}
+		
+		return location;
+	}
+	
 	@Override
 	public int getGroupCount() {
 		return mListGroup.size();
 	}
 	
-	public int indexOfGroup(Object object) {
-		return mListGroup.indexOf(object);
+	public int indexOfGroup(Object group) {
+		return mListGroup.indexOf(group);
 	}
 	
 	@Override
@@ -196,14 +213,27 @@ public class CourseAdapter extends BaseExpandableListAdapter
 	}
 	
 	public void addChildren(int groupPosition, List<?> listChild, List<?> listCount) {
-		if (groupPosition < getGroupCount()) {
-			mListChild.get(groupPosition).addAll(listChild);
-			mListCount.get(groupPosition).addAll(listCount);
+		mListChild.get(groupPosition).addAll(listChild);
+		mListCount.get(groupPosition).addAll(listCount);
+		
+		if (mIsNotifyOnChange) {
+			notifyDataSetChanged();
+		}
+	}
+	
+	public int removeChild(int groupPosition, Object child) {
+		int location = indexOfChild(groupPosition, child);
+		
+		if (location != -1) {
+			mListChild.get(groupPosition).remove(location);
+			mListCount.get(groupPosition).remove(location);
 			
 			if (mIsNotifyOnChange) {
 				notifyDataSetChanged();
 			}
 		}
+		
+		return location;
 	}
 	
 	@Override
@@ -211,8 +241,8 @@ public class CourseAdapter extends BaseExpandableListAdapter
 		return mListChild.get(groupPosition).size();
 	}
 	
-	public int indexOfChild(Object object) {
-		return mListChild.indexOf(object);
+	public int indexOfChild(int groupPosition, Object child) {
+		return mListChild.get(groupPosition).indexOf(child);
 	}
 	
 	@Override

@@ -97,12 +97,24 @@
 		Отмена
 	</string>
 	
+	<string name="dialog_button_delete">
+		Удалить
+	</string>
+	
 	<string name="dialog_button_video_controls">
 		‹‹ Видео ››
 	</string>
 	
 	<string name="dialog_button_close_controls">
 		‹‹ Закрыть ››
+	</string>
+	
+	<string name="dialog_delete_confirm">
+		Вы уверены?
+	</string>
+	
+	<string name="dialog_delete_hint">
+		Удаление&#8230;
 	</string>
 	
 	<!-- ERROR -->
@@ -112,6 +124,14 @@
 	
 	<string name="error_no_network">
 		« Нет сети »
+	</string>
+	
+	<string name="error_media_storage_not_available">
+		Неудачно, внешнее хранилище не доступно.
+	</string>
+	
+	<string name="error_media_storage_not_writable">
+		Неудачно, внешнее хранилище не доступно для записи.
 	</string>
 	
 </resources>

@@ -9,6 +9,9 @@
 package ru.strider.app;
 
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,9 +32,24 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 	
 	private volatile boolean mIsDestroy = false;
 	
-	private int mNegativeButtonId = View.NO_ID;
-	private int mNeutralButtonId = View.NO_ID;
-	private int mPositiveButtonId = View.NO_ID;
+	private OnCancelListener mOnCancelListener = null;
+	private OnDismissListener mOnDismissListener = null;
+	
+	private Button mNegativeButton = null;
+	private Button mNeutralButton = null;
+	private Button mPositiveButton = null;
+	
+	private CharSequence mNegativeText = null;
+	private CharSequence mNeutralText = null;
+	private CharSequence mPositiveText = null;
+	
+	private int mNegativeTextId = View.NO_ID;
+	private int mNeutralTextId = View.NO_ID;
+	private int mPositiveTextId = View.NO_ID;
+	
+	private OnClickListener mOnNegativeListener = null;
+	private OnClickListener mOnNeutralListener = null;
+	private OnClickListener mOnPositiveListener = null;
 	
 	public static BaseDialogFragment newInstance() {
 		BaseDialogFragment fragment = new BaseDialogFragment();
@@ -97,24 +115,42 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 		return mIsDestroy;
 	}
 	
-	private Button initControlButton(Button button, int which) {
+	private Button registerControlButton(Button button, int which) {
 		if (button.getId() == View.NO_ID) {
 			throw (new IllegalArgumentException("The Button must have a valid ID."));
 		}
 		
 		switch (which) {
 			case (DialogInterface.BUTTON_NEGATIVE): {
-				mNegativeButtonId = button.getId();
+				mNegativeButton = button;
+				
+				if (mNegativeText != null) {
+					mNegativeButton.setText(mNegativeText);
+				} else if (mNegativeTextId != View.NO_ID) {
+					mNegativeButton.setText(mNegativeTextId);
+				}
 				
 				break;
 			}
 			case (DialogInterface.BUTTON_NEUTRAL): {
-				mNeutralButtonId = button.getId();
+				mNeutralButton = button;
+				
+				if (mNeutralText != null) {
+					mNeutralButton.setText(mNeutralText);
+				} else if (mNeutralTextId != View.NO_ID) {
+					mNeutralButton.setText(mNeutralTextId);
+				}
 				
 				break;
 			}
 			case (DialogInterface.BUTTON_POSITIVE): {
-				mPositiveButtonId = button.getId();
+				mPositiveButton = button;
+				
+				if (mPositiveText != null) {
+					mPositiveButton.setText(mPositiveText);
+				} else if (mPositiveTextId != View.NO_ID) {
+					mPositiveButton.setText(mPositiveTextId);
+				}
 				
 				break;
 			}
@@ -128,53 +164,171 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 		return button;
 	}
 	
-	private int findButtonIdByView(View view) {
-		if (view.getId() != View.NO_ID) {
-			if (view.getId() == mNegativeButtonId) {
+	private Button registerControlButton(View parent, int buttonId, int which) {
+		return registerControlButton((Button) parent.findViewById(buttonId), which);
+	}
+	
+	private int findWhichByView(View view) {
+		int id = view.getId();
+		
+		if (id != View.NO_ID) {
+			if ((mNegativeButton != null) && (id == mNegativeButton.getId())) {
 				return DialogInterface.BUTTON_NEGATIVE;
 			}
 			
-			if (view.getId() == mNeutralButtonId) {
+			if ((mNeutralButton != null) && (id == mNeutralButton.getId())) {
 				return DialogInterface.BUTTON_NEUTRAL;
 			}
 			
-			if (view.getId() == mPositiveButtonId) {
+			if ((mPositiveButton != null) && (id == mPositiveButton.getId())) {
 				return DialogInterface.BUTTON_POSITIVE;
 			}
 		}
 		
-		return view.getId();
+		return id;
 	}
 	
 	@Override
 	public void onCancel(DialogInterface dialog) {
-		//
+		if (mOnCancelListener != null) {
+			mOnCancelListener.onCancel(this.getDialog());
+		}
 		
 		super.onCancel(dialog);
 	}
 	
 	@Override
 	public void onDismiss(DialogInterface dialog) {
-		//
+		if (mOnDismissListener != null) {
+			mOnDismissListener.onDismiss(this.getDialog());
+		}
 		
 		super.onDismiss(dialog);
 	}
 	
-	public Button setNegativeButton(Button button) {
-		return initControlButton(button, DialogInterface.BUTTON_NEGATIVE);
+	public BaseDialogFragment setOnCancelListener(OnCancelListener listener) {
+		mOnCancelListener = listener;
+		
+		return this;
 	}
 	
-	public Button setNeutralButton(Button button) {
-		return initControlButton(button, DialogInterface.BUTTON_NEUTRAL);
+	public BaseDialogFragment setOnDismissListener(OnDismissListener listener) {
+		mOnDismissListener = listener;
+		
+		return this;
 	}
 	
-	public Button setPositiveButton(Button button) {
-		return initControlButton(button, DialogInterface.BUTTON_POSITIVE);
+	//--------------------------------------------------------------------
+	// Negative Button
+	//--------------------------------------------------------------------
+	
+	public Button getNegativeButton() {
+		return mNegativeButton;
+	}
+	
+	protected Button registerNegativeButton(Button button) {
+		return registerControlButton(button, DialogInterface.BUTTON_NEGATIVE);
+	}
+	
+	protected Button registerNegativeButton(View parent, int buttonId) {
+		return registerControlButton(parent, buttonId, DialogInterface.BUTTON_NEGATIVE);
+	}
+	
+	public void setNegativeButton(CharSequence text, OnClickListener listener) {
+		if (mNegativeButton != null) {
+			mNegativeButton.setText(text);
+		} else {
+			mNegativeText = text;
+		}
+		
+		mOnNegativeListener = listener;
+	}
+	
+	public void setNegativeButton(int resId, OnClickListener listener) {
+		if (mNegativeButton != null) {
+			mNegativeButton.setText(resId);
+		} else {
+			mNegativeTextId = resId;
+		}
+		
+		mOnNegativeListener = listener;
+	}
+	
+	//--------------------------------------------------------------------
+	// Neutral Button
+	//--------------------------------------------------------------------
+	
+	public Button getNeutralButton() {
+		return mNeutralButton;
+	}
+	
+	protected Button registerNeutralButton(Button button) {
+		return registerControlButton(button, DialogInterface.BUTTON_NEUTRAL);
+	}
+	
+	protected Button registerNeutralButton(View parent, int buttonId) {
+		return registerControlButton(parent, buttonId, DialogInterface.BUTTON_NEUTRAL);
+	}
+	
+	public void setNeutralButton(CharSequence text, OnClickListener listener) {
+		if (mNeutralButton != null) {
+			mNeutralButton.setText(text);
+		} else {
+			mNeutralText = text;
+		}
+		
+		mOnNeutralListener = listener;
+	}
+	
+	public void setNeutralButton(int resId, OnClickListener listener) {
+		if (mNeutralButton != null) {
+			mNeutralButton.setText(resId);
+		} else {
+			mNeutralTextId = resId;
+		}
+		
+		mOnNeutralListener = listener;
+	}
+	
+	//--------------------------------------------------------------------
+	// Positive Button
+	//--------------------------------------------------------------------
+	
+	public Button getPositiveButton() {
+		return mPositiveButton;
+	}
+	
+	protected Button registerPositiveButton(Button button) {
+		return registerControlButton(button, DialogInterface.BUTTON_POSITIVE);
+	}
+	
+	protected Button registerPositiveButton(View parent, int buttonId) {
+		return registerControlButton(parent, buttonId, DialogInterface.BUTTON_POSITIVE);
+	}
+	
+	public void setPositiveButton(CharSequence text, OnClickListener listener) {
+		if (mPositiveButton != null) {
+			mPositiveButton.setText(text);
+		} else {
+			mPositiveText = text;
+		}
+		
+		mOnPositiveListener = listener;
+	}
+	
+	public void setPositiveButton(int resId, OnClickListener listener) {
+		if (mPositiveButton != null) {
+			mPositiveButton.setText(resId);
+		} else {
+			mPositiveTextId = resId;
+		}
+		
+		mOnPositiveListener = listener;
 	}
 	
 	@Override
 	public void onClick(View view) {
-		switch (findButtonIdByView(view)) {
+		switch (findWhichByView(view)) {
 			case (DialogInterface.BUTTON_NEGATIVE): {
 				onNegativeClick(view);
 				
@@ -197,14 +351,26 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 	}
 	
 	public void onNegativeClick(View view) {
+		if (mOnNegativeListener != null) {
+			mOnNegativeListener.onClick(this.getDialog(), DialogInterface.BUTTON_NEGATIVE);
+		}
+		
 		this.dismiss();
 	}
 	
 	public void onNeutralClick(View view) {
+		if (mOnNeutralListener != null) {
+			mOnNeutralListener.onClick(this.getDialog(), DialogInterface.BUTTON_NEUTRAL);
+		}
+		
 		this.dismiss();
 	}
 	
 	public void onPositiveClick(View view) {
+		if (mOnPositiveListener != null) {
+			mOnPositiveListener.onClick(this.getDialog(), DialogInterface.BUTTON_POSITIVE);
+		}
+		
 		this.dismiss();
 	}
 	

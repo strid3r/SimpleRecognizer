@@ -12,6 +12,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.strider.util.Text;
@@ -95,7 +96,13 @@ public class Course implements Comparable<Course>, Parcelable {
 		
 		mCreator = in.readString();
 		
+		mListItem = new ArrayList<Item>();
+		
 		in.readList(mListItem, Item.class.getClassLoader());
+		
+		if (mListItem.isEmpty()) {
+			mListItem = null;
+		}
 	}
 	
 	public long getId() {

@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -243,8 +242,8 @@ public class AdMob {
 			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 			mView = inflater.inflate(R.layout.alert_dialog_ad_free, null);
 			
-			this.setNegativeButton((Button) mView.findViewById(R.id.buttonAlertDialogBuyLicense));
-			this.setPositiveButton((Button) mView.findViewById(R.id.buttonAlertDialogExit));
+			this.registerNegativeButton(mView, R.id.buttonAlertDialogBuyLicense);
+			this.registerPositiveButton(mView, R.id.buttonAlertDialogExit);
 			
 			return (new AlertDialog.Builder(inflater.getContext()))
 					.setCustomTitle(mTitle)

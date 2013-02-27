@@ -47,16 +47,24 @@
 	</string>
 	
 	<!-- DIALOG -->
-	<string name="manage_item_dialog_title_title">
+	<string name="manage_item_dialog_title_hint">
 		Название
 	</string>
 	
-	<string name="manage_item_dialog_content_title">
+	<string name="manage_item_dialog_content_hint">
 		Содержимое
 	</string>
 	
-	<string name="manage_item_dialog_video_uri_title">
+	<string name="manage_item_dialog_video_uri_hint">
 		Видео URI
+	</string>
+	
+	<string name="manage_item_dialog_add_hint">
+		Добавление Объекта&#8230;
+	</string>
+	
+	<string name="manage_item_dialog_delete_hint">
+		Удаление Объекта&#8230;
 	</string>
 	
 </resources>

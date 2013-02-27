@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2013 strider
+	 
+	 Simple Recognizer
+	 Layout Alert Dialog Message XML
+	 By © strider 2013.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/linearLayoutAlertDialogMessage"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:orientation="vertical"
+			  android:padding="2.0dp">
+	
+	<!-- CONTENT -->
+	<ScrollView android:id="@+id/scrollViewAlertDialogMessageContent"
+				android:layout_width="match_parent"
+				android:layout_height="0.0dp"
+				android:layout_weight="1.0"
+				android:layout_margin="4.0dp"
+				android:scrollbarTrackVertical="@drawable/scrollbar_vertical_track"
+				android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+				android:scrollbarSize="8.0dp">
+		
+		<!-- MESSAGE -->
+		<LinearLayout android:id="@+id/linearLayoutAlertDialogMessageContent"
+					  android:layout_width="match_parent"
+					  android:layout_height="wrap_content"
+					  android:orientation="vertical">
+			
+			<!-- INFO -->
+			<ru.strider.widget.MainTextView android:id="@+id/textViewMessageInfo"
+											android:text="@null"
+											style="@style/Main.AlertDialog.TextView" />
+			
+			<!-- HINT -->
+			<ru.strider.widget.MainTextView android:id="@+id/textViewMessageHint"
+											android:text="@null"
+											android:gravity="center"
+											style="@style/Main.AlertDialog.TextView"
+											android:visibility="gone" />
+			
+		</LinearLayout>
+		
+	</ScrollView>
+	
+	<!-- CONTROLS -->
+	<LinearLayout android:id="@+id/linearLayoutAlertDialogMessageControls"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:layout_weight="0.0"
+				  android:orientation="horizontal"
+				  android:weightSum="1.0">
+		
+		<!-- NEGATIVE -->
+		<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogNegative"
+									  android:text="@string/dialog_button_cancel"
+									  android:layout_width="0.0dp"
+									  android:layout_weight="0.5"
+									  android:textSize="22sp"
+									  android:textColor="@color/main"
+									  style="@style/Main.Button.TextView.Info" />
+		
+		<!-- POSITIVE -->
+		<ru.strider.widget.MainButton android:id="@+id/buttonAlertDialogPositive"
+									  android:text="@string/dialog_button_ok"
+									  android:layout_width="0.0dp"
+									  android:layout_weight="0.5"
+									  android:textSize="22sp"
+									  android:textColor="@color/main"
+									  style="@style/Main.Button.TextView.Info" />
+		
+	</LinearLayout>
+	
+</LinearLayout>

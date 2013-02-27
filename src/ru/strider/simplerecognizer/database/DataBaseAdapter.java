@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.FileInputStream;
@@ -1079,7 +1078,7 @@ public class DataBaseAdapter {
 			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
 			mView = inflater.inflate(R.layout.alert_dialog_create_database_error, null);
 			
-			this.setNeutralButton((Button) mView.findViewById(R.id.buttonAlertDialogClose));
+			this.registerNeutralButton(mView, R.id.buttonAlertDialogClose);
 			
 			return (new AlertDialog.Builder(inflater.getContext()))
 					.setCustomTitle(mTitle)

@@ -40,12 +40,12 @@ public class PHash implements Comparable<PHash>, Parcelable {
 			
 		};
 	
-	private long mId = 0;
+	private long mId = 0L;
 	
 	private String mHexValue = null;
 	private String mComment = null;
 	
-	private long mItemId = 0;
+	private long mItemId = 0L;
 	
 	private int mHammingDistance = ImagePHash.HAMMING_DISTANCE_THRESHOLD;
 	

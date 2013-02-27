@@ -8,7 +8,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="ru.strider.simplerecognizer"
 		  android:versionCode="1"
-		  android:versionName="0.9.3"
+		  android:versionName="0.9.4"
 		  android:installLocation="auto">
 	
 	<uses-sdk android:minSdkVersion="5"

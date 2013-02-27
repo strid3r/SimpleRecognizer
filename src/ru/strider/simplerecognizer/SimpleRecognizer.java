@@ -9,7 +9,9 @@
 package ru.strider.simplerecognizer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -21,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Process;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,6 +39,7 @@ import cloud4apps.Utils;
 
 import com.actionbarsherlock.app.ActionBar;
 
+import ru.strider.app.BaseDialogFragment;
 import ru.strider.app.MediaReceiver;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.util.AdMob;
@@ -315,6 +319,173 @@ public class SimpleRecognizer extends Application {
 		}
 		
 		Process.killProcess(Process.myPid());
+	}
+	
+	/**
+	 * BaseDialogFragment MessageDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class MessageDialog extends BaseDialogFragment {
+		
+		//private static final String LOG_TAG = MessageDialog.class.getSimpleName();
+		
+		public static final String KEY = MessageDialog.class.getSimpleName();
+		
+		private static final String KEY_MESSAGE_TITLE = "messageTitle";
+		private static final String KEY_MESSAGE_INFO = "messageInfo";
+		private static final String KEY_MESSAGE_HINT = "messageHint";
+		
+		private String mMessageTitle = null;
+		private String mMessageInfo = null;
+		private String mMessageHint = null;
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		public static MessageDialog newInstance(String title, String info, String hint) {
+			MessageDialog fragment = new MessageDialog();
+			
+			Bundle args = new Bundle();
+			args.putString(KEY_MESSAGE_TITLE, title);
+			args.putString(KEY_MESSAGE_INFO, info);
+			args.putString(KEY_MESSAGE_HINT, hint);
+			
+			fragment.setArguments(args);
+			
+			return fragment;
+		}
+		
+		public String getMessageTitle() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.getString(KEY_MESSAGE_TITLE) : null);
+		}
+		
+		public String getMessageInfo() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.getString(KEY_MESSAGE_INFO) : null);
+		}
+		
+		public String getMessageHint() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.getString(KEY_MESSAGE_HINT) : null);
+		}
+		
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			
+			mMessageTitle = getMessageTitle();
+			mMessageInfo = getMessageInfo();
+			mMessageHint = getMessageHint();
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_message, null);
+			
+			this.registerNegativeButton(mView, R.id.buttonAlertDialogNegative);
+			this.registerPositiveButton(mView, R.id.buttonAlertDialogPositive);
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onActivityCreated(Bundle savedInstanceState) {
+			super.onActivityCreated(savedInstanceState);
+			
+			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
+			textViewTitle.setText(mMessageTitle);
+			textViewTitle.setSelected(true);
+			
+			TextView textViewInfo = (TextView) mView.findViewById(R.id.textViewMessageInfo);
+			textViewInfo.setText(mMessageInfo);
+			
+			if (!TextUtils.isEmpty(mMessageHint)) {
+				TextView textViewHint = (TextView) mView.findViewById(R.id.textViewMessageHint);
+				textViewHint.setVisibility(View.VISIBLE);
+				textViewHint.setText(mMessageHint);
+			}
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+		}
+		
+		@Override
+		public void onDestroy() {
+			mMessageTitle = null;
+			mMessageInfo = null;
+			mMessageHint = null;
+			
+			super.onDestroy();
+		}
+		
+	}
+	
+	/**
+	 * MessageDialog MessageNeutralDialog Class.
+	 * 
+	 * @author strider
+	 */
+	public static class MessageNeutralDialog extends MessageDialog {
+		
+		//private static final String LOG_TAG = MessageNeutralDialog.class.getSimpleName();
+		
+		public static final String KEY = MessageNeutralDialog.class.getSimpleName();
+		
+		private View mTitle = null;
+		private View mView = null;
+		
+		public static MessageNeutralDialog newInstance(String title, String info, String hint) {
+			MessageNeutralDialog fragment = new MessageNeutralDialog();
+			
+			Bundle args = new Bundle();
+			args.putString(MessageDialog.KEY_MESSAGE_TITLE, title);
+			args.putString(MessageDialog.KEY_MESSAGE_INFO, info);
+			args.putString(MessageDialog.KEY_MESSAGE_HINT, hint);
+			
+			fragment.setArguments(args);
+			
+			return fragment;
+		}
+		
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
+			
+			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
+			mView = inflater.inflate(R.layout.alert_dialog_message, null);
+			
+			this.registerNeutralButton(mView, R.id.buttonAlertDialogNeutral);
+			
+			return (new AlertDialog.Builder(inflater.getContext()))
+					.setCustomTitle(mTitle)
+					.setView(mView)
+					.create();
+		}
+		
+		@Override
+		public void onDestroyView() {
+			super.onDestroyView();
+			
+			mTitle = null;
+			mView = null;
+		}
+		
 	}
 	
 }

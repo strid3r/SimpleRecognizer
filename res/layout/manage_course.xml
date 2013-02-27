@@ -13,14 +13,14 @@
 			  android:orientation="vertical"
 			  android:padding="0.0dp">
 	
-	<!-- EXPANDABLE LIST -->
+	<!-- COURSE -->
 	<FrameLayout android:id="@+id/frameLayoutManageCourse"
 				 android:layout_width="match_parent"
 				 android:layout_height="0.0dp"
 				 android:layout_weight="1.0"
 				 android:padding="2dp">
 		
-		<!-- SELECT COURSE -->
+		<!-- EXPANDABLE LIST -->
 		<ExpandableListView android:id="@android:id/list"
 							android:layout_width="match_parent"
 							android:layout_height="match_parent"
