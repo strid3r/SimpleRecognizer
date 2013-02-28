@@ -10,7 +10,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := ImagePHash-version-0.9.4
+LOCAL_MODULE := ImagePHash-version-0.9.5
 LOCAL_MODULE_FILENAME := libImagePHash
 LOCAL_SRC_FILES := Main.cpp ImagePHash.cpp
 #LIST_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.cpp)

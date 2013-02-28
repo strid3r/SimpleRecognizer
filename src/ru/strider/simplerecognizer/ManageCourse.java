@@ -293,13 +293,14 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 						AddCourseDialog.newInstance(course)
 								.show(this.getSupportFragmentManager(), AddCourseDialog.KEY);
 					} else {
-						SimpleRecognizer.MessageNeutralDialog.newInstance(
+						SimpleRecognizer.MessageDialog.newInstance(
 								this.getString(R.string.dialog_title_forbidden),
 								this.getString(R.string.manage_course_dialog_not_creator_message),
-								null
+								null,
+								true
 							).show(
 									this.getSupportFragmentManager(),
-									SimpleRecognizer.MessageNeutralDialog.KEY
+									SimpleRecognizer.MessageDialog.KEY
 								);
 					}
 					
@@ -508,15 +509,13 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				iManageItem.putExtra(Course.KEY, course);
 				this.startActivity(iManageItem);
 			} else {
-				SimpleRecognizer.MessageNeutralDialog.newInstance(
+				SimpleRecognizer.MessageDialog.newInstance(
 						this.getString(R.string.dialog_title_forbidden),
 						this.getString(R.string.manage_course_dialog_not_creator_message),
-						null
-					).show(
-							this.getSupportFragmentManager(),
-							SimpleRecognizer.MessageNeutralDialog.KEY
-						);
-			}			
+						null,
+						true
+					).show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
+			}
 		} else {
 			this.finish();
 		}
@@ -1232,13 +1231,14 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				
 				sb.append(result);
 				
-				SimpleRecognizer.MessageNeutralDialog.newInstance(
+				SimpleRecognizer.MessageDialog.newInstance(
 						ManageCourse.this.getString(R.string.manage_course_context_menu_export),
 						sb.toString(),
-						null
+						null,
+						true
 					).show(
 							ManageCourse.this.getSupportFragmentManager(),
-							SimpleRecognizer.MessageNeutralDialog.KEY
+							SimpleRecognizer.MessageDialog.KEY
 						);
 			}
 			
@@ -1346,13 +1346,14 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 				
 				sb.append(result);
 				
-				SimpleRecognizer.MessageNeutralDialog.newInstance(
+				SimpleRecognizer.MessageDialog.newInstance(
 						ManageCourse.this.getString(R.string.manage_course_menu_import),
 						sb.toString(),
-						null
+						null,
+						true
 					).show(
 							ManageCourse.this.getSupportFragmentManager(),
-							SimpleRecognizer.MessageNeutralDialog.KEY
+							SimpleRecognizer.MessageDialog.KEY
 						);
 			}
 			

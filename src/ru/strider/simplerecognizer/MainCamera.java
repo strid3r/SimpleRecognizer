@@ -369,35 +369,49 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 			mCamera.setParameters(parameters);
 			
 			mPreview.setCamera(mCamera);
-		} else {//TODO: Fix
-			SimpleRecognizer.MessageDialog dialog = SimpleRecognizer.MessageDialog.newInstance(
+		} else {
+			SimpleRecognizer.MessageDialog dialog = (SimpleRecognizer.MessageDialog) this
+					.getSupportFragmentManager().findFragmentByTag(SimpleRecognizer.MessageDialog.KEY);
+			
+			if (dialog != null) {
+				dialog.dismiss();
+			}
+			
+			boolean isCameraMultiple = ((mCameraCount > 1) && (mCameraId != CAMERA_DEFAULT_ID));
+			
+			dialog = SimpleRecognizer.MessageDialog.newInstance(
 					this.getString(R.string.main_dialog_camera_error_title),
-					("Couldn't obtain Camera with ID: " + Integer.toString(mCameraId)),
-					null
+					"Couldn't obtain Camera instance.",
+					("( Camera ID" + Text.SEPARATOR + Integer.toString(mCameraId) + " )"),
+					(!isCameraMultiple)
 				);
 			dialog.setCancelable(false);
 			
-			dialog.setNegativeButton(R.string.dialog_button_try_next, (new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switchCamera();
-					}
-					
-				}));
-			
-			dialog.setPositiveButton(R.string.dialog_button_exit, (new DialogInterface.OnClickListener() {
+			DialogInterface.OnClickListener onClickExit = new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						SimpleRecognizer.exit(MainCamera.this);
 					}
 					
-				}));
+				};
+			
+			if (isCameraMultiple) {
+				dialog.setNegativeButton(R.string.dialog_button_try_next, (new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switchCamera();
+						}
+						
+					}));
+				
+				dialog.setPositiveButton(R.string.dialog_button_exit, onClickExit);
+			} else {
+				dialog.setNeutralButton(R.string.dialog_button_exit, onClickExit);
+			}
 			
 			dialog.show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
-			
-			dialog.getNegativeButton().setEnabled((mCameraCount > 1) && (mCameraId != CAMERA_DEFAULT_ID));
 		}
 	}
 	
@@ -425,11 +439,12 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 			
 			mPreview.switchCamera();
 		} else {
-			SimpleRecognizer.MessageNeutralDialog.newInstance(
+			SimpleRecognizer.MessageDialog.newInstance(
 					this.getString(R.string.main_dialog_camera_alert_title),
 					this.getString(R.string.main_dialog_camera_alert_message),
-					null
-				).show(this.getSupportFragmentManager(), SimpleRecognizer.MessageNeutralDialog.KEY);
+					null,
+					true
+				).show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
 		}
 	}
 	
@@ -450,7 +465,7 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		
 		dbAdapter.open();
 		
-		Course course = dbAdapter.getCourse(mConfigAdapter.getCourseId());
+		final Course course = dbAdapter.getCourse(mConfigAdapter.getCourseId());
 		
 		Item item = null;
 		
@@ -460,38 +475,40 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		
 		dbAdapter.close();
 		
-		SimpleRecognizer.MessageDialog dialog = null;
-		
-		if (course != null) {
-			if ((!mConfigAdapter.getIsCreator()) || (item != null)) {
-				(new AsyncGetImagePHash(data, course, item)).execute();
-			} else {
-				dialog = SimpleRecognizer.MessageDialog.newInstance(
-						this.getString(R.string.dialog_title_caution),
-						this.getString(R.string.main_dialog_no_item_message),
-						null
-					);
-			}
+		if ((course != null) && ((!mConfigAdapter.getIsCreator()) || (item != null))) {
+			(new AsyncGetImagePHash(data, course, item)).execute();
 		} else {
-			dialog = SimpleRecognizer.MessageDialog.newInstance(
+			final boolean isRequestItem = ((course != null)
+					&& SimpleRecognizer.checkCourseCreator(course.getCreator()));
+			
+			SimpleRecognizer.MessageDialog dialog = SimpleRecognizer.MessageDialog.newInstance(
 					this.getString(R.string.dialog_title_caution),
-					this.getString(R.string.main_dialog_no_course_message),
+					(isRequestItem
+							? this.getString(R.string.main_dialog_no_item_message)
+							: this.getString(R.string.main_dialog_no_course_message)
+						),
 					null
 				);
-		}
-		
-		if (dialog != null) {//TODO: Fix
+			
 			dialog.setNegativeButton(R.string.dialog_button_close, null);
 			
-			dialog.setPositiveButton(R.string.main_menu_course, (new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent iManageCourse = new Intent(MainCamera.this, ManageCourse.class);
-						MainCamera.this.startActivity(iManageCourse);
-					}
-					
-				}));
+			dialog.setPositiveButton(
+				(isRequestItem ? R.string.manage_item_name : R.string.manage_course_name_viewer),
+				(new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (isRequestItem) {
+								Intent iManageItem = new Intent(MainCamera.this, ManageItem.class);
+								iManageItem.putExtra(Course.KEY, course);
+								MainCamera.this.startActivity(iManageItem);
+							} else {
+								Intent iManageCourse = new Intent(MainCamera.this, ManageCourse.class);
+								MainCamera.this.startActivity(iManageCourse);
+							}
+						}
+						
+					}));
 			
 			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					
@@ -500,9 +517,7 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 						MainCamera.this.onLockView(false);
 					}
 					
-				});
-			
-			dialog.show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
+				}).show(this.getSupportFragmentManager(), SimpleRecognizer.MessageDialog.KEY);
 		}
 	}
 	
@@ -688,7 +703,7 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 			if ((mItem != null) && (!TextUtils.isEmpty(mItem.getVideoUri()))) {
 				Button buttonVideo = this.getPositiveButton();
 				buttonVideo.setTextColor(this.getResources().getColor(R.color.main));
-				buttonVideo.setClickable(true);
+				buttonVideo.setClickable(true);//FIXME: CHECK WHY IS CLICKABLE NEVERTHELESS
 			}
 			
 			// TODO: FIND A WAY FOR TRANSPARENCY
@@ -733,8 +748,10 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		
 		@Override
 		public void onNegativeClick(View view) {
-			Intent iVideoUri = new Intent(Intent.ACTION_VIEW, Uri.parse(mItem.getVideoUri()));
-			this.startActivity(iVideoUri);
+			if (!TextUtils.isEmpty(mItem.getVideoUri())) {
+				Intent iVideoUri = new Intent(Intent.ACTION_VIEW, Uri.parse(mItem.getVideoUri()));
+				this.startActivity(iVideoUri);
+			}
 			
 			super.onNegativeClick(view);
 		}
@@ -796,10 +813,11 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 									ManagePHash.AddPHashDialog.KEY
 								);
 					} else {
-						SimpleRecognizer.MessageNeutralDialog.newInstance(
+						SimpleRecognizer.MessageDialog.newInstance(
 								MainCamera.this.getString(R.string.dialog_title_forbidden),
 								MainCamera.this.getString(R.string.manage_course_dialog_not_creator_message),
-								null
+								null,
+								true
 							).setOnDismissListener(new DialogInterface.OnDismissListener() {
 									
 									@Override
@@ -809,7 +827,7 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 									
 								}).show(
 										MainCamera.this.getSupportFragmentManager(),
-										SimpleRecognizer.MessageNeutralDialog.KEY
+										SimpleRecognizer.MessageDialog.KEY
 									);
 					}
 				} else { // FIXME: [ DEBUG ] PREPARE FOR DEPLOYMENT

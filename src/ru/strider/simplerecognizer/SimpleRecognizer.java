@@ -335,22 +335,24 @@ public class SimpleRecognizer extends Application {
 		private static final String KEY_MESSAGE_TITLE = "messageTitle";
 		private static final String KEY_MESSAGE_INFO = "messageInfo";
 		private static final String KEY_MESSAGE_HINT = "messageHint";
-		
-		private String mMessageTitle = null;
-		private String mMessageInfo = null;
-		private String mMessageHint = null;
+		private static final String KEY_IS_NEUTRAL = "isNeutral";
 		
 		private View mTitle = null;
 		private View mView = null;
 		
 		public static MessageDialog newInstance(String title, String info, String hint) {
+			return newInstance(title, info, hint, false);
+		}
+		
+		public static MessageDialog newInstance(String title, String info, String hint,
+				boolean isNeutral) {
 			MessageDialog fragment = new MessageDialog();
 			
 			Bundle args = new Bundle();
 			args.putString(KEY_MESSAGE_TITLE, title);
 			args.putString(KEY_MESSAGE_INFO, info);
 			args.putString(KEY_MESSAGE_HINT, hint);
-			
+			args.putBoolean(KEY_IS_NEUTRAL, isNeutral);
 			fragment.setArguments(args);
 			
 			return fragment;
@@ -374,13 +376,10 @@ public class SimpleRecognizer extends Application {
 			return ((args != null) ? args.getString(KEY_MESSAGE_HINT) : null);
 		}
 		
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
+		public boolean getIsNeutral() {
+			Bundle args = this.getArguments();
 			
-			mMessageTitle = getMessageTitle();
-			mMessageInfo = getMessageInfo();
-			mMessageHint = getMessageHint();
+			return ((args != null) ? args.getBoolean(KEY_IS_NEUTRAL) : false);
 		}
 		
 		@Override
@@ -388,89 +387,30 @@ public class SimpleRecognizer extends Application {
 			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
 			
 			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-			mView = inflater.inflate(R.layout.alert_dialog_message, null);
+			mView = inflater.inflate((getIsNeutral()
+					? R.layout.alert_dialog_message_neutral
+					: R.layout.alert_dialog_message
+				), null);
 			
-			this.registerNegativeButton(mView, R.id.buttonAlertDialogNegative);
-			this.registerPositiveButton(mView, R.id.buttonAlertDialogPositive);
-			
-			return (new AlertDialog.Builder(inflater.getContext()))
-					.setCustomTitle(mTitle)
-					.setView(mView)
-					.create();
-		}
-		
-		@Override
-		public void onActivityCreated(Bundle savedInstanceState) {
-			super.onActivityCreated(savedInstanceState);
+			if (getIsNeutral()) {
+				this.registerNeutralButton(mView, R.id.buttonAlertDialogNeutral);
+			} else {
+				this.registerNegativeButton(mView, R.id.buttonAlertDialogNegative);
+				this.registerPositiveButton(mView, R.id.buttonAlertDialogPositive);
+			}
 			
 			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
-			textViewTitle.setText(mMessageTitle);
+			textViewTitle.setText(getMessageTitle());
 			textViewTitle.setSelected(true);
 			
 			TextView textViewInfo = (TextView) mView.findViewById(R.id.textViewMessageInfo);
-			textViewInfo.setText(mMessageInfo);
+			textViewInfo.setText(getMessageInfo());
 			
-			if (!TextUtils.isEmpty(mMessageHint)) {
+			if (!TextUtils.isEmpty(getMessageHint())) {
 				TextView textViewHint = (TextView) mView.findViewById(R.id.textViewMessageHint);
 				textViewHint.setVisibility(View.VISIBLE);
-				textViewHint.setText(mMessageHint);
+				textViewHint.setText(getMessageHint());
 			}
-		}
-		
-		@Override
-		public void onDestroyView() {
-			super.onDestroyView();
-			
-			mTitle = null;
-			mView = null;
-		}
-		
-		@Override
-		public void onDestroy() {
-			mMessageTitle = null;
-			mMessageInfo = null;
-			mMessageHint = null;
-			
-			super.onDestroy();
-		}
-		
-	}
-	
-	/**
-	 * MessageDialog MessageNeutralDialog Class.
-	 * 
-	 * @author strider
-	 */
-	public static class MessageNeutralDialog extends MessageDialog {
-		
-		//private static final String LOG_TAG = MessageNeutralDialog.class.getSimpleName();
-		
-		public static final String KEY = MessageNeutralDialog.class.getSimpleName();
-		
-		private View mTitle = null;
-		private View mView = null;
-		
-		public static MessageNeutralDialog newInstance(String title, String info, String hint) {
-			MessageNeutralDialog fragment = new MessageNeutralDialog();
-			
-			Bundle args = new Bundle();
-			args.putString(MessageDialog.KEY_MESSAGE_TITLE, title);
-			args.putString(MessageDialog.KEY_MESSAGE_INFO, info);
-			args.putString(MessageDialog.KEY_MESSAGE_HINT, hint);
-			
-			fragment.setArguments(args);
-			
-			return fragment;
-		}
-		
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
-			
-			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-			mView = inflater.inflate(R.layout.alert_dialog_message, null);
-			
-			this.registerNeutralButton(mView, R.id.buttonAlertDialogNeutral);
 			
 			return (new AlertDialog.Builder(inflater.getContext()))
 					.setCustomTitle(mTitle)

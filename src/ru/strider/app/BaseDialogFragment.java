@@ -222,7 +222,7 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 	// Negative Button
 	//--------------------------------------------------------------------
 	
-	public Button getNegativeButton() {
+	protected Button getNegativeButton() {
 		return mNegativeButton;
 	}
 	
@@ -258,7 +258,7 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 	// Neutral Button
 	//--------------------------------------------------------------------
 	
-	public Button getNeutralButton() {
+	protected Button getNeutralButton() {
 		return mNeutralButton;
 	}
 	
@@ -294,7 +294,7 @@ public class BaseDialogFragment extends SherlockDialogFragment implements View.O
 	// Positive Button
 	//--------------------------------------------------------------------
 	
-	public Button getPositiveButton() {
+	protected Button getPositiveButton() {
 		return mPositiveButton;
 	}
 	
