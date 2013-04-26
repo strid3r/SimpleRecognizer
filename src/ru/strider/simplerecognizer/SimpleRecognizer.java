@@ -25,6 +25,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -400,16 +401,16 @@ public class SimpleRecognizer extends Application {
 			}
 			
 			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
-			textViewTitle.setText(getMessageTitle());
+			textViewTitle.setText(Html.fromHtml(getMessageTitle()));
 			textViewTitle.setSelected(true);
 			
 			TextView textViewInfo = (TextView) mView.findViewById(R.id.textViewMessageInfo);
-			textViewInfo.setText(getMessageInfo());
+			textViewInfo.setText(Html.fromHtml(getMessageInfo()));
 			
 			if (!TextUtils.isEmpty(getMessageHint())) {
 				TextView textViewHint = (TextView) mView.findViewById(R.id.textViewMessageHint);
 				textViewHint.setVisibility(View.VISIBLE);
-				textViewHint.setText(getMessageHint());
+				textViewHint.setText(Html.fromHtml(getMessageHint()));
 			}
 			
 			return (new AlertDialog.Builder(inflater.getContext()))

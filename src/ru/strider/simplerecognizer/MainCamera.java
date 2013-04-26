@@ -9,28 +9,17 @@
 package ru.strider.simplerecognizer;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -42,7 +31,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import ru.strider.app.BaseDialogFragment;
 import ru.strider.app.BaseFragmentActivity;
 import ru.strider.simplerecognizer.database.DataBaseAdapter;
 import ru.strider.simplerecognizer.model.Course;
@@ -475,7 +463,8 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		
 		dbAdapter.close();
 		
-		if ((course != null) && ((!mConfigAdapter.getIsCreator()) || (item != null))) {
+		if ((course != null) && ((!mConfigAdapter.getIsCreator())
+				|| ((item != null) && (item.getCourseId() == course.getId())))) {
 			(new AsyncGetImagePHash(data, course, item)).execute();
 		} else {
 			final boolean isRequestItem = ((course != null)
@@ -493,22 +482,23 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 			dialog.setNegativeButton(R.string.dialog_button_close, null);
 			
 			dialog.setPositiveButton(
-				(isRequestItem ? R.string.manage_item_name : R.string.manage_course_name_viewer),
-				(new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if (isRequestItem) {
-								Intent iManageItem = new Intent(MainCamera.this, ManageItem.class);
-								iManageItem.putExtra(Course.KEY, course);
-								MainCamera.this.startActivity(iManageItem);
-							} else {
-								Intent iManageCourse = new Intent(MainCamera.this, ManageCourse.class);
-								MainCamera.this.startActivity(iManageCourse);
+					(isRequestItem ? R.string.manage_item_name : R.string.manage_course_name_viewer),
+					(new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								if (isRequestItem) {
+									Intent iManageItem = new Intent(MainCamera.this, ManageItem.class);
+									iManageItem.putExtra(Course.KEY, course);
+									MainCamera.this.startActivity(iManageItem);
+								} else {
+									Intent iManageCourse = new Intent(MainCamera.this, ManageCourse.class);
+									MainCamera.this.startActivity(iManageCourse);
+								}
 							}
-						}
-						
-					}));
+							
+						})
+				);
 			
 			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
 					
@@ -609,153 +599,6 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 		}
 		
 		return optimalFocusMode;
-	}
-	
-	/**
-	 * BaseDialogFragment ItemInfoDialog Class.
-	 * 
-	 * @author strider
-	 */
-	public static class ItemInfoDialog extends BaseDialogFragment {
-		
-		//private static final String LOG_TAG = ItemInfoDialog.class.getSimpleName();
-		
-		public static final String KEY = ItemInfoDialog.class.getSimpleName();
-		
-		private OnLockViewListener mLockViewListener = null;
-		
-		private Item mItem = null;
-		
-		private View mTitle = null;
-		private View mView = null;
-		
-		public static ItemInfoDialog newInstance(Item item) {
-			ItemInfoDialog fragment = new ItemInfoDialog();
-			
-			Bundle args = new Bundle();
-			args.putParcelable(Item.KEY, item);
-			
-			fragment.setArguments(args);
-			
-			return fragment;
-		}
-		
-		public Item getItem() {
-			Bundle args = this.getArguments();
-			
-			return ((args != null) ? args.<Item> getParcelable(Item.KEY) : null);
-		}
-		
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-			
-			try {
-				mLockViewListener = (OnLockViewListener) activity;
-			} catch (ClassCastException e) {
-				throw (new ClassCastException(
-						activity.toString() + " must implement OnLockViewListener."
-					));
-			}
-		}
-		
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			
-			mItem = getItem();
-		}
-		
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
-			
-			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-			mView = inflater.inflate(R.layout.alert_dialog_item_info, null);
-			
-			this.registerNegativeButton(mView, R.id.buttonAlertDialogVideo);
-			this.registerPositiveButton(mView, R.id.buttonAlertDialogClose);
-			
-			return (new AlertDialog.Builder(inflater.getContext()))
-					.setCustomTitle(mTitle)
-					.setView(mView)
-					.create();
-		}
-		
-		@Override
-		public void onActivityCreated(Bundle savedInstanceState) {
-			super.onActivityCreated(savedInstanceState);
-			
-			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
-			textViewTitle.setText((mItem != null) ? mItem.getTitle() : "Item not Found");
-			textViewTitle.setSelected(true);
-			
-			TextView textViewContent = (TextView) mView.findViewById(R.id.textViewItemContent);
-			textViewContent.setText(Html.fromHtml((!TextUtils.isEmpty(mItem.getContent()))
-					? mItem.getContent().replace(Text.LF, Text.BR)
-					: Text.NOT_AVAILABLE
-				));
-			
-			if (TextUtils.isEmpty(mItem.getContent())) {
-				textViewContent.setGravity(Gravity.CENTER);
-			}
-			
-			if ((mItem != null) && (!TextUtils.isEmpty(mItem.getVideoUri()))) {
-				Button buttonVideo = this.getPositiveButton();
-				buttonVideo.setTextColor(this.getResources().getColor(R.color.main));
-				buttonVideo.setClickable(true);//FIXME: CHECK WHY IS CLICKABLE NEVERTHELESS
-			}
-			
-			// TODO: FIND A WAY FOR TRANSPARENCY
-			//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);
-			//alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-		}
-		
-		@Override
-		public void onDestroyView() {
-			super.onDestroyView();
-			
-			mTitle = null;
-			mView = null;
-		}
-		
-		@Override
-		public void onDestroy() {
-			mItem = null;
-			
-			super.onDestroy();
-		}
-		
-		@Override
-		public void onDetach() {
-			mLockViewListener = null;
-			
-			super.onDetach();
-		}
-		
-		private void unlockView() {
-			if (mLockViewListener != null) {
-				mLockViewListener.onLockView(false);
-			}
-		}
-		
-		@Override
-		public void onDismiss(DialogInterface dialog) {
-			unlockView();
-			
-			super.onDismiss(dialog);
-		}
-		
-		@Override
-		public void onNegativeClick(View view) {
-			if (!TextUtils.isEmpty(mItem.getVideoUri())) {
-				Intent iVideoUri = new Intent(Intent.ACTION_VIEW, Uri.parse(mItem.getVideoUri()));
-				this.startActivity(iVideoUri);
-			}
-			
-			super.onNegativeClick(view);
-		}
-		
 	}
 	
 	/**
@@ -896,8 +739,19 @@ public class MainCamera extends BaseFragmentActivity implements OnLockViewListen
 						}
 					}
 					
-					ItemInfoDialog.newInstance(itemResult)
-							.show(MainCamera.this.getSupportFragmentManager(), ItemInfoDialog.KEY);
+					ManageItem.ShowItemDialog.newInstance(itemResult, true)
+							.setOnDismissListener(new DialogInterface.OnDismissListener() {
+									
+									@Override
+									public void onDismiss(DialogInterface dialog) {
+										MainCamera.this.onLockView(false);
+									}
+									
+								})
+							.show(
+									MainCamera.this.getSupportFragmentManager(),
+									ManageItem.ShowItemDialog.KEY
+								);
 				}
 			}
 		}

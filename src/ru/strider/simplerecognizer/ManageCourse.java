@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -1258,6 +1259,9 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 		
 		private long mInitTime = 0L;
 		
+		private boolean mIsWait = false;
+		private boolean mIsOldCourse = false;
+		
 		@Override
 		protected void onPreExecute() {
 			mInitTime = SystemClock.elapsedRealtime();
@@ -1311,13 +1315,86 @@ public class ManageCourse extends BaseFragmentActivity implements OnLockViewList
 						for (Course course : listCourse) {
 							Course oldCourse = dbAdapter.getCourse(course.getCategory(), course.getTitle());
 							
-							if ((oldCourse != null)	&& oldCourse.getCreator().equals(course.getCreator())
-									&& (oldCourse.getVersion() < course.getVersion())) {
-								// FIXME: ASK USER IF OVERWRITE
-								dbAdapter.deleteCourse(oldCourse.getId());
+							mIsOldCourse = ((oldCourse != null)	&& oldCourse.getCreator().equals(course.getCreator())
+									&& (oldCourse.getVersion() < course.getVersion()));
+							
+							if (mIsOldCourse) {
+								mIsWait = true;
+								
+								int color = SimpleRecognizer.getPackageContext().getResources().getColor(R.color.main);
+								
+								StringBuilder sbTitle = new StringBuilder();
+								
+								sbTitle.append("<font color=\"").append(color).append("\">");
+								sbTitle.append(oldCourse.getCategory());
+								sbTitle.append("</font>");
+								sbTitle.append(Text.SEPARATOR);
+								sbTitle.append("<font color=\"").append(color).append("\">");
+								sbTitle.append(oldCourse.getTitle());
+								sbTitle.append("</font>");
+								
+								StringBuilder sbHint = new StringBuilder();
+								
+								sbHint.append("[ ");
+								sbHint.append("<font color=\"").append(color).append("\">");
+								sbHint.append(oldCourse.getVersion());
+								sbHint.append("</font>");
+								sbHint.append(Text.SEPARATOR_BY);
+								sbHint.append("<font color=\"").append(color).append("\">");
+								sbHint.append(oldCourse.getCreator());
+								sbHint.append("</font>");
+								sbHint.append(" ]");
+								
+								SimpleRecognizer.MessageDialog dialog = SimpleRecognizer.MessageDialog.newInstance(
+										sbTitle.toString(),
+										SimpleRecognizer.getPackageContext().getString(R.string.dialog_delete_confirm),
+										sbHint.toString()
+									);
+								
+								dialog.setPositiveButton(
+										R.string.dialog_button_overwrite,
+										(new DialogInterface.OnClickListener() {
+												
+												@Override
+												public void onClick(DialogInterface dialog, int which) {
+													mIsOldCourse = false;
+												}
+												
+											})
+									);
+								
+								dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+										
+										@Override
+										public void onDismiss(DialogInterface dialog) {
+											mIsWait = false;
+											
+											AsyncCourseImport.this.notify();
+										}
+										
+									}).show(
+											ManageCourse.this.getSupportFragmentManager(),
+											SimpleRecognizer.MessageDialog.KEY
+										);
+								
+								synchronized (this) {
+									while (mIsWait) {
+										try {
+											this.wait();
+										} catch (InterruptedException e) {
+											//
+										}
+									}
+								}
+								
+								if (!mIsOldCourse) {
+									dbAdapter.deleteCourse(oldCourse.getId());
+								}
 							}
 							
-							dbAdapter.addCourse(course, true);
+							if (!mIsOldCourse) {
+								dbAdapter.addCourse(course, true);
+							}
 						}
 						
 						dbAdapter.close();

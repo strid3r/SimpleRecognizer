@@ -20,14 +20,24 @@
 					<folderInfo id="com.android.toolchain.gcc.1784934937.1031202008" name="/" resourcePath="">
 						<toolChain id="com.android.toolchain.gcc.869116886" name="com.android.toolchain.gcc" superClass="com.android.toolchain.gcc">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="com.android.targetPlatform.606526281" isAbstract="false" superClass="com.android.targetPlatform"/>
-							<builder id="com.android.builder.2070770099" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Android Builder" superClass="com.android.builder">
+							<builder enableCleanBuild="true" id="com.android.builder.2070770099" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Android Builder" superClass="com.android.builder">
 								<outputEntries>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="obj"/>
 									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="libs"/>
 								</outputEntries>
 							</builder>
 							<tool id="com.android.gcc.compiler.1257508511" name="Android GCC Compiler" superClass="com.android.gcc.compiler">
-								<option id="com.android.gcc.option.includePath.922361177" superClass="com.android.gcc.option.includePath"/>
+								<option id="com.android.gcc.option.includePath.922361177" superClass="com.android.gcc.option.includePath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\sources\cxx-stl\stlport\stlport&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\sources\cxx-stl\gabi++\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\sources\cxx-stl\gnu-libstdc++\4.6\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\platforms\android-14\arch-arm\usr\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\platforms\android-14\arch-mips\usr\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\platforms\android-14\arch-x86\usr\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\toolchains\arm-linux-androideabi-4.6\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.6\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Work\Android\android-ndk\toolchains\arm-linux-androideabi-4.6\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.6\include-fixed&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SimpleRecognizer/jni/ImagePHash}&quot;"/>
+								</option>
 								<inputType id="com.android.gcc.inputType.928678947" superClass="com.android.gcc.inputType"/>
 							</tool>
 						</toolChain>
@@ -46,14 +56,22 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.pathentry"/>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/SimpleRecognizer"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.1784934937.824136421;com.android.toolchain.gcc.1784934937.824136421.;com.android.gcc.compiler.331517088;com.android.gcc.inputType.241050395">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.1784934937;com.android.toolchain.gcc.1784934937.1031202008;com.android.gcc.compiler.1257508511;com.android.gcc.inputType.928678947">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
 		</scannerConfigBuildInfo>
-	</storageModule>
-	<storageModule moduleId="refreshScope"/>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-		<buildTargets/>
 	</storageModule>
 </cproject>

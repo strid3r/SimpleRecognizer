@@ -6,7 +6,7 @@
  * By © strider 2013.
  */
 
-#include "ImagePHash.h"
+#include "ImagePHash.hpp"
 
 //#include <android/log.h>
 

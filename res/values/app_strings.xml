@@ -104,6 +104,10 @@
 		Delete
 	</string>
 	
+	<string name="dialog_button_overwrite">
+		Overwrite
+	</string>
+	
 	<string name="dialog_button_video_controls">
 		‹‹ Video ››
 	</string>

@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -864,16 +866,23 @@ public class ManageItem extends BaseFragmentActivity implements OnLockViewListen
 		
 		public static final String KEY = ShowItemDialog.class.getSimpleName();
 		
+		private static final String KEY_IS_INFO = "isInfo";
+		
 		private Item mItem = null;
 		
 		private View mTitle = null;
 		private View mView = null;
 		
 		public static ShowItemDialog newInstance(Item item) {
+			return newInstance(item, false);
+		}
+		
+		public static ShowItemDialog newInstance(Item item, boolean isInfo) {
 			ShowItemDialog fragment = new ShowItemDialog();
 			
 			Bundle args = new Bundle();
 			args.putParcelable(Item.KEY, item);
+			args.putBoolean(KEY_IS_INFO, isInfo);
 			
 			fragment.setArguments(args);
 			
@@ -886,13 +895,19 @@ public class ManageItem extends BaseFragmentActivity implements OnLockViewListen
 			return ((args != null) ? args.<Item> getParcelable(Item.KEY) : null);
 		}
 		
+		public boolean getIsInfo() {
+			Bundle args = this.getArguments();
+			
+			return ((args != null) ? args.getBoolean(KEY_IS_INFO) : false);
+		}
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			
 			mItem = getItem();
 			
-			if (mItem == null) {
+			if ((!getIsInfo()) && (mItem == null)) {
 				throw (new IllegalArgumentException(
 						"The Fragment requires valid Item as an argument."
 					));
@@ -904,9 +919,17 @@ public class ManageItem extends BaseFragmentActivity implements OnLockViewListen
 			LayoutInflater inflater = LayoutInflater.from((Context) this.getSherlockActivity());
 			
 			mTitle = inflater.inflate(R.layout.alert_dialog_title, null);
-			mView = inflater.inflate(R.layout.alert_dialog_show_item, null);
+			mView = inflater.inflate((getIsInfo()
+					? R.layout.alert_dialog_show_item_info
+					: R.layout.alert_dialog_show_item
+				), null);
 			
-			this.registerNeutralButton(mView, R.id.buttonAlertDialogClose);
+			if (getIsInfo()) {
+				this.registerNegativeButton(mView, R.id.buttonAlertDialogVideo);
+				this.registerPositiveButton(mView, R.id.buttonAlertDialogClose);
+			} else {
+				this.registerNeutralButton(mView, R.id.buttonAlertDialogClose);
+			}
 			
 			return (new AlertDialog.Builder(inflater.getContext()))
 					.setCustomTitle(mTitle)
@@ -919,27 +942,40 @@ public class ManageItem extends BaseFragmentActivity implements OnLockViewListen
 			super.onActivityCreated(savedInstanceState);
 			
 			TextView textViewTitle = (TextView) mTitle.findViewById(R.id.textViewAlertDialogTitle);
-			textViewTitle.setText(mItem.getTitle());
+			textViewTitle.setText((mItem != null) ? mItem.getTitle() : "Item not Found");
 			textViewTitle.setSelected(true);
 			
 			TextView textViewContent = (TextView) mView.findViewById(R.id.textViewItemContent);
-			textViewContent.setText(Html.fromHtml((!TextUtils.isEmpty(mItem.getContent()))
-					? mItem.getContent().replace(Text.LF, Text.BR)
-					: Text.NOT_AVAILABLE
+			textViewContent.setText(Html.fromHtml(
+					((mItem != null) && (!TextUtils.isEmpty(mItem.getContent())))
+							? mItem.getContent().replace(Text.LF, Text.BR)
+							: Text.NOT_AVAILABLE
 				));
 			
-			if (TextUtils.isEmpty(mItem.getContent())) {
+			if ((mItem == null) || TextUtils.isEmpty(mItem.getContent())) {
 				textViewContent.setGravity(Gravity.CENTER);
 			}
 			
-			TextView textViewVideoUri = (TextView) mView.findViewById(R.id.textViewItemVideoUri);
-			textViewVideoUri.setText(Html.fromHtml((!TextUtils.isEmpty(mItem.getVideoUri()))
-					? mItem.getVideoUri()
-					: Text.NOT_AVAILABLE
-				));
-			
-			if (TextUtils.isEmpty(mItem.getVideoUri())) {
-				textViewVideoUri.setGravity(Gravity.CENTER);
+			if (getIsInfo()) {
+				if ((mItem != null) && (!TextUtils.isEmpty(mItem.getVideoUri()))) {
+					Button buttonVideo = this.getNegativeButton();
+					buttonVideo.setTextColor(this.getResources().getColor(R.color.main));
+					buttonVideo.setEnabled(true);
+				}
+				
+				// TODO: FIND A WAY FOR TRANSPARENCY // Is left from Alert solution
+				//alert.getWindow().setBackgroundDrawableResource(R.color.transparent);
+				//alert.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+			} else {
+				TextView textViewVideoUri = (TextView) mView.findViewById(R.id.textViewItemVideoUri);
+				textViewVideoUri.setText(Html.fromHtml((!TextUtils.isEmpty(mItem.getVideoUri()))
+						? mItem.getVideoUri()
+						: Text.NOT_AVAILABLE
+					));
+				
+				if (TextUtils.isEmpty(mItem.getVideoUri())) {
+					textViewVideoUri.setGravity(Gravity.CENTER);
+				}
 			}
 		}
 		
@@ -956,6 +992,16 @@ public class ManageItem extends BaseFragmentActivity implements OnLockViewListen
 			mItem = null;
 			
 			super.onDestroy();
+		}
+		
+		@Override
+		public void onNegativeClick(View view) {
+			if (getIsInfo() && (!TextUtils.isEmpty(mItem.getVideoUri()))) {
+				Intent iVideoUri = new Intent(Intent.ACTION_VIEW, Uri.parse(mItem.getVideoUri()));
+				this.startActivity(iVideoUri);
+			}
+			
+			super.onNegativeClick(view);
 		}
 		
 	}

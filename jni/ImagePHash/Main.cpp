@@ -8,7 +8,7 @@
 
 #include <jni.h>
 
-#include "ImagePHash.h"
+#include "ImagePHash.hpp"
 
 extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 	JNIEnv* env;

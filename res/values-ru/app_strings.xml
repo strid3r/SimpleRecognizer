@@ -101,6 +101,10 @@
 		Удалить
 	</string>
 	
+	<string name="dialog_button_overwrite">
+		Перезаписать
+	</string>
+	
 	<string name="dialog_button_video_controls">
 		‹‹ Видео ››
 	</string>
